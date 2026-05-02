@@ -28,6 +28,7 @@ Hephaestus/
 - Architecture notes: [docs/architecture.md](docs/architecture.md)
 - Development conventions: [docs/development.md](docs/development.md)
 - Repository structure notes: [docs/repository.md](docs/repository.md)
+- Analysis documents: [docs/analysis](docs/analysis)
 
 ## Helper Scripts
 
