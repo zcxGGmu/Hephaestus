@@ -31,7 +31,10 @@
             <a href="#architecture">Architecture</a>
             <a href="#flow">Flow</a>
             <a href="#capabilities">Capabilities</a>
+            <a href="#use-cases">Use Cases</a>
+            <a href="#compare">Compare</a>
             <a href="#start">Quick Start</a>
+            <a href="#faq">FAQ</a>
           </nav>
           <div class="nav-actions">
             <a class="button button-ghost" href="https://github.com/zcxGGmu/Hephaestus" target="_blank" rel="noreferrer">GitHub</a>
@@ -126,7 +129,7 @@
           </div>
         </section>
 
-        <section class="section">
+        <section class="section" data-reveal>
           <div class="container">
             <div class="section-intro">
               <div class="eyebrow">
@@ -166,7 +169,7 @@
           </div>
         </section>
 
-        <section id="architecture" class="section section-alt">
+        <section id="architecture" class="section section-alt" data-reveal>
           <div class="container">
             <div class="section-intro">
               <div class="eyebrow">
@@ -230,7 +233,7 @@
           </div>
         </section>
 
-        <section id="flow" class="section">
+        <section id="flow" class="section" data-reveal>
           <div class="container">
             <div class="section-intro">
               <div class="eyebrow">
@@ -280,7 +283,7 @@
           </div>
         </section>
 
-        <section id="capabilities" class="section section-alt">
+        <section id="capabilities" class="section section-alt" data-reveal>
           <div class="container split">
             <div class="section-intro compact">
               <div class="eyebrow">
@@ -340,6 +343,101 @@
           </div>
         </section>
 
+        <section id="use-cases" class="section" data-reveal>
+          <div class="container">
+            <div class="section-intro">
+              <div class="eyebrow">
+                <span>Use Cases</span>
+                <span class="dot"></span>
+                <span>从演示能力走向真实工作场景</span>
+              </div>
+              <h2>Designed for teams that want a system, not just a prompt box.</h2>
+              <p>
+                The product story becomes much clearer when we tie the platform to concrete usage patterns:
+                research threads, execution-heavy tasks, browser-backed inspection, and long-running internal workflows.
+              </p>
+            </div>
+
+            <div class="use-case-grid">
+              <article class="feature-card">
+                <h3>Research Operations</h3>
+                <span>研究型工作流</span>
+                <p>Capture a question, fan out into browsing and document inspection, and stream structured results back into a persistent thread.</p>
+              </article>
+              <article class="feature-card">
+                <h3>Product Copilot Surface</h3>
+                <span>产品内部副驾驶</span>
+                <p>Use projects, threads, and tool panels as a product interface for PM, ops, and engineering collaboration around the same task context.</p>
+              </article>
+              <article class="feature-card">
+                <h3>Sandboxed Execution</h3>
+                <span>受控执行环境</span>
+                <p>Route code, files, shell operations, and browser actions through a sandbox-oriented runtime instead of letting execution disappear into hidden services.</p>
+              </article>
+              <article class="feature-card">
+                <h3>Workflow Foundation</h3>
+                <span>工作流底座</span>
+                <p>Model agent runs as persistent state that can later grow into richer workflow systems, triggers, scheduled execution, and multi-step orchestration.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="compare" class="section section-alt" data-reveal>
+          <div class="container">
+            <div class="section-intro">
+              <div class="eyebrow">
+                <span>Product Positioning</span>
+                <span class="dot"></span>
+                <span>和普通聊天式产品的差异</span>
+              </div>
+              <h2>Hephaestus is closer to an execution platform than a chatbot shell.</h2>
+              <p>
+                The website should help visitors immediately understand what makes the system different:
+                it is not only about model response quality, but about product structure, execution flow, and tool visibility.
+              </p>
+            </div>
+
+            <div class="compare-grid">
+              <article class="compare-card compare-card-muted">
+                <div class="compare-label">Chat-first tools</div>
+                <h3>Prompt in, answer out.</h3>
+                <ul>
+                  <li>Conversation is the whole surface</li>
+                  <li>Execution is hidden or abstracted away</li>
+                  <li>Tool usage often collapses into plain text</li>
+                  <li>State is shallow or short-lived</li>
+                </ul>
+              </article>
+              <article class="compare-card compare-card-accent">
+                <div class="compare-label">Hephaestus</div>
+                <h3>Intent in, systemized execution out.</h3>
+                <ul>
+                  <li>Projects, threads, tools, runs, and state all have product surfaces</li>
+                  <li>Async execution is a first-class design constraint</li>
+                  <li>Tool output is rendered as structured UI, not only text</li>
+                  <li>Persistent backend state makes tasks resumable and inspectable</li>
+                </ul>
+              </article>
+            </div>
+
+            <div class="deployment-grid">
+              <article class="deployment-card">
+                <h3>Local-first</h3>
+                <p>For teams that want to run the stack under their own control and keep credentials, workflows, and execution surfaces closer to the edge.</p>
+              </article>
+              <article class="deployment-card">
+                <h3>Private deployment</h3>
+                <p>Suitable for internal environments where product teams need stronger ownership over data flow, runtime coordination, and system boundaries.</p>
+              </article>
+              <article class="deployment-card">
+                <h3>Public product surface</h3>
+                <p>The landing website can stay static and fast, while the product application evolves separately as a richer operational interface.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
         <section id="start" class="section">
           <div class="container">
             <div class="section-intro center">
@@ -394,6 +492,42 @@ npm run dev</code></pre>
             </div>
           </div>
         </section>
+
+        <section id="faq" class="section" data-reveal>
+          <div class="container faq-layout">
+            <div class="section-intro compact">
+              <div class="eyebrow">
+                <span>FAQ</span>
+                <span class="dot"></span>
+                <span>把最常见的问题提前讲清楚</span>
+              </div>
+              <h2>Questions a technical team will ask before adopting the platform.</h2>
+              <p>
+                A stronger product website should answer architecture and deployment questions directly,
+                especially when the system sits between product UX and agent infrastructure.
+              </p>
+            </div>
+
+            <div class="faq-list">
+              <details class="faq-item" open>
+                <summary>Why separate the product app from the website?</summary>
+                <p>The product app and the marketing site serve different goals. The app is an authenticated operational surface, while the website is a public narrative and entry point.</p>
+              </details>
+              <details class="faq-item">
+                <summary>Is Hephaestus only a chat interface?</summary>
+                <p>No. The system is structured around threads, tool execution, background workers, persistence, and sandbox-backed actions. Chat is only one interaction layer.</p>
+              </details>
+              <details class="faq-item">
+                <summary>Why emphasize Redis, workers, and persistence on the website?</summary>
+                <p>Because those layers determine whether the product can handle real tasks. The website should make those execution guarantees legible instead of hiding them behind generic AI messaging.</p>
+              </details>
+              <details class="faq-item">
+                <summary>Can this site be deployed independently of the product app?</summary>
+                <p>Yes. The `website/` directory is static and can be deployed to GitHub Pages or any static host, while the product application continues to live in `frontend/`.</p>
+              </details>
+            </div>
+          </div>
+        </section>
       </main>
 
       <footer class="footer">
@@ -432,5 +566,6 @@ npm run dev</code></pre>
         </div>
       </footer>
     </div>
+    <script src="./script.js"></script>
   </body>
 </html>
