@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Request, Body, File, UploadFile, Form, Query # type: ignore
+﻿from fastapi import APIRouter, HTTPException, Depends, Request, Body, File, UploadFile, Form, Query # type: ignore
 from fastapi.responses import StreamingResponse # type: ignore
 import asyncio
 import json
@@ -25,30 +25,30 @@ from run_agent_background import run_agent_background
 
 def determine_sandbox_type(files):
     """
-    根据上传的文件类型智能选择沙箱模板
+    鏍规嵁涓婁紶鐨勬枃浠剁被鍨嬫櫤鑳介€夋嫨娌欑妯℃澘
     
     Args:
-        files: 上传的文件列表
+        files: 涓婁紶鐨勬枃浠跺垪琛?
         
     Returns:
-        str: 沙箱类型 ('desktop', 'browser', 'code', 'base')
+        str: 娌欑绫诲瀷 ('desktop', 'browser', 'code', 'base')
     """
     if not files:
-        return 'desktop'  # 默认使用桌面模板
+        return 'desktop'  # 榛樿浣跨敤妗岄潰妯℃澘
     
-    # 分析文件类型
+    # 鍒嗘瀽鏂囦欢绫诲瀷
     file_extensions = []
     file_names = []
     
     for file_obj in files:
-        # UploadFile 对象直接使用 .filename 属性
+        # UploadFile 瀵硅薄鐩存帴浣跨敤 .filename 灞炴€?
         if hasattr(file_obj, 'filename') and file_obj.filename:
             filename = file_obj.filename.lower()
         elif hasattr(file_obj, 'get'):
-            # 如果是字典格式的文件信息
+            # 濡傛灉鏄瓧鍏告牸寮忕殑鏂囦欢淇℃伅
             filename = file_obj.get('filename', '').lower()
         else:
-            # 如果是字符串
+            # 濡傛灉鏄瓧绗︿覆
             filename = str(file_obj).lower()
             
         file_names.append(filename)
@@ -58,25 +58,25 @@ def determine_sandbox_type(files):
     
     logger.info(f"Analyzing file types: {file_extensions}")
     
-    # 如果有网页相关文件，使用浏览器模板
+    # 濡傛灉鏈夌綉椤电浉鍏虫枃浠讹紝浣跨敤娴忚鍣ㄦā鏉?
     web_extensions = {'html', 'htm', 'css', 'js', 'ts', 'jsx', 'tsx', 'vue', 'react'}
     if any(ext in web_extensions for ext in file_extensions):
         logger.info("Detected web files, selecting browser template")
         return 'browser'
     
-    # 如果只有代码文件且不需要图形界面，使用代码解释器
+    # 濡傛灉鍙湁浠ｇ爜鏂囦欢涓斾笉闇€瑕佸浘褰㈢晫闈紝浣跨敤浠ｇ爜瑙ｉ噴鍣?
     code_extensions = {'py', 'ipynb', 'r', 'sql', 'sh', 'bash', 'json', 'yaml', 'yml', 'txt', 'md'}
     if (any(ext in code_extensions for ext in file_extensions) and 
         not any(ext in {'png', 'jpg', 'jpeg', 'gif', 'svg', 'pdf', 'doc', 'docx'} for ext in file_extensions)):
-        # 如果有 Jupyter notebook，使用桌面环境以便查看图表
+        # 濡傛灉鏈?Jupyter notebook锛屼娇鐢ㄦ闈㈢幆澧冧互渚挎煡鐪嬪浘琛?
         if any(ext == 'ipynb' for ext in file_extensions):
             logger.info("Detected Jupyter notebook, selecting desktop template")
             return 'desktop'
         logger.info("Detected pure code files, selecting code interpreter template")
         return 'code'
     
-    # 默认使用桌面模板 - 提供最完整的功能
-    # 适用于：图像文件、混合文件类型、需要图形界面的场景
+    # 榛樿浣跨敤妗岄潰妯℃澘 - 鎻愪緵鏈€瀹屾暣鐨勫姛鑳?
+    # 閫傜敤浜庯細鍥惧儚鏂囦欢銆佹贩鍚堟枃浠剁被鍨嬨€侀渶瑕佸浘褰㈢晫闈㈢殑鍦烘櫙
     logger.info("Using default desktop template")
     return 'desktop'
 from utils.constants import MODEL_NAME_ALIASES
@@ -116,8 +116,8 @@ class MessageCreateRequest(BaseModel):
 class AgentCreateRequest(BaseModel):
     name: str
     description: Optional[str] = None
-    system_prompt: Optional[str] = None  # 确保系统提示词是可选的，允许默认使用 FuFanManus 的系统提示词
-    model: Optional[str] = None  # 确保模型是可选的
+    system_prompt: Optional[str] = None  # 纭繚绯荤粺鎻愮ず璇嶆槸鍙€夌殑锛屽厑璁搁粯璁や娇鐢?Hephaestus 鐨勭郴缁熸彁绀鸿瘝
+    model: Optional[str] = None  # 纭繚妯″瀷鏄彲閫夌殑
     configured_mcps: Optional[List[Dict[str, Any]]] = []
     custom_mcps: Optional[List[Dict[str, Any]]] = []
     agentpress_tools: Optional[Dict[str, Any]] = {}
@@ -341,11 +341,11 @@ async def stop_agent_run(agent_run_id: str, error_message: Optional[str] = None)
 
 async def get_agent_run_with_access_check(client, agent_run_id: str, user_id: str):
     """
-    1. 查询 agent_run 记录：根据 agent_run_id 从 agent_runs 表中查找对应的 agent 运行记录
-    2. 获取关联的 thread 信息：通过 thread_id 查询对应的线程记录
-    3. 权限验证：检查当前用户是否有权限访问这个 agent_run
+    1. 鏌ヨ agent_run 璁板綍锛氭牴鎹?agent_run_id 浠?agent_runs 琛ㄤ腑鏌ユ壘瀵瑰簲鐨?agent 杩愯璁板綍
+    2. 鑾峰彇鍏宠仈鐨?thread 淇℃伅锛氶€氳繃 thread_id 鏌ヨ瀵瑰簲鐨勭嚎绋嬭褰?
+    3. 鏉冮檺楠岃瘉锛氭鏌ュ綋鍓嶇敤鎴锋槸鍚︽湁鏉冮檺璁块棶杩欎釜 agent_run
     """
-    # 先查询 agent_run，使用新的 agent_run_id 字段
+    # 鍏堟煡璇?agent_run锛屼娇鐢ㄦ柊鐨?agent_run_id 瀛楁
     agent_run = await client.table('agent_runs').select('*').eq('agent_run_id', agent_run_id).execute()
     if not agent_run.data:
         raise HTTPException(status_code=404, detail="Agent run not found")
@@ -353,17 +353,17 @@ async def get_agent_run_with_access_check(client, agent_run_id: str, user_id: st
     agent_run_data = agent_run.data[0]
     thread_id = agent_run_data['thread_id']
     
-    # 再查询对应的 thread 来获取 account_id
+    # 鍐嶆煡璇㈠搴旂殑 thread 鏉ヨ幏鍙?account_id
     thread_result = await client.table('threads').select('account_id').eq('thread_id', thread_id).execute()
     if not thread_result.data:
         raise HTTPException(status_code=404, detail="Thread not found")
     
-    # 如果 agent_run 的 account_id 与 user_id 相同，则直接返回 agent_run_data
+    # 濡傛灉 agent_run 鐨?account_id 涓?user_id 鐩稿悓锛屽垯鐩存帴杩斿洖 agent_run_data
     account_id = thread_result.data[0]['account_id']
     if account_id == user_id:
         return agent_run_data
 
-    # 如果 agent_run 的 account_id 与 user_id 不同，则需要验证用户是否有权限访问这个 agent_run，此逻辑用于扩展更丰富的权限控制
+    # 濡傛灉 agent_run 鐨?account_id 涓?user_id 涓嶅悓锛屽垯闇€瑕侀獙璇佺敤鎴锋槸鍚︽湁鏉冮檺璁块棶杩欎釜 agent_run锛屾閫昏緫鐢ㄤ簬鎵╁睍鏇翠赴瀵岀殑鏉冮檺鎺у埗
     await verify_thread_access(client, thread_id, user_id)
     return agent_run_data
 
@@ -384,7 +384,7 @@ async def start_agent(
     if not instance_id:
         raise HTTPException(status_code=500, detail="Agent API not initialized with instance ID")
 
-    # 使用配置中的模型，如果请求中没有指定
+    # 浣跨敤閰嶇疆涓殑妯″瀷锛屽鏋滆姹備腑娌℃湁鎸囧畾
     model_name = body.model_name
     logger.info(f"Original model_name from request: {model_name}")
 
@@ -392,19 +392,19 @@ async def start_agent(
         model_name = config.MODEL_TO_USE
         logger.info(f"Using model from config: {model_name}")
 
-    # 获取模型别名
+    # 鑾峰彇妯″瀷鍒悕
     resolved_model = MODEL_NAME_ALIASES.get(model_name, model_name)
     logger.info(f"Resolved model name: {resolved_model}")
 
-    # 根据别名更新模型名称
+    # 鏍规嵁鍒悕鏇存柊妯″瀷鍚嶇О
     model_name = resolved_model
 
     logger.info(f"Starting new agent for thread: {thread_id} with config: model={model_name}, thinking={body.enable_thinking}, effort={body.reasoning_effort}, stream={body.stream}, context_manager={body.enable_context_manager} (Instance: {instance_id})")
     
-    # 获取数据库连接
+    # 鑾峰彇鏁版嵁搴撹繛鎺?
     client = await db.client
 
-    # 获取线程信息
+    # 鑾峰彇绾跨▼淇℃伅
     thread_result = await client.table('threads').select('project_id, account_id, metadata').eq('thread_id', thread_id).execute()
     logger.info(f"Thread result: {thread_result}")
     if not thread_result.data:
@@ -431,7 +431,7 @@ async def start_agent(
     # if is_agent_builder:
     #     logger.info(f"Thread {thread_id} is in agent builder mode, target_agent_id: {target_agent_id}")
     
-    # 加载agent配置，支持版本管理
+    # 鍔犺浇agent閰嶇疆锛屾敮鎸佺増鏈鐞?
     agent_config = None
     effective_agent_id = body.agent_id  # Optional agent ID from request
     
@@ -441,7 +441,7 @@ async def start_agent(
 
     if effective_agent_id:
         logger.info(f"[AGENT LOAD] Querying for agent: {effective_agent_id}")
-        # 查询agent实例
+        # 鏌ヨagent瀹炰緥
         agent_result = await client.table('agents').select('*').eq('agent_id', effective_agent_id).eq('user_id', user_id).execute()
         logger.info(f"[AGENT LOAD] Query result: found {len(agent_result.data) if agent_result.data else 0} agents")
         
@@ -451,7 +451,7 @@ async def start_agent(
         agent_data = agent_result.data[0]
         logger.info(f"[AGENT INITIATE] Agent data: {agent_data}")
         
-        # 使用版本管理系统获取当前版本
+        # 浣跨敤鐗堟湰绠＄悊绯荤粺鑾峰彇褰撳墠鐗堟湰
         version_data = None
         if agent_data.get('current_version_id'):
             try:
@@ -478,16 +478,16 @@ async def start_agent(
     else:
         logger.info(f"No agent_id provided, querying default agent")
         logger.info(f"No agent_id provided, querying default agent")
-        # 优先查找FuFanManus默认Agent，如果没有再查找普通默认Agent
-        # 这里查找的逻辑是可以把自定义的Agent设置成默认，如果有，则加载指定的默认Agent
-        fufanmanus_agent_result = await client.table('agents').select('*').eq('user_id', user_id).eq("metadata->>'is_fufanmanus_default'", 'true').execute()
+        # 浼樺厛鏌ユ壘Hephaestus榛樿Agent锛屽鏋滄病鏈夊啀鏌ユ壘鏅€氶粯璁gent
+        # 杩欓噷鏌ユ壘鐨勯€昏緫鏄彲浠ユ妸鑷畾涔夌殑Agent璁剧疆鎴愰粯璁わ紝濡傛灉鏈夛紝鍒欏姞杞芥寚瀹氱殑榛樿Agent
+        hephaestus_agent_result = await client.table('agents').select('*').eq('user_id', user_id).eq("metadata->>'is_hephaestus_default'", 'true').execute()
         
-        if fufanmanus_agent_result.data:
-            logger.info(f"Found FuFanManus default agent: {len(fufanmanus_agent_result.data)} agents")
-            default_agent_result = fufanmanus_agent_result
+        if hephaestus_agent_result.data:
+            logger.info(f"Found Hephaestus default agent: {len(hephaestus_agent_result.data)} agents")
+            default_agent_result = hephaestus_agent_result
         else:
-            # 回退到普通默认Agent查询
-            logger.info(f"No FuFanManus agent found, querying regular default agent")
+            # 鍥為€€鍒版櫘閫氶粯璁gent鏌ヨ
+            logger.info(f"No Hephaestus agent found, querying regular default agent")
             default_agent_result = await client.schema('public').table('agents').select('*').eq('user_id', user_id).eq('is_default', True).execute()
             logger.info(f"Default agent query result: found {len(default_agent_result.data) if default_agent_result.data else 0} default agents")
         
@@ -495,7 +495,7 @@ async def start_agent(
             agent_data = default_agent_result.data[0]
             logger.info(f"Found default agent: {agent_data.get('name', 'Unknown')} (ID: {agent_data.get('agent_id')})")
             
-            # 使用版本系统获取当前版本（做版本控制）
+            # 浣跨敤鐗堟湰绯荤粺鑾峰彇褰撳墠鐗堟湰锛堝仛鐗堟湰鎺у埗锛?
             version_data = None
             if agent_data.get('current_version_id'):
                 try:
@@ -522,32 +522,32 @@ async def start_agent(
         else:
             logger.warning(f"User {user_id} not found default agent")
             
-            # 自动创建FuFanManus默认Agent（兜底）
-            logger.info(f"Creating FuFanManus default agent for user {user_id}")
+            # 鑷姩鍒涘缓Hephaestus榛樿Agent锛堝厹搴曪級
+            logger.info(f"Creating Hephaestus default agent for user {user_id}")
             try:
-                from agent.fufanmanus.repository import FufanmanusAgentRepository
-                repository = FufanmanusAgentRepository()
-                agent_id = await repository.create_fufanmanus_agent(user_id)
+                from agent.hephaestus.repository import HephaestusAgentRepository
+                repository = HephaestusAgentRepository()
+                agent_id = await repository.create_hephaestus_agent(user_id)
                 
                 if agent_id:
-                    # 重新查询刚创建的默认Agent
+                    # 閲嶆柊鏌ヨ鍒氬垱寤虹殑榛樿Agent
                     default_agent_result = await client.schema('public').table('agents').select('*').eq('user_id', user_id).eq('is_default', True).execute()
                     if default_agent_result.data:
                         agent_data = default_agent_result.data[0]
-                        logger.info(f"Created FuFanManus default agent: {agent_data.get('name', 'Unknown')} (ID: {agent_data.get('agent_id')})")
+                        logger.info(f"Created Hephaestus default agent: {agent_data.get('name', 'Unknown')} (ID: {agent_data.get('agent_id')})")
                         
-                        # 使用版本系统获取当前版本（暂时跳过）
+                        # 浣跨敤鐗堟湰绯荤粺鑾峰彇褰撳墠鐗堟湰锛堟殏鏃惰烦杩囷級
                         version_data = None
                         agent_config = extract_agent_config(agent_data, version_data)
                         
-                        logger.info(f"Using created FuFanManus default agent: {agent_config['name']} ({agent_config['agent_id']})")
+                        logger.info(f"Using created Hephaestus default agent: {agent_config['name']} ({agent_config['agent_id']})")
                     else:
-                        logger.error(f"Failed to query created FuFanManus default agent")
+                        logger.error(f"Failed to query created Hephaestus default agent")
                 else:
-                    logger.error(f"FuFanManus repository returned no agent_id")
+                    logger.error(f"Hephaestus repository returned no agent_id")
             except Exception as e:
-                logger.error(f"Failed to create FuFanManus default agent: {e}")
-                # 可以考虑继续执行或抛出异常，根据业务需求决定
+                logger.error(f"Failed to create Hephaestus default agent: {e}")
+                # 鍙互鑰冭檻缁х画鎵ц鎴栨姏鍑哄紓甯革紝鏍规嵁涓氬姟闇€姹傚喅瀹?
 
     if agent_config:
         logger.info(f"Agent config keys: {list(agent_config.keys())}")
@@ -601,19 +601,19 @@ async def start_agent(
     logger.info(f"enable_context_manager: {body.enable_context_manager}")
     logger.info(f"request_id: {request_id}")
 
-    # 🔧 添加短暂延迟，确保前端刚发送的用户消息已经保存到数据库
-    # 这解决了时序竞争问题：前端调用 /threads/{thread_id}/messages 后立即调用 /agent/start
+    # 馃敡 娣诲姞鐭殏寤惰繜锛岀‘淇濆墠绔垰鍙戦€佺殑鐢ㄦ埛娑堟伅宸茬粡淇濆瓨鍒版暟鎹簱
+    # 杩欒В鍐充簡鏃跺簭绔炰簤闂锛氬墠绔皟鐢?/threads/{thread_id}/messages 鍚庣珛鍗宠皟鐢?/agent/start
     logger.info("Waiting briefly to ensure user message is saved to database...")
-    await asyncio.sleep(0.1)  # 100ms延迟，足够数据库操作完成
+    await asyncio.sleep(0.1)  # 100ms寤惰繜锛岃冻澶熸暟鎹簱鎿嶄綔瀹屾垚
     
-    # 🔍 验证最新消息存在（可选的额外保险）
+    # 馃攳 楠岃瘉鏈€鏂版秷鎭瓨鍦紙鍙€夌殑棰濆淇濋櫓锛?
     try:
         events_result = await client.schema('public').table('events').select('id, timestamp').eq('session_id', thread_id).eq('author', 'user').order('timestamp', desc=True).limit(1).execute()
         if events_result.data:
             latest_message_time = events_result.data[0]['timestamp']
-            logger.info(f"✅ Latest user message found: {latest_message_time}")
+            logger.info(f"鉁?Latest user message found: {latest_message_time}")
         else:
-            logger.warning("⚠️ No user messages found in events table")
+            logger.warning("鈿狅笍 No user messages found in events table")
     except Exception as check_error:
         logger.warning(f"Could not verify latest message: {check_error}")
 
@@ -648,9 +648,9 @@ async def stop_agent(agent_run_id: str, user_id: str = Depends(get_current_user_
 @router.get("/thread/{thread_id}/agent-runs")
 async def get_agent_runs(thread_id: str, user_id: str = Depends(get_current_user_id_from_jwt)):
     """Get all agent runs for a thread."""
-    print(f"🔍 ===== 查询线程Agent运行记录 =====")
-    print(f"  📋 thread_id: {thread_id}")
-    print(f"  👤 user_id: {user_id}")
+    print(f"馃攳 ===== 鏌ヨ绾跨▼Agent杩愯璁板綍 =====")
+    print(f"  馃搵 thread_id: {thread_id}")
+    print(f"  馃懁 user_id: {user_id}")
     
     structlog.contextvars.bind_contextvars(
         thread_id=thread_id,
@@ -659,24 +659,24 @@ async def get_agent_runs(thread_id: str, user_id: str = Depends(get_current_user
     client = await db.client
     await verify_thread_access(client, thread_id, user_id)
     
-    print(f"  🔍 查询数据库中的agent_runs记录...")
+    print(f"  馃攳 鏌ヨ鏁版嵁搴撲腑鐨刟gent_runs璁板綍...")
     agent_runs = await client.table('agent_runs').select('id, agent_run_id, thread_id, status, started_at, completed_at, error, created_at, updated_at').eq("thread_id", thread_id).order('created_at', desc=True).execute()
     
-    print(f"  📊 查询结果: 找到 {len(agent_runs.data)} 条记录")
+    print(f"  馃搳 鏌ヨ缁撴灉: 鎵惧埌 {len(agent_runs.data)} 鏉¤褰?)
     for i, run in enumerate(agent_runs.data):
-        print(f"    {i+1}. ID: {run.get('id')}, agent_run_id: {run.get('agent_run_id')}, 状态: {run.get('status')}, 开始时间: {run.get('started_at')}, 完成时间: {run.get('completed_at')}")
+        print(f"    {i+1}. ID: {run.get('id')}, agent_run_id: {run.get('agent_run_id')}, 鐘舵€? {run.get('status')}, 寮€濮嬫椂闂? {run.get('started_at')}, 瀹屾垚鏃堕棿: {run.get('completed_at')}")
     
-    # 处理返回数据，确保使用正确的ID字段
+    # 澶勭悊杩斿洖鏁版嵁锛岀‘淇濅娇鐢ㄦ纭殑ID瀛楁
     processed_runs = []
     for run in agent_runs.data:
         processed_run = dict(run)
-        # 优先使用agent_run_id，如果没有则使用id
+        # 浼樺厛浣跨敤agent_run_id锛屽鏋滄病鏈夊垯浣跨敤id
         if processed_run.get('agent_run_id'):
             processed_run['id'] = processed_run['agent_run_id']
         processed_runs.append(processed_run)
     
     logger.debug(f"Found {len(agent_runs.data)} agent runs for thread: {thread_id}")
-    print(f"🎉 ===== 查询完成 =====")
+    print(f"馃帀 ===== 鏌ヨ瀹屾垚 =====")
     return {"agent_runs": processed_runs}
 
 @router.get("/agent-run/{agent_run_id}")
@@ -815,7 +815,7 @@ async def get_thread_agent(thread_id: str, user_id: str = Depends(get_current_us
         return {
             "agent": AgentResponse(
                 agent_id=agent_data['agent_id'],
-                account_id=user_id,  # 使用 user_id 作为 account_id
+                account_id=user_id,  # 浣跨敤 user_id 浣滀负 account_id
                 name=agent_data['name'],
                 description=agent_data.get('description'),
                 system_prompt=system_prompt,
@@ -852,36 +852,36 @@ async def stream_agent_run(
     request: Request = None
 ):
     """Stream the responses of an agent run using Redis Lists and Pub/Sub."""
-    print(f"🚀 ===== 流式输出接口开始 =====")
-    print(f"  📋 agent_run_id: {agent_run_id}")
-    print(f"  🔑 token: {token[:10] if token else 'None'}...")
-    print(f"  🌐 request: {request}")
+    print(f"馃殌 ===== 娴佸紡杈撳嚭鎺ュ彛寮€濮?=====")
+    print(f"  馃搵 agent_run_id: {agent_run_id}")
+    print(f"  馃攽 token: {token[:10] if token else 'None'}...")
+    print(f"  馃寪 request: {request}")
     
     print(f"Starting stream for agent run: {agent_run_id}")
     client = await db.client
 
-    print(f"  🔐 开始用户身份验证...")
-    user_id = await get_user_id_from_stream_auth(request, token) # 瞬时验证
-    print(f"  ✅ 用户身份验证完成: {user_id}")
+    print(f"  馃攼 寮€濮嬬敤鎴疯韩浠介獙璇?..")
+    user_id = await get_user_id_from_stream_auth(request, token) # 鐬椂楠岃瘉
+    print(f"  鉁?鐢ㄦ埛韬唤楠岃瘉瀹屾垚: {user_id}")
     
-    print(f"  🔍 开始检查agent_run访问权限...")
+    print(f"  馃攳 寮€濮嬫鏌gent_run璁块棶鏉冮檺...")
     agent_run_data = await get_agent_run_with_access_check(client, agent_run_id, user_id) # 1 db query
-    print(f"  ✅ agent_run数据获取完成: {agent_run_data}")
+    print(f"  鉁?agent_run鏁版嵁鑾峰彇瀹屾垚: {agent_run_data}")
 
-    # 结构化日志上下文，将 agent_run_id 和 user_id 绑定到当前请求的上下文中，后续的所有日志记录都会自动包含这些信息
+    # 缁撴瀯鍖栨棩蹇椾笂涓嬫枃锛屽皢 agent_run_id 鍜?user_id 缁戝畾鍒板綋鍓嶈姹傜殑涓婁笅鏂囦腑锛屽悗缁殑鎵€鏈夋棩蹇楄褰曢兘浼氳嚜鍔ㄥ寘鍚繖浜涗俊鎭?
     structlog.contextvars.bind_contextvars(
         agent_run_id=agent_run_id,
         user_id=user_id,
     )
 
-    # 定义Redis中的键名，用于流式输出的数据存储和通信
-    response_list_key = f"agent_run:{agent_run_id}:responses"  # Redis List 键名，存储 agent_run 的所有响应数据
-    response_channel = f"agent_run:{agent_run_id}:new_response" # Redis Pub/Sub 频道名，用于通知新响应到达
-    control_channel = f"agent_run:{agent_run_id}:control" # edis Pub/Sub 频道名，用于控制信号，比如发送停止、暂停、错误、管理流式输出的生命周期
+    # 瀹氫箟Redis涓殑閿悕锛岀敤浜庢祦寮忚緭鍑虹殑鏁版嵁瀛樺偍鍜岄€氫俊
+    response_list_key = f"agent_run:{agent_run_id}:responses"  # Redis List 閿悕锛屽瓨鍌?agent_run 鐨勬墍鏈夊搷搴旀暟鎹?
+    response_channel = f"agent_run:{agent_run_id}:new_response" # Redis Pub/Sub 棰戦亾鍚嶏紝鐢ㄤ簬閫氱煡鏂板搷搴斿埌杈?
+    control_channel = f"agent_run:{agent_run_id}:control" # edis Pub/Sub 棰戦亾鍚嶏紝鐢ㄤ簬鎺у埗淇″彿锛屾瘮濡傚彂閫佸仠姝€佹殏鍋溿€侀敊璇€佺鐞嗘祦寮忚緭鍑虹殑鐢熷懡鍛ㄦ湡
     
 
     async def stream_generator(agent_run_data):
-        print(f"   ===== 流式生成器开始 =====")
+        print(f"   ===== 娴佸紡鐢熸垚鍣ㄥ紑濮?=====")
         print(f"Streaming responses for {agent_run_id} using Redis list {response_list_key} and channel {response_channel}")
         last_processed_index = -1
         pubsub_response = None
@@ -891,108 +891,108 @@ async def stream_agent_run(
         initial_yield_complete = False
 
         try:
-            # 1. 捕获 Redis List 中的初始响应，并发送给前端
-            # 目的：前端重连时，能获取到之前错过的响应
-            print(f"  📥 步骤1: 获取Redis中的初始响应...")
+            # 1. 鎹曡幏 Redis List 涓殑鍒濆鍝嶅簲锛屽苟鍙戦€佺粰鍓嶇
+            # 鐩殑锛氬墠绔噸杩炴椂锛岃兘鑾峰彇鍒颁箣鍓嶉敊杩囩殑鍝嶅簲
+            print(f"  馃摜 姝ラ1: 鑾峰彇Redis涓殑鍒濆鍝嶅簲...")
             initial_responses_json = await redis.lrange(response_list_key, 0, -1)
-            print(f"  📊 Redis中初始响应数量: {len(initial_responses_json) if initial_responses_json else 0}")
+            print(f"  馃搳 Redis涓垵濮嬪搷搴旀暟閲? {len(initial_responses_json) if initial_responses_json else 0}")
             
             initial_responses = []
             if initial_responses_json:
                 initial_responses = [json.loads(r) for r in initial_responses_json]
-                print(f"  📤 发送 {len(initial_responses)} 个初始响应给前端")
+                print(f"  馃摛 鍙戦€?{len(initial_responses)} 涓垵濮嬪搷搴旂粰鍓嶇")
                 for i, response in enumerate(initial_responses):
                     response_str = f"data: {json.dumps(response)}\n\n"
-                    print(f"    [{i+1}] 发送响应: {response}")
+                    print(f"    [{i+1}] 鍙戦€佸搷搴? {response}")
                     yield response_str
                 last_processed_index = len(initial_responses) - 1
-                print(f"  ✅ 初始响应发送完成，最后处理索引: {last_processed_index}")
+                print(f"  鉁?鍒濆鍝嶅簲鍙戦€佸畬鎴愶紝鏈€鍚庡鐞嗙储寮? {last_processed_index}")
             else:
-                print(f"  ℹ️ Redis中没有初始响应")
+                print(f"  鈩癸笍 Redis涓病鏈夊垵濮嬪搷搴?)
             
             initial_yield_complete = True
 
-            # 2. 状态检查
-            # 目的：避免对已完成的agent_run进行不必要的监听
-            print(f"  🔍 步骤2: 检查agent_run状态...")
+            # 2. 鐘舵€佹鏌?
+            # 鐩殑锛氶伩鍏嶅宸插畬鎴愮殑agent_run杩涜涓嶅繀瑕佺殑鐩戝惉
+            print(f"  馃攳 姝ラ2: 妫€鏌gent_run鐘舵€?..")
             current_status = agent_run_data.get('status') if agent_run_data else None
-            print(f"  📊 当前状态: {current_status}")
+            print(f"  馃搳 褰撳墠鐘舵€? {current_status}")
 
-            # 如果agent_run状态不是running，则直接返回完成状态
+            # 濡傛灉agent_run鐘舵€佷笉鏄痳unning锛屽垯鐩存帴杩斿洖瀹屾垚鐘舵€?
             if current_status != 'running':
-                print(f"  ⚠️ Agent run {agent_run_id} 不在运行状态 (status: {current_status})，结束流式输出")
+                print(f"  鈿狅笍 Agent run {agent_run_id} 涓嶅湪杩愯鐘舵€?(status: {current_status})锛岀粨鏉熸祦寮忚緭鍑?)
                 logger.info(f"Agent run {agent_run_id} is not running (status: {current_status}). Ending stream.")
                 completion_message = {'type': 'status', 'status': 'completed'}
-                print(f"  📤 发送完成状态: {completion_message}")
+                print(f"  馃摛 鍙戦€佸畬鎴愮姸鎬? {completion_message}")
                 yield f"data: {json.dumps(completion_message)}\n\n"
                 return
           
-            print(f"  ✅ Agent run正在运行，继续流式输出")
+            print(f"  鉁?Agent run姝ｅ湪杩愯锛岀户缁祦寮忚緭鍑?)
             structlog.contextvars.bind_contextvars(
                 thread_id=agent_run_data.get('thread_id'),
             )
 
-            # 3. 设置 Pub/Sub 监听器，用于接收新响应和控制信号
-            # 目的：建立实时监听，监听 Redis 中的新响应和控制信号，并将其传递给流式生成器
-            print(f"  📡 步骤3: 设置Pub/Sub监听器...")
+            # 3. 璁剧疆 Pub/Sub 鐩戝惉鍣紝鐢ㄤ簬鎺ユ敹鏂板搷搴斿拰鎺у埗淇″彿
+            # 鐩殑锛氬缓绔嬪疄鏃剁洃鍚紝鐩戝惉 Redis 涓殑鏂板搷搴斿拰鎺у埗淇″彿锛屽苟灏嗗叾浼犻€掔粰娴佸紡鐢熸垚鍣?
+            print(f"  馃摗 姝ラ3: 璁剧疆Pub/Sub鐩戝惉鍣?..")
             pubsub_response_task = asyncio.create_task(redis.create_pubsub())
             pubsub_control_task = asyncio.create_task(redis.create_pubsub())
             
             pubsub_response, pubsub_control = await asyncio.gather(pubsub_response_task, pubsub_control_task)
-            print(f"  ✅ Pub/Sub客户端创建完成")
+            print(f"  鉁?Pub/Sub瀹㈡埛绔垱寤哄畬鎴?)
             
             # Subscribe to channels concurrently
             response_subscribe_task = asyncio.create_task(pubsub_response.subscribe(response_channel))
             control_subscribe_task = asyncio.create_task(pubsub_control.subscribe(control_channel))
             
             await asyncio.gather(response_subscribe_task, control_subscribe_task)
-            print(f"  ✅ 订阅频道完成: {response_channel}, {control_channel}")
+            print(f"  鉁?璁㈤槄棰戦亾瀹屾垚: {response_channel}, {control_channel}")
             
             logger.debug(f"Subscribed to response channel: {response_channel}")
             logger.debug(f"Subscribed to control channel: {control_channel}")
 
             # Queue to communicate between listeners and the main generator loop
             message_queue = asyncio.Queue()
-            print(f"  📨 消息队列创建完成")
+            print(f"  馃摠 娑堟伅闃熷垪鍒涘缓瀹屾垚")
 
-            # 消息处理循环
+            # 娑堟伅澶勭悊寰幆
             async def listen_messages():
-                print(f"  👂 ===== 消息监听器开始 =====")
+                print(f"  馃憘 ===== 娑堟伅鐩戝惉鍣ㄥ紑濮?=====")
                 response_reader = pubsub_response.listen()
                 control_reader = pubsub_control.listen()
                 tasks = [asyncio.create_task(response_reader.__anext__()), asyncio.create_task(control_reader.__anext__())]
-                print(f"  📡 监听器任务创建完成")
+                print(f"  馃摗 鐩戝惉鍣ㄤ换鍔″垱寤哄畬鎴?)
 
                 while not terminate_stream:
-                    print(f"  🔄 等待消息...")
+                    print(f"  馃攧 绛夊緟娑堟伅...")
                     done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
                     for task in done:
                         try:
                             message = task.result()
-                            print(f"  📨 收到消息: {message}")
+                            print(f"  馃摠 鏀跺埌娑堟伅: {message}")
                             if message and isinstance(message, dict) and message.get("type") == "message":
                                 channel = message.get("channel")
                                 data = message.get("data")
                                 if isinstance(data, bytes): data = data.decode('utf-8')
-                                print(f"  📡 频道: {channel}, 数据: {data}")
+                                print(f"  馃摗 棰戦亾: {channel}, 鏁版嵁: {data}")
 
                                 if channel == response_channel and data == "new":
-                                    print(f"  🔔 收到新响应通知")
+                                    print(f"  馃敂 鏀跺埌鏂板搷搴旈€氱煡")
                                     await message_queue.put({"type": "new_response"})
                                 elif channel == control_channel and data in ["STOP", "END_STREAM", "ERROR"]:
-                                    print(f"  🛑 收到控制信号: {data}")
+                                    print(f"  馃洃 鏀跺埌鎺у埗淇″彿: {data}")
                                     logger.info(f"Received control signal '{data}' for {agent_run_id}")
                                     await message_queue.put({"type": "control", "data": data})
                                     return # Stop listening on control signal
 
                         except StopAsyncIteration:
-                            print(f"  ⚠️ 监听器 {task} 停止")
+                            print(f"  鈿狅笍 鐩戝惉鍣?{task} 鍋滄")
                             logger.warning(f"Listener {task} stopped.")
                             # Decide how to handle listener stopping, maybe terminate?
                             await message_queue.put({"type": "error", "data": "Listener stopped unexpectedly"})
                             return
                         except Exception as e:
-                            print(f"  ❌ 监听器错误: {e}")
+                            print(f"  鉂?鐩戝惉鍣ㄩ敊璇? {e}")
                             logger.error(f"Error in listener for {agent_run_id}: {e}")
                             await message_queue.put({"type": "error", "data": "Listener failed"})
                             return
@@ -1006,126 +1006,126 @@ async def stream_agent_run(
                                      tasks.append(asyncio.create_task(control_reader.__anext__()))
 
                 # Cancel pending listener tasks on exit
-                print(f"  🛑 取消待处理的监听器任务")
+                print(f"  馃洃 鍙栨秷寰呭鐞嗙殑鐩戝惉鍣ㄤ换鍔?)
                 for p_task in pending: p_task.cancel()
                 for task in tasks: task.cancel()
 
 
             listener_task = asyncio.create_task(listen_messages())
-            print(f"  ✅ 监听器任务启动完成")
+            print(f"  鉁?鐩戝惉鍣ㄤ换鍔″惎鍔ㄥ畬鎴?)
 
             # 4. Main loop to process messages from the queue
-            print(f"  🔄 ===== 主循环开始 =====")
+            print(f"  馃攧 ===== 涓诲惊鐜紑濮?=====")
             while not terminate_stream:
                 try:
-                    print(f"  📨 等待队列消息...")
+                    print(f"  馃摠 绛夊緟闃熷垪娑堟伅...")
                     queue_item = await message_queue.get()
-                    print(f"  📥 收到队列消息: {queue_item}")
+                    print(f"  馃摜 鏀跺埌闃熷垪娑堟伅: {queue_item}")
                     if queue_item["type"] == "new_response":
-                        print(f"  📤 处理新响应...")
-                        # 获取新响应并发送给前端
+                        print(f"  馃摛 澶勭悊鏂板搷搴?..")
+                        # 鑾峰彇鏂板搷搴斿苟鍙戦€佺粰鍓嶇
                         new_start_index = last_processed_index + 1
-                        print(f"  📍 从索引 {new_start_index} 开始获取新响应")
+                        print(f"  馃搷 浠庣储寮?{new_start_index} 寮€濮嬭幏鍙栨柊鍝嶅簲")
                         new_responses_json = await redis.lrange(response_list_key, new_start_index, -1)
-                        print(f"  📊 获取到 {len(new_responses_json) if new_responses_json else 0} 个新响应")
+                        print(f"  馃搳 鑾峰彇鍒?{len(new_responses_json) if new_responses_json else 0} 涓柊鍝嶅簲")
 
                         if new_responses_json:
                             new_responses = [json.loads(r) for r in new_responses_json]
                             num_new = len(new_responses)
-                            print(f"  📤 发送 {num_new} 个新响应给前端")
+                            print(f"  馃摛 鍙戦€?{num_new} 涓柊鍝嶅簲缁欏墠绔?)
                             # logger.debug(f"Received {num_new} new responses for {agent_run_id} (index {new_start_index} onwards)")
                             for i, response in enumerate(new_responses):
                                 response_str = f"data: {json.dumps(response)}\n\n"
-                                print(f"    [{i+1}] 发送响应: {response}")
+                                print(f"    [{i+1}] 鍙戦€佸搷搴? {response}")
                                 yield response_str
                                 # Check if this response signals completion
                                 if response.get('type') == 'status' and response.get('status') in ['completed', 'failed', 'stopped']:
-                                    print(f"  🎯 检测到运行完成状态: {response.get('status')}")
+                                    print(f"  馃幆 妫€娴嬪埌杩愯瀹屾垚鐘舵€? {response.get('status')}")
                                     logger.info(f"Detected run completion via status message in stream: {response.get('status')}")
                                     terminate_stream = True
                                     break # Stop processing further new responses
                             last_processed_index += num_new
-                            print(f"  ✅ 新响应处理完成，最后处理索引: {last_processed_index}")
+                            print(f"  鉁?鏂板搷搴斿鐞嗗畬鎴愶紝鏈€鍚庡鐞嗙储寮? {last_processed_index}")
                         else:
-                            print(f"  ℹ️ 没有新响应")
+                            print(f"  鈩癸笍 娌℃湁鏂板搷搴?)
                         if terminate_stream: 
-                            print(f"  🛑 流式输出终止")
+                            print(f"  馃洃 娴佸紡杈撳嚭缁堟")
                             break
 
                     elif queue_item["type"] == "control":
                         control_signal = queue_item["data"]
-                        print(f"  🛑 收到控制信号: {control_signal}")
+                        print(f"  馃洃 鏀跺埌鎺у埗淇″彿: {control_signal}")
                         terminate_stream = True # Stop the stream on any control signal
                         control_message = {'type': 'status', 'status': control_signal}
-                        print(f"  📤 发送控制状态: {control_message}")
+                        print(f"  馃摛 鍙戦€佹帶鍒剁姸鎬? {control_message}")
                         yield f"data: {json.dumps(control_message)}\n\n"
                         break
 
                     elif queue_item["type"] == "error":
-                        print(f"  ❌ 监听器错误: {queue_item['data']}")
+                        print(f"  鉂?鐩戝惉鍣ㄩ敊璇? {queue_item['data']}")
                         logger.error(f"Listener error for {agent_run_id}: {queue_item['data']}")
                         terminate_stream = True
                         error_message = {'type': 'status', 'status': 'error'}
-                        print(f"  📤 发送错误状态: {error_message}")
+                        print(f"  馃摛 鍙戦€侀敊璇姸鎬? {error_message}")
                         yield f"data: {json.dumps(error_message)}\n\n"
                         break
 
                 except asyncio.CancelledError:
-                     print(f"  🛑 流式生成器主循环被取消")
+                     print(f"  馃洃 娴佸紡鐢熸垚鍣ㄤ富寰幆琚彇娑?)
                      logger.info(f"Stream generator main loop cancelled for {agent_run_id}")
                      terminate_stream = True
                      break
                 except Exception as loop_err:
-                    print(f"  ❌ 流式生成器主循环错误: {loop_err}")
+                    print(f"  鉂?娴佸紡鐢熸垚鍣ㄤ富寰幆閿欒: {loop_err}")
                     logger.error(f"Error in stream generator main loop for {agent_run_id}: {loop_err}", exc_info=True)
                     terminate_stream = True
                     error_message = {'type': 'status', 'status': 'error', 'message': f'Stream failed: {loop_err}'}
-                    print(f"  📤 发送错误状态: {error_message}")
+                    print(f"  馃摛 鍙戦€侀敊璇姸鎬? {error_message}")
                     yield f"data: {json.dumps(error_message)}\n\n"
                     break
 
         except Exception as e:
-            print(f"  ❌ 设置流式输出时发生错误: {e}")
+            print(f"  鉂?璁剧疆娴佸紡杈撳嚭鏃跺彂鐢熼敊璇? {e}")
             logger.error(f"Error setting up stream for agent run {agent_run_id}: {e}", exc_info=True)
             # Only yield error if initial yield didn't happen
             if not initial_yield_complete:
                  error_message = {'type': 'status', 'status': 'error', 'message': f'Failed to start stream: {e}'}
-                 print(f"  📤 发送启动错误状态: {error_message}")
+                 print(f"  馃摛 鍙戦€佸惎鍔ㄩ敊璇姸鎬? {error_message}")
                  yield f"data: {json.dumps(error_message)}\n\n"
         finally:
-            print(f"  🧹 ===== 清理资源 =====")
+            print(f"  馃Ч ===== 娓呯悊璧勬簮 =====")
             terminate_stream = True
-            # Graceful shutdown order: unsubscribe → close → cancel
+            # Graceful shutdown order: unsubscribe 鈫?close 鈫?cancel
             if pubsub_response: 
-                print(f"  📡 取消订阅响应频道")
+                print(f"  馃摗 鍙栨秷璁㈤槄鍝嶅簲棰戦亾")
                 await pubsub_response.unsubscribe(response_channel)
             if pubsub_control: 
-                print(f"  📡 取消订阅控制频道")
+                print(f"  馃摗 鍙栨秷璁㈤槄鎺у埗棰戦亾")
                 await pubsub_control.unsubscribe(control_channel)
             if pubsub_response: 
-                print(f"  📡 关闭响应Pub/Sub连接")
+                print(f"  馃摗 鍏抽棴鍝嶅簲Pub/Sub杩炴帴")
                 await pubsub_response.close()
             if pubsub_control: 
-                print(f"  📡 关闭控制Pub/Sub连接")
+                print(f"  馃摗 鍏抽棴鎺у埗Pub/Sub杩炴帴")
                 await pubsub_control.close()
 
             if listener_task:
-                print(f"  🛑 取消监听器任务")
+                print(f"  馃洃 鍙栨秷鐩戝惉鍣ㄤ换鍔?)
                 listener_task.cancel()
                 try:
                     await listener_task  # Reap inner tasks & swallow their errors
                 except asyncio.CancelledError:
-                    print(f"  ✅ 监听器任务已取消")
+                    print(f"  鉁?鐩戝惉鍣ㄤ换鍔″凡鍙栨秷")
                     pass
                 except Exception as e:
-                    print(f"  ⚠️ 监听器任务结束时有错误: {e}")
+                    print(f"  鈿狅笍 鐩戝惉鍣ㄤ换鍔＄粨鏉熸椂鏈夐敊璇? {e}")
                     logger.debug(f"listener_task ended with: {e}")
             # Wait briefly for tasks to cancel
             await asyncio.sleep(0.1)
-            print(f"  ✅ 流式输出清理完成")
+            print(f"  鉁?娴佸紡杈撳嚭娓呯悊瀹屾垚")
             logger.debug(f"Streaming cleanup complete for agent run: {agent_run_id}")
 
-    print(f"  开始创建StreamingResponse...")
+    print(f"  寮€濮嬪垱寤篠treamingResponse...")
     return StreamingResponse(stream_generator(agent_run_data), media_type="text/event-stream", headers={
         "Cache-Control": "no-cache, no-transform", "Connection": "keep-alive",
         "X-Accel-Buffering": "no", "Content-Type": "text/event-stream",
@@ -1153,27 +1153,27 @@ async def initiate_agent_with_files(
     user_id: str = Depends(get_current_user_id_from_jwt)
 ):
     """
-    启动一个新的Agent会话,支持可选的文件附件
+    鍚姩涓€涓柊鐨凙gent浼氳瘽,鏀寔鍙€夌殑鏂囦欢闄勪欢
     
-    参数说明:
-    - prompt: 用户输入的提示词
-    - model_name: 使用的模型名称(如果为None则使用配置中的默认模型)
-    - enable_thinking: 是否启用思考模式
-    - reasoning_effort: 推理程度(low/medium/high)
-    - stream: 是否启用流式响应
-    - enable_context_manager: 是否启用上下文管理器
-    - agent_id: 指定的Agent ID(可选)
-    - files: 上传的文件列表
-    - is_agent_builder: 是否为Agent构建器模式
-    - target_agent_id: 目标Agent ID(在构建器模式下使用)
-    - user_id: 当前用户ID(从JWT中获取)
+    鍙傛暟璇存槑:
+    - prompt: 鐢ㄦ埛杈撳叆鐨勬彁绀鸿瘝
+    - model_name: 浣跨敤鐨勬ā鍨嬪悕绉?濡傛灉涓篘one鍒欎娇鐢ㄩ厤缃腑鐨勯粯璁ゆā鍨?
+    - enable_thinking: 鏄惁鍚敤鎬濊€冩ā寮?
+    - reasoning_effort: 鎺ㄧ悊绋嬪害(low/medium/high)
+    - stream: 鏄惁鍚敤娴佸紡鍝嶅簲
+    - enable_context_manager: 鏄惁鍚敤涓婁笅鏂囩鐞嗗櫒
+    - agent_id: 鎸囧畾鐨凙gent ID(鍙€?
+    - files: 涓婁紶鐨勬枃浠跺垪琛?
+    - is_agent_builder: 鏄惁涓篈gent鏋勫缓鍣ㄦā寮?
+    - target_agent_id: 鐩爣Agent ID(鍦ㄦ瀯寤哄櫒妯″紡涓嬩娇鐢?
+    - user_id: 褰撳墠鐢ㄦ埛ID(浠嶫WT涓幏鍙?
     """
 
-    # 提取前端传递的参数
+    # 鎻愬彇鍓嶇浼犻€掔殑鍙傛暟
     logger.info(f"Starting new agent session with prompt: {prompt}")
     logger.info(f"Starting new agent session with model name: {model_name}")
 
-    # 打印文件详细信息
+    # 鎵撳嵃鏂囦欢璇︾粏淇℃伅
     for i, file in enumerate(files):
         logger.info(f"Upload Files {i+1}: {file.filename} (size: {file.size if hasattr(file, 'size') else 'unknown'} bytes, type: {file.content_type})")
     
@@ -1186,29 +1186,29 @@ async def initiate_agent_with_files(
 
     logger.info(f"Processing model name: {model_name}")
 
-    # 2. 格式化需要使用的模型名称
-    # 如果前端没有传递模型名称，则使用配置中的默认模型
+    # 2. 鏍煎紡鍖栭渶瑕佷娇鐢ㄧ殑妯″瀷鍚嶇О
+    # 濡傛灉鍓嶇娌℃湁浼犻€掓ā鍨嬪悕绉帮紝鍒欎娇鐢ㄩ厤缃腑鐨勯粯璁ゆā鍨?
     if model_name is None:
         model_name = config.MODEL_TO_USE
         logger.info(f"No model name provided, using default model: {model_name}")
 
-    # 处理模型名称，使其适配 LiteLLM 的模型定义规范， 如 deepseek-r1 → deepseek/deepseek-r1  claude-4-sonnet → anthropic/claude-4-sonnet gpt-5 → openai/gpt-5
+    # 澶勭悊妯″瀷鍚嶇О锛屼娇鍏堕€傞厤 LiteLLM 鐨勬ā鍨嬪畾涔夎鑼冿紝 濡?deepseek-r1 鈫?deepseek/deepseek-r1  claude-4-sonnet 鈫?anthropic/claude-4-sonnet gpt-5 鈫?openai/gpt-5
     resolved_model = MODEL_NAME_ALIASES.get(model_name, model_name)
-    # 更新model_name为解析后的版本
+    # 鏇存柊model_name涓鸿В鏋愬悗鐨勭増鏈?
     model_name = resolved_model
 
-    # 初始化数据库连接
+    # 鍒濆鍖栨暟鎹簱杩炴帴
     client = await db.client
     logger.info(f"Database connection successful, account_id: {user_id}")
     
-    # 4: TODO：加载Agent配置（支持版本管理，注：此版本还未实现）
+    # 4: TODO锛氬姞杞紸gent閰嶇疆锛堟敮鎸佺増鏈鐞嗭紝娉細姝ょ増鏈繕鏈疄鐜帮級
     agent_config = None
     logger.info(f"Requested agent_id: {agent_id}")
 
     if agent_id:
-        # 加载自主创建 Agent 及配置管理（可以通过 agent_id 来加载自主创建的配置）
+        # 鍔犺浇鑷富鍒涘缓 Agent 鍙婇厤缃鐞嗭紙鍙互閫氳繃 agent_id 鏉ュ姞杞借嚜涓诲垱寤虹殑閰嶇疆锛?
         logger.info(f"[AGENT INITIATE] Querying for specific agent: {agent_id}")
-        # 获取 Agent 实例对象
+        # 鑾峰彇 Agent 瀹炰緥瀵硅薄
         agent_result = await client.table('agents').select('*').eq('agent_id', agent_id).eq('user_id', user_id).execute()
         logger.info(f"[AGENT INITIATE] Query result: found {len(agent_result.data) if agent_result.data else 0} agents")
         
@@ -1218,7 +1218,7 @@ async def initiate_agent_with_files(
         agent_data = agent_result.data[0]
         logger.info(f"[AGENT INITIATE] Agent data: {agent_data}")
         
-        # 使用版本管理系统获取当前版本
+        # 浣跨敤鐗堟湰绠＄悊绯荤粺鑾峰彇褰撳墠鐗堟湰
         version_data = None
         if agent_data.get('current_version_id'):
             try:
@@ -1244,16 +1244,16 @@ async def initiate_agent_with_files(
             logger.info(f"Using custom agent: {agent_config['name']} ({agent_id}) - no version data")
     else:
         logger.info(f"No agent_id provided, querying default agent")
-        # 优先查找FuFanManus默认Agent，如果没有再查找普通默认Agent
-        # 这里查找的逻辑是可以把自定义的Agent设置成默认，如果有，则加载指定的默认Agent
-        fufanmanus_agent_result = await client.table('agents').select('*').eq('user_id', user_id).eq("metadata->>'is_fufanmanus_default'", 'true').execute()
+        # 浼樺厛鏌ユ壘Hephaestus榛樿Agent锛屽鏋滄病鏈夊啀鏌ユ壘鏅€氶粯璁gent
+        # 杩欓噷鏌ユ壘鐨勯€昏緫鏄彲浠ユ妸鑷畾涔夌殑Agent璁剧疆鎴愰粯璁わ紝濡傛灉鏈夛紝鍒欏姞杞芥寚瀹氱殑榛樿Agent
+        hephaestus_agent_result = await client.table('agents').select('*').eq('user_id', user_id).eq("metadata->>'is_hephaestus_default'", 'true').execute()
         
-        if fufanmanus_agent_result.data:
-            logger.info(f"Found FuFanManus default agent: {len(fufanmanus_agent_result.data)} agents")
-            default_agent_result = fufanmanus_agent_result
+        if hephaestus_agent_result.data:
+            logger.info(f"Found Hephaestus default agent: {len(hephaestus_agent_result.data)} agents")
+            default_agent_result = hephaestus_agent_result
         else:
-            # 回退到普通默认Agent查询
-            logger.info(f"No FuFanManus agent found, querying regular default agent")
+            # 鍥為€€鍒版櫘閫氶粯璁gent鏌ヨ
+            logger.info(f"No Hephaestus agent found, querying regular default agent")
             default_agent_result = await client.schema('public').table('agents').select('*').eq('user_id', user_id).eq('is_default', True).execute()
             logger.info(f"Default agent query result: found {len(default_agent_result.data) if default_agent_result.data else 0} default agents")
         
@@ -1261,7 +1261,7 @@ async def initiate_agent_with_files(
             agent_data = default_agent_result.data[0]
             logger.info(f"Found default agent: {agent_data.get('name', 'Unknown')} (ID: {agent_data.get('agent_id')})")
             
-            # 使用版本系统获取当前版本（做版本控制）
+            # 浣跨敤鐗堟湰绯荤粺鑾峰彇褰撳墠鐗堟湰锛堝仛鐗堟湰鎺у埗锛?
             version_data = None
             if agent_data.get('current_version_id'):
                 try:
@@ -1288,58 +1288,58 @@ async def initiate_agent_with_files(
         else:
             logger.warning(f"User {user_id} not found default agent")
             
-            # 自动创建FuFanManus默认Agent（兜底）
-            logger.info(f"Creating FuFanManus default agent for user {user_id}")
+            # 鑷姩鍒涘缓Hephaestus榛樿Agent锛堝厹搴曪級
+            logger.info(f"Creating Hephaestus default agent for user {user_id}")
             try:
-                from agent.fufanmanus.repository import FufanmanusAgentRepository
-                repository = FufanmanusAgentRepository()
-                agent_id = await repository.create_fufanmanus_agent(user_id)
+                from agent.hephaestus.repository import HephaestusAgentRepository
+                repository = HephaestusAgentRepository()
+                agent_id = await repository.create_hephaestus_agent(user_id)
                 
                 if agent_id:
-                    # 重新查询刚创建的默认Agent
+                    # 閲嶆柊鏌ヨ鍒氬垱寤虹殑榛樿Agent
                     default_agent_result = await client.schema('public').table('agents').select('*').eq('user_id', user_id).eq('is_default', True).execute()
                     if default_agent_result.data:
                         agent_data = default_agent_result.data[0]
-                        logger.info(f"Created FuFanManus default agent: {agent_data.get('name', 'Unknown')} (ID: {agent_data.get('agent_id')})")
+                        logger.info(f"Created Hephaestus default agent: {agent_data.get('name', 'Unknown')} (ID: {agent_data.get('agent_id')})")
                         
-                        # 使用版本系统获取当前版本（暂时跳过）
+                        # 浣跨敤鐗堟湰绯荤粺鑾峰彇褰撳墠鐗堟湰锛堟殏鏃惰烦杩囷級
                         version_data = None
                         agent_config = extract_agent_config(agent_data, version_data)
                         
-                        logger.info(f"Using created FuFanManus default agent: {agent_config['name']} ({agent_config['agent_id']})")
+                        logger.info(f"Using created Hephaestus default agent: {agent_config['name']} ({agent_config['agent_id']})")
                     else:
-                        logger.error(f"Failed to query created FuFanManus default agent")
+                        logger.error(f"Failed to query created Hephaestus default agent")
                 else:
-                    logger.error(f"FuFanManus repository returned no agent_id")
+                    logger.error(f"Hephaestus repository returned no agent_id")
             except Exception as e:
-                logger.error(f"Failed to create FuFanManus default agent: {e}")
-                # 可以考虑继续执行或抛出异常，根据业务需求决定
+                logger.error(f"Failed to create Hephaestus default agent: {e}")
+                # 鍙互鑰冭檻缁х画鎵ц鎴栨姏鍑哄紓甯革紝鏍规嵁涓氬姟闇€姹傚喅瀹?
 
     if agent_config:
         logger.info(f"Agent config keys: {list(agent_config.keys())}")
         logger.info(f"Agent name: {agent_config.get('name', 'Unknown')}")
         logger.info(f"Agent ID: {agent_config.get('agent_id', 'Unknown')}")
 
-    # 步骤5: 执行权限和限制检查
+    # 姝ラ5: 鎵ц鏉冮檺鍜岄檺鍒舵鏌?
     logger.info(f"Executing permissions and limit checks")
     
-    # TODO：这里可以添加模型检查，比如模型是否支持访问，用户是否有模型使用权限等，在业务层前做检查
-    # 如下是一系列的检查操作：比如
-    # 模型连通性：model connectivity check
-    # 模型使用权限：model access permission check
-    # 模型使用限制：model usage limit check
-    # 模型使用计费：model usage billing check
-    # 模型使用日志：model usage logging check
-    # 模型使用监控：model usage monitoring check
-    # 模型使用分析：model usage analysis check
+    # TODO锛氳繖閲屽彲浠ユ坊鍔犳ā鍨嬫鏌ワ紝姣斿妯″瀷鏄惁鏀寔璁块棶锛岀敤鎴锋槸鍚︽湁妯″瀷浣跨敤鏉冮檺绛夛紝鍦ㄤ笟鍔″眰鍓嶅仛妫€鏌?
+    # 濡備笅鏄竴绯诲垪鐨勬鏌ユ搷浣滐細姣斿
+    # 妯″瀷杩為€氭€э細model connectivity check
+    # 妯″瀷浣跨敤鏉冮檺锛歮odel access permission check
+    # 妯″瀷浣跨敤闄愬埗锛歮odel usage limit check
+    # 妯″瀷浣跨敤璁¤垂锛歮odel usage billing check
+    # 妯″瀷浣跨敤鏃ュ織锛歮odel usage logging check
+    # 妯″瀷浣跨敤鐩戞帶锛歮odel usage monitoring check
+    # 妯″瀷浣跨敤鍒嗘瀽锛歮odel usage analysis check
 
     try:
-        # 5. 创建项目并生成项目ID,并插入到数据库中。注意：此操作仅用于初始化占位符
+        # 5. 鍒涘缓椤圭洰骞剁敓鎴愰」鐩甀D,骞舵彃鍏ュ埌鏁版嵁搴撲腑銆傛敞鎰忥細姝ゆ搷浣滀粎鐢ㄤ簬鍒濆鍖栧崰浣嶇
         placeholder_name = f"{prompt[:30]}..." if len(prompt) > 30 else prompt if prompt else "new conversation"
         
         project_id = str(uuid.uuid4())
 
-        # 插入项目数据到数据库中
+        # 鎻掑叆椤圭洰鏁版嵁鍒版暟鎹簱涓?
         project = await client.schema('public').table('projects').insert({
             "project_id": project_id, 
             "account_id": user_id, 
@@ -1351,10 +1351,10 @@ async def initiate_agent_with_files(
             logger.error(f"Failed to create project")
             raise Exception("Failed to create project")
 
-        # 创建沙盒（懒加载）：只有在文件上传时才立即创建
+        # 鍒涘缓娌欑洅锛堟噿鍔犺浇锛夛細鍙湁鍦ㄦ枃浠朵笂浼犳椂鎵嶇珛鍗冲垱寤?
         logger.info("Staring Creating sandbox environment")
 
-        # 定义变量
+        # 瀹氫箟鍙橀噺
         sandbox_id = None
         sandbox = None
         sandbox_pass = None
@@ -1369,20 +1369,20 @@ async def initiate_agent_with_files(
                 sandbox_pass = str(uuid.uuid4())
                 logger.info(f"Generated sandbox password: {sandbox_pass}")
                 
-                # 根据文件类型和用户需求智能选择模板
+                # 鏍规嵁鏂囦欢绫诲瀷鍜岀敤鎴烽渶姹傛櫤鑳介€夋嫨妯℃澘
                 sandbox_type = determine_sandbox_type(files)
                 logger.info(f"Determined sandbox type: {sandbox_type}")
                 sandbox = await create_sandbox(sandbox_pass, project_id, sandbox_type)
 
-                # 获取沙箱ID
+                # 鑾峰彇娌欑ID
                 sandbox_info = sandbox.get_info()
                 sandbox_id = sandbox_info.sandbox_id if hasattr(sandbox_info, 'sandbox_id') else getattr(sandbox, 'id', 'unknown')
                 logger.info(f"Created sandbox successfully: {sandbox_id} (project: {project_id}, type: {sandbox_type})")
 
-                # 获取访问链接
+                # 鑾峰彇璁块棶閾炬帴
                 logger.info("Getting sandbox access links...")
                 
-                # 判断沙箱类型并获取对应的访问链接
+                # 鍒ゆ柇娌欑绫诲瀷骞惰幏鍙栧搴旂殑璁块棶閾炬帴
                 sandbox_name = getattr(sandbox_info, 'name', '')
                 logger.info(f"Detected sandbox name: {sandbox_name}")
                 
@@ -1391,13 +1391,13 @@ async def initiate_agent_with_files(
                 browser_debug_url = ''
                 
                 if sandbox_name == 'desktop':
-                    #  Desktop 模板 - 使用 stream API 获取 VNC URL
+                    #  Desktop 妯℃澘 - 浣跨敤 stream API 鑾峰彇 VNC URL
                     try:
                         logger.info("Using desktop stream API to get VNC URL...")
                         url = sandbox.stream.get_url()
                         vnc_url = url
                         logger.info(f"Desktop VNC URL: {url}")
-                        # 尝试获取只读模式URL
+                        # 灏濊瘯鑾峰彇鍙妯″紡URL
                         try:
                             readonly_url = sandbox.stream.get_url(view_only=True)
                             logger.info(f"Desktop readonly VNC URL: {readonly_url}")
@@ -1409,7 +1409,7 @@ async def initiate_agent_with_files(
   
                 # TODO
                 elif sandbox_name == 'browser-chromium' or sandbox_type == 'browser':
-                    # 🌐 Browser 模板 - 获取 Chrome 调试协议地址
+                    # 馃寪 Browser 妯℃澘 - 鑾峰彇 Chrome 璋冭瘯鍗忚鍦板潃
                     try:
                         browser_host = sandbox.get_host(9223)
                         browser_debug_url = f"https://{browser_host}"
@@ -1417,7 +1417,7 @@ async def initiate_agent_with_files(
                     except Exception as e:
                         logger.error(f"Failed to get browser CDP URL: {e}")
                 
-                # 更新项目信息
+                # 鏇存柊椤圭洰淇℃伅
                 logger.info("Updating project sandbox information...")
                 update_result = await client.table('projects').eq('project_id', project_id).update({
                     'sandbox': json.dumps({
@@ -1457,11 +1457,11 @@ async def initiate_agent_with_files(
         else:
             logger.info("No files uploaded, skipping sandbox creation")
 
-        # 6. 创建线程（thread_id）并做关联
+        # 6. 鍒涘缓绾跨▼锛坱hread_id锛夊苟鍋氬叧鑱?
         thread_id = str(uuid.uuid4())
         logger.info(f"Generated New thread ID: {thread_id}")
         
-        # 构建关联关系：user_id -> project_id -> thread_id
+        # 鏋勫缓鍏宠仈鍏崇郴锛歶ser_id -> project_id -> thread_id
         thread_data = {
             "thread_id": thread_id, 
             "project_id": project_id, 
@@ -1469,22 +1469,22 @@ async def initiate_agent_with_files(
             "created_at": datetime.now()
         }
 
-        # 绑定上下文变量，用于在日志中追踪相关信息
+        # 缁戝畾涓婁笅鏂囧彉閲忥紝鐢ㄤ簬鍦ㄦ棩蹇椾腑杩借釜鐩稿叧淇℃伅
         structlog.contextvars.bind_contextvars(
             thread_id=thread_data["thread_id"],
             project_id=project_id,
             account_id=user_id,
         )
         
-        # 线程是Agent无关的，不存储agent_id
-        # Agent选择将在每个消息/Agent运行时处理
+        # 绾跨▼鏄疉gent鏃犲叧鐨勶紝涓嶅瓨鍌╝gent_id
+        # Agent閫夋嫨灏嗗湪姣忎釜娑堟伅/Agent杩愯鏃跺鐞?
         if agent_config:
             logger.info(f"Using Agent {agent_config['agent_id']} for conversation (thread remains Agent-agnostic)")
             structlog.contextvars.bind_contextvars(
                 agent_id=agent_config['agent_id'],
             )
         
-        # # 如果是Agent构建器会话，存储构建器元数据
+        # # 濡傛灉鏄疉gent鏋勫缓鍣ㄤ細璇濓紝瀛樺偍鏋勫缓鍣ㄥ厓鏁版嵁
         if is_agent_builder:
             print(f"store agent builder metadata: target_agent_id={target_agent_id}")
             thread_data["metadata"] = {
@@ -1495,7 +1495,7 @@ async def initiate_agent_with_files(
                 target_agent_id=target_agent_id,
             )
         
-        # 插入线程到数据库
+        # 鎻掑叆绾跨▼鍒版暟鎹簱
         thread = await client.schema('public').table('threads').insert(thread_data)
         
         if not thread.data:
@@ -1503,12 +1503,12 @@ async def initiate_agent_with_files(
             raise Exception("Failed to create thread")
             
 
-        # 在创建新的Agent会话时异步触发，通过大模型生成更贴合主题的会话名称 
-        # TODO：可选。这里可以添加一个任务，通过大模型生成更贴合主题的会话名称，并更新到项目中
+        # 鍦ㄥ垱寤烘柊鐨凙gent浼氳瘽鏃跺紓姝ヨЕ鍙戯紝閫氳繃澶фā鍨嬬敓鎴愭洿璐村悎涓婚鐨勪細璇濆悕绉?
+        # TODO锛氬彲閫夈€傝繖閲屽彲浠ユ坊鍔犱竴涓换鍔★紝閫氳繃澶фā鍨嬬敓鎴愭洿璐村悎涓婚鐨勪細璇濆悕绉帮紝骞舵洿鏂板埌椤圭洰涓?
         asyncio.create_task(generate_and_update_project_name(project_id=project_id, prompt=prompt))
 
         message_content = prompt    
-        # 处理上传文件到沙盒环境（如果有）
+        # 澶勭悊涓婁紶鏂囦欢鍒版矙鐩掔幆澧冿紙濡傛灉鏈夛級
         if files:
             logger.info(f"Start uploading {len(files)} files to sandbox...")
             successful_uploads = []
@@ -1522,17 +1522,17 @@ async def initiate_agent_with_files(
                         safe_filename = file.filename.replace('/', '_').replace('\\', '_')
                         target_path = f"/workspace/{safe_filename}"
                         logger.info(f"files target_path: {target_path}")
-                        logger.info(f"files size: {file.size if hasattr(file, 'size') else '未知'} bytes")
+                        logger.info(f"files size: {file.size if hasattr(file, 'size') else '鏈煡'} bytes")
                         
                         content = await file.read()
                         logger.info(f"files read success, size: {len(content)} bytes")
                         
                         upload_successful = False
                         try:
-                            # 使用 PPIO 推荐的方法: sandbox.files.write()
+                            # 浣跨敤 PPIO 鎺ㄨ崘鐨勬柟娉? sandbox.files.write()
                             if hasattr(sandbox, 'files') and hasattr(sandbox.files, 'write'):
                                 logger.info(f"Uploading file to sandbox: {target_path}")
-                                # 根据 PPIO 官方文档，files.write() 是同步方法，不需要 await
+                                # 鏍规嵁 PPIO 瀹樻柟鏂囨。锛宖iles.write() 鏄悓姝ユ柟娉曪紝涓嶉渶瑕?await
                                 write_result = sandbox.files.write(target_path, content)
                                 logger.info(f"File uploaded successfully: {target_path}")
                                 upload_successful = True            
@@ -1542,7 +1542,7 @@ async def initiate_agent_with_files(
                                 
                         except Exception as upload_error:
                             logger.error(f"Sandbox upload failed {safe_filename}: {str(upload_error)}")
-                            logger.debug(f"Sandbox upload error details: {upload_error}")  # 使用 debug 记录详细错误
+                            logger.debug(f"Sandbox upload error details: {upload_error}")  # 浣跨敤 debug 璁板綍璇︾粏閿欒
 
                         if upload_successful:
                             try:
@@ -1550,9 +1550,9 @@ async def initiate_agent_with_files(
                                 await asyncio.sleep(0.2)
                                 parent_dir = os.path.dirname(target_path)
                                 
-                                # 使用 PPIO 正确的 API 验证文件
+                                # 浣跨敤 PPIO 姝ｇ‘鐨?API 楠岃瘉鏂囦欢
                                 if hasattr(sandbox, 'files') and hasattr(sandbox.files, 'exists'):
-                                    # 检查文件是否存在
+                                    # 妫€鏌ユ枃浠舵槸鍚﹀瓨鍦?
                                     file_exists = sandbox.files.exists(target_path)
                                     if file_exists:
                                         successful_uploads.append(target_path)
@@ -1561,30 +1561,30 @@ async def initiate_agent_with_files(
                                         logger.error(f"File verification failed: {target_path} does not exist")
                                         failed_uploads.append(safe_filename)
                                 else:
-                                    # 如果没有 exists 方法，直接标记为成功（已经成功上传了）
+                                    # 濡傛灉娌℃湁 exists 鏂规硶锛岀洿鎺ユ爣璁颁负鎴愬姛锛堝凡缁忔垚鍔熶笂浼犱簡锛?
                                     successful_uploads.append(target_path)
                                     logger.info(f"File uploaded successfully (skip verification): {safe_filename} -> {target_path}")
                                     
                             except Exception as verify_error:
-                                # 验证失败不影响上传，标记为成功
+                                # 楠岃瘉澶辫触涓嶅奖鍝嶄笂浼狅紝鏍囪涓烘垚鍔?
                                 successful_uploads.append(target_path)
                                 logger.warning(f"File verification failed but upload was successful {safe_filename}: {str(verify_error)}")
-                                logger.debug(f"File verification error details: {verify_error}")  # 使用 debug 避免 exc_info 问题
+                                logger.debug(f"File verification error details: {verify_error}")  # 浣跨敤 debug 閬垮厤 exc_info 闂
                         else:
                             failed_uploads.append(safe_filename)
                     except Exception as file_error:
                         logger.error(f"File processing failed {file.filename}: {str(file_error)}")
-                        logger.debug(f"File processing error details: {file_error}")  # 使用 debug 记录详细错误
+                        logger.debug(f"File processing error details: {file_error}")  # 浣跨敤 debug 璁板綍璇︾粏閿欒
                         failed_uploads.append(file.filename)
                     finally:
                         await file.close()
                         logger.info(f"File closed: {file.filename}")
 
-            # 更新消息内容
+            # 鏇存柊娑堟伅鍐呭
             if successful_uploads:
                 message_content += "\n\n" if message_content else ""
                 for file_path in successful_uploads: 
-                    message_content += f"[用户上传文件: {file_path}]\n"
+                    message_content += f"[鐢ㄦ埛涓婁紶鏂囦欢: {file_path}]\n"
                 logger.info(f"File uploaded successfully: {len(successful_uploads)} files")
                 
             if failed_uploads:
@@ -1597,32 +1597,32 @@ async def initiate_agent_with_files(
         else:
             logger.info("No files to upload")
  
-        # 添加初始用户消息到线程
+        # 娣诲姞鍒濆鐢ㄦ埛娑堟伅鍒扮嚎绋?
         message_payload = {"role": "user", "content": message_content}
         logger.info(f"New Message payload: {message_payload}")
         
-        # 在ADK架构中，使用thread_id作为session_id
+        # 鍦ˋDK鏋舵瀯涓紝浣跨敤thread_id浣滀负session_id
         adk_session_id = thread_id
         
-        # 创建ADK session（如果不存在）
+        # 鍒涘缓ADK session锛堝鏋滀笉瀛樺湪锛?
         await _create_adk_session_if_not_exists(client, user_id, adk_session_id)
         logger.info(f"Created ADK session successfully: {adk_session_id}")
 
-        # # 使用ADK events表记录消息
+        # # 浣跨敤ADK events琛ㄨ褰曟秷鎭?
         message_id = str(uuid.uuid4())
         await _log_adk_user_message_event(client, user_id, message_content, adk_session_id, message_id)
         logger.info(f"User message event recorded successfully: {message_id}")
         
-        # 确定最终使用的模型
-        # 模型选择的优先级逻辑
-        # model_name ：用户在前端选择的模型
-        # agent_config.model ：用户在Agent配置中选择的模型
-        # MODEL_NAME_ALIASES，即config.MODEL_TO_USE，模型别名映射，在.ENV 文件中获取
+        # 纭畾鏈€缁堜娇鐢ㄧ殑妯″瀷
+        # 妯″瀷閫夋嫨鐨勪紭鍏堢骇閫昏緫
+        # model_name 锛氱敤鎴峰湪鍓嶇閫夋嫨鐨勬ā鍨?
+        # agent_config.model 锛氱敤鎴峰湪Agent閰嶇疆涓€夋嫨鐨勬ā鍨?
+        # MODEL_NAME_ALIASES锛屽嵆config.MODEL_TO_USE锛屾ā鍨嬪埆鍚嶆槧灏勶紝鍦?ENV 鏂囦欢涓幏鍙?
 
-        # 优先级：用户在前端选择的模型 > Agent配置中选择的模型 > 模型别名映射
-        # 如果用户在前端选择的模型在MODEL_NAME_ALIASES中存在，则使用MODEL_NAME_ALIASES中的模型
-        # 如果用户在前端选择的模型在MODEL_NAME_ALIASES中不存在，则使用用户在前端选择的模型
-        # 如果用户在Agent配置中选择的模型在MODEL_NAME_ALIASES中存在，则使用MODEL_NAME_ALIASES中的模型
+        # 浼樺厛绾э細鐢ㄦ埛鍦ㄥ墠绔€夋嫨鐨勬ā鍨?> Agent閰嶇疆涓€夋嫨鐨勬ā鍨?> 妯″瀷鍒悕鏄犲皠
+        # 濡傛灉鐢ㄦ埛鍦ㄥ墠绔€夋嫨鐨勬ā鍨嬪湪MODEL_NAME_ALIASES涓瓨鍦紝鍒欎娇鐢∕ODEL_NAME_ALIASES涓殑妯″瀷
+        # 濡傛灉鐢ㄦ埛鍦ㄥ墠绔€夋嫨鐨勬ā鍨嬪湪MODEL_NAME_ALIASES涓笉瀛樺湪锛屽垯浣跨敤鐢ㄦ埛鍦ㄥ墠绔€夋嫨鐨勬ā鍨?
+        # 濡傛灉鐢ㄦ埛鍦ˋgent閰嶇疆涓€夋嫨鐨勬ā鍨嬪湪MODEL_NAME_ALIASES涓瓨鍦紝鍒欎娇鐢∕ODEL_NAME_ALIASES涓殑妯″瀷
         effective_model = model_name
         if not model_name and agent_config and agent_config.get('model'):
             effective_model = agent_config['model']
@@ -1632,21 +1632,21 @@ async def initiate_agent_with_files(
         else:
             logger.info(f"Using default model: {effective_model}")
         
-        # 完成模型别名解析，适配 LiteLLM 的规范
+        # 瀹屾垚妯″瀷鍒悕瑙ｆ瀽锛岄€傞厤 LiteLLM 鐨勮鑼?
         resolved_model = MODEL_NAME_ALIASES.get(effective_model, effective_model)
         logger.info(f"Model alias resolved: {effective_model} -> {resolved_model}")
         
-        # 8. 创建Agent运行记录的元数据
+        # 8. 鍒涘缓Agent杩愯璁板綍鐨勫厓鏁版嵁
         agent_run_metadata = {
-            "model_name": resolved_model,  # 使用解析后的模型名
-            "requested_model": model_name,  # 保留用户原始请求
+            "model_name": resolved_model,  # 浣跨敤瑙ｆ瀽鍚庣殑妯″瀷鍚?
+            "requested_model": model_name,  # 淇濈暀鐢ㄦ埛鍘熷璇锋眰
             "enable_thinking": enable_thinking,
             "reasoning_effort": reasoning_effort,
             "enable_context_manager": enable_context_manager
         }
         logger.info(f"Agent run metadata: {agent_run_metadata}")
         
-        # 存储Agent运行记录到数据库中
+        # 瀛樺偍Agent杩愯璁板綍鍒版暟鎹簱涓?
         agent_run = await client.schema('public').table('agent_runs').insert({
             "thread_id": thread_id, 
             "status": "running",
@@ -1663,12 +1663,12 @@ async def initiate_agent_with_files(
         agent_run_id = str(agent_run.data[0].get('agent_run_id') or agent_run.data[0]['id'])
         logger.info(f"Created agent run ids: {agent_run_id}")
         
-        # 绑定Agent运行ID到上下文，用于在日志中追踪相关信息
+        # 缁戝畾Agent杩愯ID鍒颁笂涓嬫枃锛岀敤浜庡湪鏃ュ織涓拷韪浉鍏充俊鎭?
         structlog.contextvars.bind_contextvars(
             agent_run_id=agent_run_id,
         )
 
-        # 9. 在Redis中注册运行
+        # 9. 鍦≧edis涓敞鍐岃繍琛?
         instance_key = f"active_run:{instance_id}:{agent_run_id}"
         try:
             await redis.set(instance_key, "running", ex=redis.REDIS_KEY_TTL)
@@ -1676,12 +1676,12 @@ async def initiate_agent_with_files(
         except Exception as e:
             logger.error(f"Redis registered failed ({instance_key}): {str(e)}")
 
-        # 获取请求ID并启动后台Agent
+        # 鑾峰彇璇锋眰ID骞跺惎鍔ㄥ悗鍙癆gent
         request_id = structlog.contextvars.get_contextvars().get('request_id')
         logger.info(f"Request ID: {request_id}")
 
-        # 11. 发送Agent运行任务到后台，这里才是真正开始执行Agent的逻辑
-        # 注意：这里不需要传递用户的请求，因为需要在后续的处理中通过查询数据库来获取
+        # 11. 鍙戦€丄gent杩愯浠诲姟鍒板悗鍙帮紝杩欓噷鎵嶆槸鐪熸寮€濮嬫墽琛孉gent鐨勯€昏緫
+        # 娉ㄦ剰锛氳繖閲屼笉闇€瑕佷紶閫掔敤鎴风殑璇锋眰锛屽洜涓洪渶瑕佸湪鍚庣画鐨勫鐞嗕腑閫氳繃鏌ヨ鏁版嵁搴撴潵鑾峰彇
         try:
             message = run_agent_background.send(
                 agent_run_id=agent_run_id, 
@@ -1732,26 +1732,26 @@ async def get_agents(
     client = await db.client
     
     try:
-        # 计算偏移量
+        # 璁＄畻鍋忕Щ閲?
         offset = (page - 1) * limit
-        # 构建基础查询：选择 agents 表的所有字段 (*)
-        # 启用精确计数 (count='exact') 用于分页
-        # 过滤条件：只查询当前用户的 agents
+        # 鏋勫缓鍩虹鏌ヨ锛氶€夋嫨 agents 琛ㄧ殑鎵€鏈夊瓧娈?(*)
+        # 鍚敤绮剧‘璁℃暟 (count='exact') 鐢ㄤ簬鍒嗛〉
+        # 杩囨护鏉′欢锛氬彧鏌ヨ褰撳墠鐢ㄦ埛鐨?agents
         query = client.table('agents').select('*', count='exact').eq("user_id", user_id)
 
-        # 如果提供搜索词，在 name 和 description 字段中模糊搜索
+        # 濡傛灉鎻愪緵鎼滅储璇嶏紝鍦?name 鍜?description 瀛楁涓ā绯婃悳绱?
         if search:
-            search_term = f"%{search}%"  # 模糊匹配模式
+            search_term = f"%{search}%"  # 妯＄硦鍖归厤妯″紡
             query = query.or_(f"name.ilike.{search_term},description.ilike.{search_term}")
         
-        # 过滤条件：是否为默认 Agent，只有明确传入 True/False 时才应用此过滤
+        # 杩囨护鏉′欢锛氭槸鍚︿负榛樿 Agent锛屽彧鏈夋槑纭紶鍏?True/False 鏃舵墠搴旂敤姝よ繃婊?
         if has_default is not None:
             query = query.eq("is_default", has_default)
         
                 
-        # 支持按 name、updated_at、created_at 排序
-        # 支持升序(asc)和降序(desc)
-        # 默认按创建时间降序排列（最新的在前）
+        # 鏀寔鎸?name銆乽pdated_at銆乧reated_at 鎺掑簭
+        # 鏀寔鍗囧簭(asc)鍜岄檷搴?desc)
+        # 榛樿鎸夊垱寤烘椂闂撮檷搴忔帓鍒楋紙鏈€鏂扮殑鍦ㄥ墠锛?
         if sort_by == "name":
             query = query.order("name", desc=(sort_order == "desc"))
         elif sort_by == "updated_at":
@@ -1759,10 +1759,10 @@ async def get_agents(
         elif sort_by == "created_at":
             query = query.order("created_at", desc=(sort_order == "desc"))
         else:
-            # 默认按创建时间排序
+            # 榛樿鎸夊垱寤烘椂闂存帓搴?
             query = query.order("created_at", desc=(sort_order == "desc"))
 
-        # 获取分页数据和总数量
+        # 鑾峰彇鍒嗛〉鏁版嵁鍜屾€绘暟閲?
         query = query.range(offset, offset + limit - 1)
         agents_result = await query.execute()
         total_count = agents_result.count if agents_result.count is not None else 0
@@ -1779,11 +1779,11 @@ async def get_agents(
                 }
             }
         
-        # 后处理：工具过滤和tools_count排序
+        # 鍚庡鐞嗭細宸ュ叿杩囨护鍜宼ools_count鎺掑簭
         agents_data = agents_result.data
         
-        # 首先，批量获取所有Agent的版本数据，确保我们拥有正确的工具信息
-        # 这样做比逐个Agent调用服务更高效
+        # 棣栧厛锛屾壒閲忚幏鍙栨墍鏈堿gent鐨勭増鏈暟鎹紝纭繚鎴戜滑鎷ユ湁姝ｇ‘鐨勫伐鍏蜂俊鎭?
+        # 杩欐牱鍋氭瘮閫愪釜Agent璋冪敤鏈嶅姟鏇撮珮鏁?
         agent_version_map = {}
         version_ids = list({agent['current_version_id'] for agent in agents_data if agent.get('current_version_id')})
         logger.info(f"version_ids: {version_ids}")
@@ -1814,20 +1814,20 @@ async def get_agents(
             except Exception as e:
                 logger.warning(f"Failed to batch load versions for agents: {e}")
         
-        # 应用工具过滤条件使用版本数据
+        # 搴旂敤宸ュ叿杩囨护鏉′欢浣跨敤鐗堟湰鏁版嵁
         if has_mcp_tools is not None or has_agentpress_tools is not None or tools:
             filtered_agents = []
             tools_filter = []
             if tools:
-                # 处理tools参数可能作为dict而不是字符串传递的情况
+                # 澶勭悊tools鍙傛暟鍙兘浣滀负dict鑰屼笉鏄瓧绗︿覆浼犻€掔殑鎯呭喌
                 if isinstance(tools, str):
                     tools_filter = [tool.strip() for tool in tools.split(',') if tool.strip()]
                 elif isinstance(tools, dict):
-                    # 如果tools是dict，记录问题并跳过过滤
+                    # 濡傛灉tools鏄痙ict锛岃褰曢棶棰樺苟璺宠繃杩囨护
                     logger.warning(f"Received tools parameter as dict instead of string: {tools}")
                     tools_filter = []
                 elif isinstance(tools, list):
-                    # 如果tools是list，直接使用
+                    # 濡傛灉tools鏄痩ist锛岀洿鎺ヤ娇鐢?
                     tools_filter = [str(tool).strip() for tool in tools if str(tool).strip()]
                 else:
                     logger.warning(f"Unexpected tools parameter type: {type(tools)}, value: {tools}")
@@ -1878,13 +1878,13 @@ async def get_agents(
             
             agents_data = filtered_agents
         
-        # 处理tools_count排序 (后处理 required)
+        # 澶勭悊tools_count鎺掑簭 (鍚庡鐞?required)
         if sort_by == "tools_count":
             def get_tools_count(agent):
-                # 获取版本数据如果available
+                # 鑾峰彇鐗堟湰鏁版嵁濡傛灉available
                 version_data = agent_version_map.get(agent['agent_id'])
                 
-                # 使用版本数据用于工具如果available, 否则回退到Agent数据
+                # 浣跨敤鐗堟湰鏁版嵁鐢ㄤ簬宸ュ叿濡傛灉available, 鍚﹀垯鍥為€€鍒癆gent鏁版嵁
                 if version_data:
                     configured_mcps = version_data.get('configured_mcps', [])
                     agentpress_tools = version_data.get('agentpress_tools', {})
@@ -1901,16 +1901,16 @@ async def get_agents(
             
             agents_data.sort(key=get_tools_count, reverse=(sort_order == "desc"))
         
-        # 应用分页到过滤结果如果我们做了后处理
+        # 搴旂敤鍒嗛〉鍒拌繃婊ょ粨鏋滃鏋滄垜浠仛浜嗗悗澶勭悊
         if has_mcp_tools is not None or has_agentpress_tools is not None or tools or sort_by == "tools_count":
             total_count = len(agents_data)
             agents_data = agents_data[offset:offset + limit]
         
-        # 格式化响应
+        # 鏍煎紡鍖栧搷搴?
         agent_list = []
         for agent in agents_data:
             current_version = None
-            # 使用已经获取的版本数据 from agent_version_map
+            # 浣跨敤宸茬粡鑾峰彇鐨勭増鏈暟鎹?from agent_version_map
             version_dict = agent_version_map.get(agent['agent_id'])
             if version_dict:
                 try:
@@ -1932,7 +1932,7 @@ async def get_agents(
                 except Exception as e:
                     logger.warning(f"Failed to get version data for agent {agent['agent_id']}: {e}")
             
-            # 提取配置使用统一配置 approach
+            # 鎻愬彇閰嶇疆浣跨敤缁熶竴閰嶇疆 approach
             from agent.config_helper import extract_agent_config
             agent_config = extract_agent_config(agent, version_dict)
             
@@ -2145,7 +2145,7 @@ async def export_agent(agent_id: str, user_id: str = Depends(get_current_user_id
         export_metadata = {}
         if agent.get('metadata'):
             export_metadata = {k: v for k, v in agent['metadata'].items() 
-                             if k not in ['is_fufanmanus_default', 'centrally_managed', 'installation_date', 'last_central_update']}
+                             if k not in ['is_hephaestus_default', 'centrally_managed', 'installation_date', 'last_central_update']}
         
         export_data = {
             "tools": sanitized_config['tools'],
@@ -2299,7 +2299,7 @@ async def create_agent(
             detail="Custom agents currently disabled. This feature is not available at the moment."
         )
     
-    # 连接数据库
+    # 杩炴帴鏁版嵁搴?
     client = await db.client
     
     from .utils import check_agent_count_limit
@@ -2317,17 +2317,17 @@ async def create_agent(
         raise HTTPException(status_code=402, detail=error_detail)
     
     try:
-        # 创建或更新Agent时，如果 is_default=True,将该用户的所有其他Agent的 is_default 设为 False. 确保只有一个Agent是默认的
+        # 鍒涘缓鎴栨洿鏂癆gent鏃讹紝濡傛灉 is_default=True,灏嗚鐢ㄦ埛鐨勬墍鏈夊叾浠朅gent鐨?is_default 璁句负 False. 纭繚鍙湁涓€涓狝gent鏄粯璁ょ殑
         if agent_data.is_default:
             await client.table('agents').update({"is_default": False}).eq("user_id", user_id).eq("is_default", True)
    
-        # 获取默认的系统提示词和工具
-        from agent.config_helper import get_default_system_prompt_for_fufanmanus_agent
-        default_system_prompt = get_default_system_prompt_for_fufanmanus_agent()
+        # 鑾峰彇榛樿鐨勭郴缁熸彁绀鸿瘝鍜屽伐鍏?
+        from agent.config_helper import get_default_system_prompt_for_hephaestus_agent
+        default_system_prompt = get_default_system_prompt_for_hephaestus_agent()
         
-        # 获取默认工具配置
-        from agent.fufanmanus.config import FufanmanusConfig
-        default_tools = FufanmanusConfig.DEFAULT_TOOLS
+        # 鑾峰彇榛樿宸ュ叿閰嶇疆
+        from agent.hephaestus.config import HephaestusConfig
+        default_tools = HephaestusConfig.DEFAULT_TOOLS
         
         insert_data = {
             "agent_id": str(uuid.uuid4()),
@@ -2392,7 +2392,7 @@ async def create_agent(
             raise HTTPException(status_code=500, detail="Failed to create initial version")
         
         from utils.cache import Cache
-        # 清除用户当前Agent数量限制缓存，因为创建了新的Agent，数量发生变化，下次查询时会重新计算
+        # 娓呴櫎鐢ㄦ埛褰撳墠Agent鏁伴噺闄愬埗缂撳瓨锛屽洜涓哄垱寤轰簡鏂扮殑Agent锛屾暟閲忓彂鐢熷彉鍖栵紝涓嬫鏌ヨ鏃朵細閲嶆柊璁＄畻
         await Cache.invalidate(f"agent_count_limit:{user_id}")
         
         logger.info(f"Created agent {agent['agent_id']} with v1 for user: {user_id}")
@@ -2470,55 +2470,55 @@ async def update_agent(
         existing_data = existing_agent.data
 
         agent_metadata = existing_data.get('metadata', {})
-        is_fufanmanus_agent = agent_metadata.get('is_fufanmanus_default', False)
+        is_hephaestus_agent = agent_metadata.get('is_hephaestus_default', False)
         restrictions = agent_metadata.get('restrictions', {})
         
-        if is_fufanmanus_agent:
-            logger.warning(f"Update attempt on FuFanManus default agent {agent_id} by user {user_id}")
+        if is_hephaestus_agent:
+            logger.warning(f"Update attempt on Hephaestus default agent {agent_id} by user {user_id}")
             
             if (agent_data.name is not None and 
                 agent_data.name != existing_data.get('name') and 
                 restrictions.get('name_editable') == False):
-                logger.error(f"User {user_id} attempted to modify restricted name of FuFanManus agent {agent_id}")
+                logger.error(f"User {user_id} attempted to modify restricted name of Hephaestus agent {agent_id}")
                 raise HTTPException(
                     status_code=403, 
-                    detail="FuFanManus's name cannot be modified. This restriction is managed centrally."
+                    detail="Hephaestus's name cannot be modified. This restriction is managed centrally."
                 )
             
             if (agent_data.description is not None and
                 agent_data.description != existing_data.get('description') and 
                 restrictions.get('description_editable') == False):
-                logger.error(f"User {user_id} attempted to modify restricted description of FuFanManus agent {agent_id}")
+                logger.error(f"User {user_id} attempted to modify restricted description of Hephaestus agent {agent_id}")
                 raise HTTPException(
                     status_code=403, 
-                    detail="FuFanManus's description cannot be modified."
+                    detail="Hephaestus's description cannot be modified."
                 )
             
             if (agent_data.system_prompt is not None and 
                 restrictions.get('system_prompt_editable') == False):
-                logger.error(f"User {user_id} attempted to modify restricted system prompt of FuFanManus agent {agent_id}")
+                logger.error(f"User {user_id} attempted to modify restricted system prompt of Hephaestus agent {agent_id}")
                 raise HTTPException(
                     status_code=403, 
-                    detail="FuFanManus's system prompt cannot be modified. This is managed centrally to ensure optimal performance."
+                    detail="Hephaestus's system prompt cannot be modified. This is managed centrally to ensure optimal performance."
                 )
             
             if (agent_data.agentpress_tools is not None and 
                 restrictions.get('tools_editable') == False):
-                logger.error(f"User {user_id} attempted to modify restricted tools of FuFanManus agent {agent_id}")
+                logger.error(f"User {user_id} attempted to modify restricted tools of Hephaestus agent {agent_id}")
                 raise HTTPException(
                     status_code=403, 
-                    detail="FuFanManus's default tools cannot be modified. These tools are optimized for FuFanManus's capabilities."
+                    detail="Hephaestus's default tools cannot be modified. These tools are optimized for Hephaestus's capabilities."
                 )
             
             if ((agent_data.configured_mcps is not None or agent_data.custom_mcps is not None) and 
                 restrictions.get('mcps_editable') == False):
-                logger.error(f"User {user_id} attempted to modify restricted MCPs of FuFanManus agent {agent_id}")
+                logger.error(f"User {user_id} attempted to modify restricted MCPs of Hephaestus agent {agent_id}")
                 raise HTTPException(
                     status_code=403, 
-                    detail="FuFanManus's integrations cannot be modified."
+                    detail="Hephaestus's integrations cannot be modified."
                 )
             
-            logger.info(f"FuFanManus agent update validation passed for agent {agent_id} by user {user_id}")
+            logger.info(f"Hephaestus agent update validation passed for agent {agent_id} by user {user_id}")
 
         current_version_data = None
         if existing_data.get('current_version_id'):
@@ -2805,8 +2805,8 @@ async def delete_agent(agent_id: str, user_id: str = Depends(get_current_user_id
         if agent['is_default']:
             raise HTTPException(status_code=400, detail="Cannot delete default agent")
         
-        if agent.get('metadata', {}).get('is_fufanmanus_default', False):
-            raise HTTPException(status_code=400, detail="Cannot delete FuFanManus default agent")
+        if agent.get('metadata', {}).get('is_hephaestus_default', False):
+            raise HTTPException(status_code=400, detail="Cannot delete Hephaestus default agent")
         
         delete_result = await client.table('agents').delete().eq('agent_id', agent_id).execute()
         
@@ -2853,7 +2853,7 @@ async def get_agent_builder_chat_history(
         agent_builder_threads = []
         for thread in threads_result.data:
             metadata = thread.get('metadata', {})
-            # 如果metadata是字符串，解析为字典
+            # 濡傛灉metadata鏄瓧绗︿覆锛岃В鏋愪负瀛楀吀
             if isinstance(metadata, str):
                 try:
                     metadata = json.loads(metadata)
@@ -2875,12 +2875,12 @@ async def get_agent_builder_chat_history(
         
         latest_thread_id = agent_builder_threads[0]['thread_id']
         logger.info(f"Found {len(agent_builder_threads)} agent builder threads, using latest: {latest_thread_id}")
-        # 从ADK events表查询消息（按时间排序）
+        # 浠嶢DK events琛ㄦ煡璇㈡秷鎭紙鎸夋椂闂存帓搴忥級
         messages_result = await client.schema('public').table('events').select('*').eq('session_id', latest_thread_id).order('timestamp', desc=False).execute()
         
         logger.info(f"Found {len(messages_result.data)} events for agent builder chat history")
         
-        # 转换ADK events为消息格式
+        # 杞崲ADK events涓烘秷鎭牸寮?
         messages = _convert_adk_events_to_messages(messages_result.data)
         
         return {
@@ -3357,17 +3357,17 @@ async def get_user_threads(
     page: Optional[int] = Query(1, ge=1, description="Page number (1-based)"),
     limit: Optional[int] = Query(1000, ge=1, le=1000, description="Number of items per page (max 1000)")
 ):
-    """获取当前用户的所有对话线程，包含关联的项目数据"""
+    """鑾峰彇褰撳墠鐢ㄦ埛鐨勬墍鏈夊璇濈嚎绋嬶紝鍖呭惈鍏宠仈鐨勯」鐩暟鎹?""
     logger.info(f"Fetching threads with project data for user: {user_id} (page={page}, limit={limit})")
     client = await db.client
     try:
-        # 计算分页偏移量
+        # 璁＄畻鍒嗛〉鍋忕Щ閲?
         offset = (page - 1) * limit
         
-        # 步骤1: 从threads表中获取指定用户的所有对话线程，按创建时间倒序排列
+        # 姝ラ1: 浠巘hreads琛ㄤ腑鑾峰彇鎸囧畾鐢ㄦ埛鐨勬墍鏈夊璇濈嚎绋嬶紝鎸夊垱寤烘椂闂村€掑簭鎺掑垪
         threads_result = await client.table('threads').select('*').eq('account_id', user_id).order('created_at', desc=True).execute()
         
-        # 如果没有找到任何线程，返回空结果
+        # 濡傛灉娌℃湁鎵惧埌浠讳綍绾跨▼锛岃繑鍥炵┖缁撴灉
         if not threads_result.data:
             logger.info(f"No threads found for user: {user_id}")
             return {
@@ -3380,37 +3380,37 @@ async def get_user_threads(
                 }
             }
         
-        # 获取总线程数量
+        # 鑾峰彇鎬荤嚎绋嬫暟閲?
         total_count = len(threads_result.data)
         
-        # 步骤2: 对线程数据进行分页处理
+        # 姝ラ2: 瀵圭嚎绋嬫暟鎹繘琛屽垎椤靛鐞?
         paginated_threads = threads_result.data[offset:offset + limit]
         
-        # 步骤3: 提取所有线程中关联的项目ID，并去重
+        # 姝ラ3: 鎻愬彇鎵€鏈夌嚎绋嬩腑鍏宠仈鐨勯」鐩甀D锛屽苟鍘婚噸
         project_ids = [
             thread['project_id'] for thread in paginated_threads 
             if thread.get('project_id')
         ]
         unique_project_ids = list(set(project_ids)) if project_ids else []
         
-        # 步骤4: 如果有项目ID，则批量获取项目数据
+        # 姝ラ4: 濡傛灉鏈夐」鐩甀D锛屽垯鎵归噺鑾峰彇椤圭洰鏁版嵁
         projects_by_id = {}
         if unique_project_ids:
             projects_result = await client.table('projects').select('*').in_('project_id', unique_project_ids).execute()
             
             if projects_result.data:
                 logger.info(f"[API] Raw projects from DB: {len(projects_result.data)}")
-                # 创建项目ID到项目数据的映射表，便于快速查找
+                # 鍒涘缓椤圭洰ID鍒伴」鐩暟鎹殑鏄犲皠琛紝渚夸簬蹇€熸煡鎵?
                 projects_by_id = {
                     project['project_id']: project 
                     for project in projects_result.data
                 }
         
-        # 步骤5: 将线程数据与项目数据进行关联映射
+        # 姝ラ5: 灏嗙嚎绋嬫暟鎹笌椤圭洰鏁版嵁杩涜鍏宠仈鏄犲皠
         mapped_threads = []
         for thread in paginated_threads:
             project_data = None
-            # 如果线程有关联的项目，则获取项目数据
+            # 濡傛灉绾跨▼鏈夊叧鑱旂殑椤圭洰锛屽垯鑾峰彇椤圭洰鏁版嵁
             if thread.get('project_id') and thread['project_id'] in projects_by_id:
                 project = projects_by_id[thread['project_id']]
                 project_data = {
@@ -3424,7 +3424,7 @@ async def get_user_threads(
                     "updated_at": project['updated_at']
                 }
             
-            # 构建线程数据结构，包含关联的项目信息
+            # 鏋勫缓绾跨▼鏁版嵁缁撴瀯锛屽寘鍚叧鑱旂殑椤圭洰淇℃伅
             mapped_thread = {
                 "thread_id": thread['thread_id'],
                 "account_id": thread['account_id'],
@@ -3433,16 +3433,16 @@ async def get_user_threads(
                 "is_public": thread.get('is_public', False),
                 "created_at": thread['created_at'],
                 "updated_at": thread['updated_at'],
-                "project": project_data  # 关联的项目数据
+                "project": project_data  # 鍏宠仈鐨勯」鐩暟鎹?
             }
             mapped_threads.append(mapped_thread)
         
-        # 步骤6: 计算总页数
+        # 姝ラ6: 璁＄畻鎬婚〉鏁?
         total_pages = (total_count + limit - 1) // limit if total_count else 0
         
         logger.info(f"[API] Mapped threads for frontend: {len(mapped_threads)} threads, {len(projects_by_id)} unique projects")
         
-        # 步骤7: 返回结果，包含线程列表和分页信息
+        # 姝ラ7: 杩斿洖缁撴灉锛屽寘鍚嚎绋嬪垪琛ㄥ拰鍒嗛〉淇℃伅
         return {
             "threads": mapped_threads,
             "pagination": {
@@ -3464,37 +3464,37 @@ async def get_project(
     user_id: str = Depends(get_current_user_id_from_jwt)
 ):
     """Get a specific project by ID with complete related data."""
-    print(f"🔄 ===== 开始获取项目信息 =====")
-    print(f"  📋 project_id: {project_id}")
-    print(f"  👤 user_id: {user_id}")
+    print(f"馃攧 ===== 寮€濮嬭幏鍙栭」鐩俊鎭?=====")
+    print(f"  馃搵 project_id: {project_id}")
+    print(f"  馃懁 user_id: {user_id}")
     logger.info(f"Fetching project: {project_id}")
     client = await db.client
     
     try:
-        print(f"  📊 获取项目数据...")
+        print(f"  馃搳 鑾峰彇椤圭洰鏁版嵁...")
         project_result = await client.table('projects').select('*').eq('project_id', project_id).execute()
         
         if not project_result.data:
-            print(f"  ❌ 项目未找到: {project_id}")
+            print(f"  鉂?椤圭洰鏈壘鍒? {project_id}")
             raise HTTPException(status_code=404, detail="Project not found")
         
         project = project_result.data[0]
-        print(f"  ✅ 项目数据获取成功")
-        print(f"    📝 项目信息: name={project.get('name')}, account_id={project.get('account_id')}")
+        print(f"  鉁?椤圭洰鏁版嵁鑾峰彇鎴愬姛")
+        print(f"    馃摑 椤圭洰淇℃伅: name={project.get('name')}, account_id={project.get('account_id')}")
         
-        # 验证项目访问权限
+        # 楠岃瘉椤圭洰璁块棶鏉冮檺
         if project.get('account_id') != user_id:
-            print(f"  ❌ 项目访问权限被拒绝: account_id={project.get('account_id')}, user_id={user_id}")
+            print(f"  鉂?椤圭洰璁块棶鏉冮檺琚嫆缁? account_id={project.get('account_id')}, user_id={user_id}")
             raise HTTPException(status_code=403, detail="Access denied")
         
-        print(f"  ✅ 项目访问权限验证通过")
+        print(f"  鉁?椤圭洰璁块棶鏉冮檺楠岃瘉閫氳繃")
         
-        # 获取项目关联的线程
-        print(f"  💬 获取项目关联的线程...")
+        # 鑾峰彇椤圭洰鍏宠仈鐨勭嚎绋?
+        print(f"  馃挰 鑾峰彇椤圭洰鍏宠仈鐨勭嚎绋?..")
         threads_result = await client.table('threads').select('*').eq('project_id', project_id).order('created_at', desc=True).execute()
         threads_data = []
         if threads_result.data:
-            print(f"    📋 找到 {len(threads_result.data)} 个关联线程")
+            print(f"    馃搵 鎵惧埌 {len(threads_result.data)} 涓叧鑱旂嚎绋?)
             threads_data = [{
                 "thread_id": thread['thread_id'],
                 "account_id": thread['account_id'],
@@ -3504,18 +3504,18 @@ async def get_project(
                 "updated_at": thread['updated_at']
             } for thread in threads_result.data]
             
-            # 打印最近的几个线程
-            for i, thread in enumerate(threads_result.data[:3]):  # 只显示前3个
+            # 鎵撳嵃鏈€杩戠殑鍑犱釜绾跨▼
+            for i, thread in enumerate(threads_result.data[:3]):  # 鍙樉绀哄墠3涓?
                 print(f"      {i+1}. thread_id: {thread['thread_id']}, created_at: {thread['created_at']}")
         else:
-            print(f"    ⏭️ 无关联线程")
+            print(f"    鈴笍 鏃犲叧鑱旂嚎绋?)
         
-        # 获取项目相关的Agent运行记录
-        print(f"  🤖 获取项目相关的Agent运行记录...")
+        # 鑾峰彇椤圭洰鐩稿叧鐨凙gent杩愯璁板綍
+        print(f"  馃 鑾峰彇椤圭洰鐩稿叧鐨凙gent杩愯璁板綍...")
         agent_runs_result = await client.table('agent_runs').select('*').in_('thread_id', [t['thread_id'] for t in threads_data]).order('created_at', desc=True).execute()
         agent_runs_data = []
         if agent_runs_result.data:
-            print(f"    📋 找到 {len(agent_runs_result.data)} 条Agent运行记录")
+            print(f"    馃搵 鎵惧埌 {len(agent_runs_result.data)} 鏉gent杩愯璁板綍")
             agent_runs_data = [{
                 "id": run['id'],
                 "thread_id": run['thread_id'],
@@ -3528,26 +3528,26 @@ async def get_project(
                 "created_at": run['created_at']
             } for run in agent_runs_result.data]
             
-            # 打印最近的几条运行记录
-            for i, run in enumerate(agent_runs_result.data[:3]):  # 只显示前3条
-                print(f"      {i+1}. ID: {run['id']}, 状态: {run.get('status', 'N/A')}, 线程: {run.get('thread_id')}")
+            # 鎵撳嵃鏈€杩戠殑鍑犳潯杩愯璁板綍
+            for i, run in enumerate(agent_runs_result.data[:3]):  # 鍙樉绀哄墠3鏉?
+                print(f"      {i+1}. ID: {run['id']}, 鐘舵€? {run.get('status', 'N/A')}, 绾跨▼: {run.get('thread_id')}")
         else:
-            print(f"    ⏭️ 无Agent运行记录")
+            print(f"    鈴笍 鏃燗gent杩愯璁板綍")
         
-        # 统计项目总消息数
-        print(f"  📊 统计项目总消息数...")
+        # 缁熻椤圭洰鎬绘秷鎭暟
+        print(f"  馃搳 缁熻椤圭洰鎬绘秷鎭暟...")
         total_message_count = 0
         if threads_data:
             for thread in threads_data:
                 message_count_result = await client.schema('public').table('events').select('id', count='exact').eq('session_id', thread['thread_id']).execute()
                 thread_message_count = message_count_result.count if message_count_result.count is not None else 0
                 total_message_count += thread_message_count
-                print(f"    📈 线程 {thread['thread_id']}: {thread_message_count} 条消息")
+                print(f"    馃搱 绾跨▼ {thread['thread_id']}: {thread_message_count} 鏉℃秷鎭?)
         
-        print(f"    📈 项目总消息数: {total_message_count}")
+        print(f"    馃搱 椤圭洰鎬绘秷鎭暟: {total_message_count}")
         
-        # 构建返回数据
-        print(f"  🔄 构建返回数据...")
+        # 鏋勫缓杩斿洖鏁版嵁
+        print(f"  馃攧 鏋勫缓杩斿洖鏁版嵁...")
         mapped_project = {
             "project_id": project['project_id'],
             "name": project.get('name', ''),
@@ -3563,8 +3563,8 @@ async def get_project(
             "thread_count": len(threads_data)
         }
         
-        print(f"  ✅ 数据构建完成")
-        print(f"    📊 返回数据概览:")
+        print(f"  鉁?鏁版嵁鏋勫缓瀹屾垚")
+        print(f"    馃搳 杩斿洖鏁版嵁姒傝:")
         print(f"      - project_id: {mapped_project['project_id']}")
         print(f"      - name: {mapped_project['name']}")
         print(f"      - account_id: {mapped_project['account_id']}")
@@ -3574,14 +3574,14 @@ async def get_project(
         print(f"      - has_sandbox: {bool(mapped_project['sandbox'])}")
         
         logger.info(f"[API] Mapped project for frontend: {project_id} with {len(threads_data)} threads and {total_message_count} total messages")
-        print(f"🎉 ===== 项目信息获取完成 =====")
+        print(f"馃帀 ===== 椤圭洰淇℃伅鑾峰彇瀹屾垚 =====")
         return mapped_project
         
     except HTTPException:
-        print(f"  ❌ HTTP异常: {e}")
+        print(f"  鉂?HTTP寮傚父: {e}")
         raise
     except Exception as e:
-        print(f"  ❌ 获取项目信息失败: {str(e)}")
+        print(f"  鉂?鑾峰彇椤圭洰淇℃伅澶辫触: {str(e)}")
         logger.error(f"Error fetching project {project_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to fetch project: {str(e)}")
 
@@ -3592,41 +3592,41 @@ async def get_thread(
     user_id: str = Depends(get_current_user_id_from_jwt)
 ):
     """Get a specific thread by ID with complete related data."""
-    print(f"🔄 ===== 开始获取线程信息 =====")
-    print(f"  📋 thread_id: {thread_id}")
-    print(f"  👤 user_id: {user_id}")
+    print(f"馃攧 ===== 寮€濮嬭幏鍙栫嚎绋嬩俊鎭?=====")
+    print(f"  馃搵 thread_id: {thread_id}")
+    print(f"  馃懁 user_id: {user_id}")
     logger.info(f"Fetching thread: {thread_id}")
     client = await db.client
     
     try:
-        print(f"  🔐 验证线程访问权限...")
+        print(f"  馃攼 楠岃瘉绾跨▼璁块棶鏉冮檺...")
         await verify_thread_access(client, thread_id, user_id)
-        print(f"  ✅ 线程访问权限验证通过")
+        print(f"  鉁?绾跨▼璁块棶鏉冮檺楠岃瘉閫氳繃")
         
         # Get the thread data
-        print(f"  📊 获取线程数据...")
+        print(f"  馃搳 鑾峰彇绾跨▼鏁版嵁...")
         thread_result = await client.table('threads').select('*').eq('thread_id', thread_id).execute()
         
         if not thread_result.data:
-            print(f"  ❌ 线程未找到: {thread_id}")
+            print(f"  鉂?绾跨▼鏈壘鍒? {thread_id}")
             raise HTTPException(status_code=404, detail="Thread not found")
         
         thread = thread_result.data[0]
-        print(f"  ✅ 线程数据获取成功")
-        print(f"    📝 线程信息: account_id={thread.get('account_id')}, project_id={thread.get('project_id')}")
+        print(f"  鉁?绾跨▼鏁版嵁鑾峰彇鎴愬姛")
+        print(f"    馃摑 绾跨▼淇℃伅: account_id={thread.get('account_id')}, project_id={thread.get('project_id')}")
         
         # Get associated project if thread has a project_id
-        print(f"  📁 检查关联项目...")
+        print(f"  馃搧 妫€鏌ュ叧鑱旈」鐩?..")
         project_data = None
         if thread.get('project_id'):
-            print(f"    🔍 线程关联项目ID: {thread['project_id']}")
+            print(f"    馃攳 绾跨▼鍏宠仈椤圭洰ID: {thread['project_id']}")
             project_result = await client.table('projects').select('*').eq('project_id', thread['project_id']).execute()
             
             if project_result.data:
                 project = project_result.data[0]
-                print(f"    ✅ 项目数据获取成功")
-                print(f"      📝 项目名称: {project.get('name', 'N/A')}")
-                print(f"      📝 项目描述: {project.get('description', 'N/A')}")
+                print(f"    鉁?椤圭洰鏁版嵁鑾峰彇鎴愬姛")
+                print(f"      馃摑 椤圭洰鍚嶇О: {project.get('name', 'N/A')}")
+                print(f"      馃摑 椤圭洰鎻忚堪: {project.get('description', 'N/A')}")
                 logger.info(f"[API] Raw project from DB for thread {thread_id}")
                 project_data = {
                     "project_id": project['project_id'],
@@ -3639,23 +3639,23 @@ async def get_thread(
                     "updated_at": project['updated_at']
                 }
             else:
-                print(f"    ⚠️ 项目未找到: {thread['project_id']}")
+                print(f"    鈿狅笍 椤圭洰鏈壘鍒? {thread['project_id']}")
         else:
-            print(f"    ⏭️ 线程无关联项目")
+            print(f"    鈴笍 绾跨▼鏃犲叧鑱旈」鐩?)
         
         # Get message count for the thread
-        print(f"  📊 统计消息数量...")
-        # 从ADK events表统计消息数量
+        print(f"  馃搳 缁熻娑堟伅鏁伴噺...")
+        # 浠嶢DK events琛ㄧ粺璁℃秷鎭暟閲?
         message_count_result = await client.schema('public').table('events').select('id', count='exact').eq('session_id', thread_id).execute()
         message_count = message_count_result.count if message_count_result.count is not None else 0
-        print(f"    📈 消息总数: {message_count}")
+        print(f"    馃搱 娑堟伅鎬绘暟: {message_count}")
         
         # Get recent agent runs for the thread
-        print(f"  🤖 获取最近的Agent运行记录...")
+        print(f"  馃 鑾峰彇鏈€杩戠殑Agent杩愯璁板綍...")
         agent_runs_result = await client.table('agent_runs').select('*').eq('thread_id', thread_id).order('created_at', desc=True).execute()
         agent_runs_data = []
         if agent_runs_result.data:
-            print(f"    📋 找到 {len(agent_runs_result.data)} 条Agent运行记录")
+            print(f"    馃搵 鎵惧埌 {len(agent_runs_result.data)} 鏉gent杩愯璁板綍")
             agent_runs_data = [{
                 "id": run['id'],
                 "status": run.get('status', ''),
@@ -3667,14 +3667,14 @@ async def get_thread(
                 "created_at": run['created_at']
             } for run in agent_runs_result.data]
             
-            # 打印最近的几条运行记录
-            for i, run in enumerate(agent_runs_result.data[:3]):  # 只显示前3条
-                print(f"      {i+1}. ID: {run['id']}, 状态: {run.get('status', 'N/A')}, 开始时间: {run.get('started_at')}")
+            # 鎵撳嵃鏈€杩戠殑鍑犳潯杩愯璁板綍
+            for i, run in enumerate(agent_runs_result.data[:3]):  # 鍙樉绀哄墠3鏉?
+                print(f"      {i+1}. ID: {run['id']}, 鐘舵€? {run.get('status', 'N/A')}, 寮€濮嬫椂闂? {run.get('started_at')}")
         else:
-            print(f"    ⏭️ 无Agent运行记录")
+            print(f"    鈴笍 鏃燗gent杩愯璁板綍")
         
         # Map thread data for frontend (matching actual DB structure)
-        print(f"  🔄 构建返回数据...")
+        print(f"  馃攧 鏋勫缓杩斿洖鏁版嵁...")
         mapped_thread = {
             "thread_id": thread['thread_id'],
             "account_id": thread['account_id'],
@@ -3688,8 +3688,8 @@ async def get_thread(
             "recent_agent_runs": agent_runs_data
         }
         
-        print(f"  ✅ 数据构建完成")
-        print(f"    📊 返回数据概览:")
+        print(f"  鉁?鏁版嵁鏋勫缓瀹屾垚")
+        print(f"    馃搳 杩斿洖鏁版嵁姒傝:")
         print(f"      - thread_id: {mapped_thread['thread_id']}")
         print(f"      - account_id: {mapped_thread['account_id']}")
         print(f"      - project_id: {mapped_thread['project_id']}")
@@ -3698,14 +3698,14 @@ async def get_thread(
         print(f"      - has_project: {mapped_thread['project'] is not None}")
         
         logger.info(f"[API] Mapped thread for frontend: {thread_id} with {message_count} messages and {len(agent_runs_data)} recent runs")
-        print(f"🎉 ===== 线程信息获取完成 =====")
+        print(f"馃帀 ===== 绾跨▼淇℃伅鑾峰彇瀹屾垚 =====")
         return mapped_thread
         
     except HTTPException:
-        print(f"  ❌ HTTP异常: {e}")
+        print(f"  鉂?HTTP寮傚父: {e}")
         raise
     except Exception as e:
-        print(f"  ❌ 获取线程信息失败: {str(e)}")
+        print(f"  鉂?鑾峰彇绾跨▼淇℃伅澶辫触: {str(e)}")
         logger.error(f"Error fetching thread {thread_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to fetch thread: {str(e)}")
 
@@ -3827,7 +3827,7 @@ async def get_thread_messages(
         batch_size = 1000
         offset = 0
         all_messages = []
-        # 🔧 Step 1: 从 messages 表查询系统消息 (assistant, tool, status等)
+        # 馃敡 Step 1: 浠?messages 琛ㄦ煡璇㈢郴缁熸秷鎭?(assistant, tool, status绛?
         all_system_messages = []
         offset = 0
         while True:
@@ -3842,7 +3842,7 @@ async def get_thread_messages(
                 break
             offset += batch_size
         
-        # 🔧 Step 2: 从 events 表查询用户消息
+        # 馃敡 Step 2: 浠?events 琛ㄦ煡璇㈢敤鎴锋秷鎭?
         all_user_events = []
         offset = 0  
         while True:
@@ -3857,15 +3857,15 @@ async def get_thread_messages(
                 break
             offset += batch_size
         
-        # 🔧 Step 3: 转换并合并两种数据源
+        # 馃敡 Step 3: 杞崲骞跺悎骞朵袱绉嶆暟鎹簮
         system_messages = _format_messages_from_table(all_system_messages)
         user_messages = _convert_user_events_to_messages(all_user_events)
         
-        # 🔧 Step 4: 合并并按时间排序
+        # 馃敡 Step 4: 鍚堝苟骞舵寜鏃堕棿鎺掑簭
         all_messages = system_messages + user_messages
         all_messages.sort(key=lambda x: x.get('created_at', ''), reverse=(order == "desc"))
         
-        # 🔍 详细统计
+        # 馃攳 璇︾粏缁熻
         system_stats = {}
         for msg in system_messages:
             msg_type = msg.get('type', 'unknown')
@@ -3881,10 +3881,10 @@ async def get_thread_messages(
             msg_type = msg.get('type', 'unknown')
             all_stats[msg_type] = all_stats.get(msg_type, 0) + 1
         
-        logger.info(f"🔗 合并结果统计:")
-        logger.info(f"  📨 系统消息{len(system_messages)}条: {system_stats}")
-        logger.info(f"  👤 用户消息{len(user_messages)}条: {user_stats}")
-        logger.info(f"  📊 总计{len(all_messages)}条: {all_stats}")
+        logger.info(f"馃敆 鍚堝苟缁撴灉缁熻:")
+        logger.info(f"  馃摠 绯荤粺娑堟伅{len(system_messages)}鏉? {system_stats}")
+        logger.info(f"  馃懁 鐢ㄦ埛娑堟伅{len(user_messages)}鏉? {user_stats}")
+        logger.info(f"  馃搳 鎬昏{len(all_messages)}鏉? {all_stats}")
         
         return {"messages": all_messages}
     except Exception as e:
@@ -3904,7 +3904,7 @@ async def get_agent_run(
     logger.warning(f"[DEPRECATED] Fetching agent run: {agent_run_id}")
     client = await db.client
     try:
-        # 使用正确的访问检查函数
+        # 浣跨敤姝ｇ‘鐨勮闂鏌ュ嚱鏁?
         agent_run_data = await get_agent_run_with_access_check(client, agent_run_id, user_id)
         return agent_run_data
     except HTTPException:
@@ -3924,11 +3924,11 @@ async def add_message_to_thread(
     client = await db.client
     await verify_thread_access(client, thread_id, user_id)
     try:
-        # 使用ADK events表记录用户消息
+        # 浣跨敤ADK events琛ㄨ褰曠敤鎴锋秷鎭?
         message_id = str(uuid.uuid4())
         event_id = await _log_adk_user_message_event(client, user_id, message, thread_id, message_id)
         
-        # 返回消息格式（模拟原messages表结构）
+        # 杩斿洖娑堟伅鏍煎紡锛堟ā鎷熷師messages琛ㄧ粨鏋勶級
         return {
             "message_id": message_id,
             "thread_id": thread_id,
@@ -3967,13 +3967,13 @@ async def create_message(
             "created_at": datetime.now()
         }
         
-        # 使用ADK events表记录消息
+        # 浣跨敤ADK events琛ㄨ褰曟秷鎭?
         if message_data.type == "user":
             event_id = await _log_adk_user_message_event(client, user_id, message_payload.get("content", ""), thread_id, insert_data["message_id"])
         else:
             event_id = await _log_adk_agent_response_event(client, user_id, message_payload.get("content", ""), thread_id, "unknown")
         
-        # 构建返回数据（模拟原messages表结构）
+        # 鏋勫缓杩斿洖鏁版嵁锛堟ā鎷熷師messages琛ㄧ粨鏋勶級
         created_message = {
             "message_id": insert_data["message_id"],
             "thread_id": thread_id,
@@ -4005,7 +4005,7 @@ async def delete_message(
     await verify_thread_access(client, thread_id, user_id)
     try:
         # Don't allow users to delete the "status" messages
-        # 从ADK events表删除消息（通过message_id在content中查找）
+        # 浠嶢DK events琛ㄥ垹闄ゆ秷鎭紙閫氳繃message_id鍦╟ontent涓煡鎵撅級
         await client.schema('public').table('events').delete().eq('session_id', thread_id).filter('content', 'cs', f'{{"message_id":"{message_id}"}}').execute()
         return {"message": "Message deleted successfully"}
     except Exception as e:
@@ -4229,10 +4229,10 @@ async def upload_agent_profile_image(
         logger.error(f"Failed to upload agent profile image for user {user_id}: {e}")
         raise HTTPException(status_code=500, detail="Failed to upload profile image")
 
-async def _create_adk_session_if_not_exists(client, user_id: str, session_id: str, app_name: str = "fufanmanus"):
-    """如果ADK session不存在则创建"""
+async def _create_adk_session_if_not_exists(client, user_id: str, session_id: str, app_name: str = "hephaestus"):
+    """濡傛灉ADK session涓嶅瓨鍦ㄥ垯鍒涘缓"""
     try:
-        # 检查session是否已存在
+        # 妫€鏌ession鏄惁宸插瓨鍦?
         async with client.pool.acquire() as conn:
             existing = await conn.fetchrow(
                 """
@@ -4243,7 +4243,7 @@ async def _create_adk_session_if_not_exists(client, user_id: str, session_id: st
             )
             
             if not existing:
-                # 不存在则创建
+                # 涓嶅瓨鍦ㄥ垯鍒涘缓
                 await conn.execute(
                     """
                     INSERT INTO sessions (
@@ -4261,8 +4261,8 @@ async def _create_adk_session_if_not_exists(client, user_id: str, session_id: st
         logger.error(f"Create ADK session failed: {e}")
         raise
 
-async def _log_adk_user_message_event(client, user_id: str, message_content: str, session_id: str, message_id: str, app_name: str = "fufanmanus"):
-    """记录用户消息事件到ADK events表"""
+async def _log_adk_user_message_event(client, user_id: str, message_content: str, session_id: str, message_id: str, app_name: str = "hephaestus"):
+    """璁板綍鐢ㄦ埛娑堟伅浜嬩欢鍒癆DK events琛?""
     try:
         import uuid
         import pickle
@@ -4271,13 +4271,13 @@ async def _log_adk_user_message_event(client, user_id: str, message_content: str
         event_id = str(uuid.uuid4())
         invocation_id = str(uuid.uuid4())
         
-        # 使用 ADK 标准格式（ADK 不接受 content 字段，只接受 parts）
+        # 浣跨敤 ADK 鏍囧噯鏍煎紡锛圓DK 涓嶆帴鍙?content 瀛楁锛屽彧鎺ュ彈 parts锛?
         content = {
             "role": "user", 
-            "parts": [{"text": message_content}]  # ADK 标准格式
+            "parts": [{"text": message_content}]  # ADK 鏍囧噯鏍煎紡
         }
         
-        # actions 需要手动序列化为字节（这是ADK的格式要求）
+        # actions 闇€瑕佹墜鍔ㄥ簭鍒楀寲涓哄瓧鑺傦紙杩欐槸ADK鐨勬牸寮忚姹傦級
         actions_dict = {
             "skip_summarization": None,
             "state_delta": {},
@@ -4287,10 +4287,10 @@ async def _log_adk_user_message_event(client, user_id: str, message_content: str
             "requested_auth_configs": {}
         }
         
-        # 手动序列化 actions 字典为字节（这是ADK的格式要求）
+        # 鎵嬪姩搴忓垪鍖?actions 瀛楀吀涓哄瓧鑺傦紙杩欐槸ADK鐨勬牸寮忚姹傦級
         actions_bytes = pickle.dumps(actions_dict)
         
-        # 插入到ADK events表
+        # 鎻掑叆鍒癆DK events琛?
         async with client.pool.acquire() as conn:
             await conn.execute(
                 """
@@ -4311,20 +4311,20 @@ async def _log_adk_user_message_event(client, user_id: str, message_content: str
         logger.error(f"Record user message event failed: {e}")
         raise
 
-async def _log_adk_agent_response_event(client, user_id: str, response_content: str, session_id: str, model_name: str, app_name: str = "fufanmanus"):
-    """记录AI代理回复事件到ADK events表"""
+async def _log_adk_agent_response_event(client, user_id: str, response_content: str, session_id: str, model_name: str, app_name: str = "hephaestus"):
+    """璁板綍AI浠ｇ悊鍥炲浜嬩欢鍒癆DK events琛?""
     try:
         import uuid
         event_id = str(uuid.uuid4())
         invocation_id = str(uuid.uuid4())
         
-        # 构建回复内容
+        # 鏋勫缓鍥炲鍐呭
         content = {            "role": "assistant",
             "content": response_content,
             "model": model_name
         }
         
-        # 插入到ADK events表
+        # 鎻掑叆鍒癆DK events琛?
         async with client.pool.acquire() as conn:
             await conn.execute(
                 """
@@ -4338,37 +4338,37 @@ async def _log_adk_agent_response_event(client, user_id: str, response_content: 
                 "assistant", datetime.now(), json.dumps(content), b'', True  # turn_complete=True
             )
         
-        logger.info(f"记录AI回复事件成功: {event_id}")
+        logger.info(f"璁板綍AI鍥炲浜嬩欢鎴愬姛: {event_id}")
         return event_id
         
     except Exception as e:
-        logger.error(f"记录AI回复事件失败: {e}")
+        logger.error(f"璁板綍AI鍥炲浜嬩欢澶辫触: {e}")
         raise
 
 def _format_messages_from_table(messages):
-    """格式化messages表数据为前端期望格式，支持assistant消息动态拆分"""
+    """鏍煎紡鍖杕essages琛ㄦ暟鎹负鍓嶇鏈熸湜鏍煎紡锛屾敮鎸乤ssistant娑堟伅鍔ㄦ€佹媶鍒?""
     formatted_messages = []
     
-    # 🔍 调试：检查原始数据库消息
-    logger.info(f"🔍 数据库原始消息数量: {len(messages)}")
+    # 馃攳 璋冭瘯锛氭鏌ュ師濮嬫暟鎹簱娑堟伅
+    logger.info(f"馃攳 鏁版嵁搴撳師濮嬫秷鎭暟閲? {len(messages)}")
     raw_message_stats = {}
     for msg in messages:
         msg_type = msg.get('type', 'unknown')
         raw_message_stats[msg_type] = raw_message_stats.get(msg_type, 0) + 1
-    logger.info(f"🔍 原始消息类型统计: {raw_message_stats}")
+    logger.info(f"馃攳 鍘熷娑堟伅绫诲瀷缁熻: {raw_message_stats}")
     
-    # 🔍 特别检查原始assistant消息
+    # 馃攳 鐗瑰埆妫€鏌ュ師濮媋ssistant娑堟伅
     raw_assistant_messages = [msg for msg in messages if msg.get('type') == 'assistant']
     if raw_assistant_messages:
         for assistant_msg in raw_assistant_messages:
             raw_msg_id = assistant_msg.get('message_id')
-            logger.info(f"🔍 发现原始assistant消息: ID={raw_msg_id} (类型: {type(raw_msg_id)}), metadata预览={str(assistant_msg.get('metadata', ''))[:200]}...")
+            logger.info(f"馃攳 鍙戠幇鍘熷assistant娑堟伅: ID={raw_msg_id} (绫诲瀷: {type(raw_msg_id)}), metadata棰勮={str(assistant_msg.get('metadata', ''))[:200]}...")
     else:
-        logger.warning("⚠️ 数据库查询结果中没有assistant消息！")
+        logger.warning("鈿狅笍 鏁版嵁搴撴煡璇㈢粨鏋滀腑娌℃湁assistant娑堟伅锛?)
     
     for msg in messages:
         try:
-            # 🔧 处理content字段 - 解析为对象以便后续判断
+            # 馃敡 澶勭悊content瀛楁 - 瑙ｆ瀽涓哄璞′互渚垮悗缁垽鏂?
             content = msg.get('content', {})
             content_obj = content
             if isinstance(content, str):
@@ -4387,7 +4387,7 @@ def _format_messages_from_table(messages):
                 content_str = str(content) if content else "{}"
                 content_obj = {}
             
-            # 🔧 处理metadata字段 - 解析为对象以便后续判断
+            # 馃敡 澶勭悊metadata瀛楁 - 瑙ｆ瀽涓哄璞′互渚垮悗缁垽鏂?
             metadata = msg.get('metadata', {})
             metadata_obj = metadata
             if isinstance(metadata, str):
@@ -4406,23 +4406,23 @@ def _format_messages_from_table(messages):
                 metadata_str = str(metadata) if metadata else "{}"
                 metadata_obj = {}
             
-            # 🔧 检查是否需要拆分assistant消息
+            # 馃敡 妫€鏌ユ槸鍚﹂渶瑕佹媶鍒哸ssistant娑堟伅
             if (msg.get("type") == "assistant" and 
                 metadata_obj.get("split_for_frontend") == True and
                 metadata_obj.get("tool_call_mapping")):
                 
-                logger.info(f"🔧 检测到需要拆分的assistant消息: {msg.get('message_id')}")
+                logger.info(f"馃敡 妫€娴嬪埌闇€瑕佹媶鍒嗙殑assistant娑堟伅: {msg.get('message_id')}")
                 tool_call_mapping = metadata_obj.get("tool_call_mapping", [])
                 assistant_text = content_obj.get("content", "")
                 tool_calls = content_obj.get("tool_calls", [])
                 
-                # 为每个tool_call创建单独的assistant消息
+                # 涓烘瘡涓猼ool_call鍒涘缓鍗曠嫭鐨刟ssistant娑堟伅
                 for mapping in tool_call_mapping:
                     index = mapping.get("index", 0)
                     tool_call_id = mapping.get("tool_call_id", "")
                     include_text = mapping.get("include_text", False)
                     
-                    # 找到对应的tool_call对象
+                    # 鎵惧埌瀵瑰簲鐨則ool_call瀵硅薄
                     matching_tool_call = None
                     for tc in tool_calls:
                         if tc.get("id") == tool_call_id:
@@ -4430,26 +4430,26 @@ def _format_messages_from_table(messages):
                             break
                     
                     if matching_tool_call:
-                        # 🔧 生成确定性UUID（与agent/run.py保持一致）
+                        # 馃敡 鐢熸垚纭畾鎬UID锛堜笌agent/run.py淇濇寔涓€鑷达級
                         import hashlib
                         seed_data = f"assistant_split_{tool_call_id}_{msg.get('thread_id')}_{index}_v1"
                         hash_object = hashlib.md5(seed_data.encode())
                         hex_dig = hash_object.hexdigest()
                         deterministic_uuid = f"{hex_dig[:8]}-{hex_dig[8:12]}-{hex_dig[12:16]}-{hex_dig[16:20]}-{hex_dig[20:]}"
                         
-                        # 构建拆分后的消息内容
+                        # 鏋勫缓鎷嗗垎鍚庣殑娑堟伅鍐呭
                         split_content = {
                             "role": "assistant",
                             "content": assistant_text if include_text else "",
                             "tool_calls": [matching_tool_call]
                         }
                         
-                        # 构建拆分后的元数据
+                        # 鏋勫缓鎷嗗垎鍚庣殑鍏冩暟鎹?
                         split_metadata = metadata_obj.copy()
                         split_metadata["tool_index"] = index
                         split_metadata["original_message_id"] = str(msg.get("message_id")) if msg.get("message_id") else None
                         
-                        # 创建拆分后的消息 - 确保所有UUID字段都是字符串
+                        # 鍒涘缓鎷嗗垎鍚庣殑娑堟伅 - 纭繚鎵€鏈塙UID瀛楁閮芥槸瀛楃涓?
                         split_message = {
                             "message_id": deterministic_uuid,
                             "thread_id": str(msg.get("thread_id")) if msg.get("thread_id") else None,
@@ -4465,19 +4465,19 @@ def _format_messages_from_table(messages):
                         }
                         
                         formatted_messages.append(split_message)
-                        logger.info(f"✅ 拆分assistant消息: {deterministic_uuid} (tool: {matching_tool_call.get('function', {}).get('name', 'unknown')})")
-                        logger.debug(f"🔍 拆分消息字段类型检查: message_id={type(deterministic_uuid)}, thread_id={type(split_message['thread_id'])}")
+                        logger.info(f"鉁?鎷嗗垎assistant娑堟伅: {deterministic_uuid} (tool: {matching_tool_call.get('function', {}).get('name', 'unknown')})")
+                        logger.debug(f"馃攳 鎷嗗垎娑堟伅瀛楁绫诲瀷妫€鏌? message_id={type(deterministic_uuid)}, thread_id={type(split_message['thread_id'])}")
                 
             else:
-                # 🔧 普通消息处理逻辑 - 确保所有UUID字段都是字符串
+                # 馃敡 鏅€氭秷鎭鐞嗛€昏緫 - 纭繚鎵€鏈塙UID瀛楁閮芥槸瀛楃涓?
                 formatted_message = {
                     "message_id": str(msg.get("message_id")) if msg.get("message_id") else None,
                     "thread_id": str(msg.get("thread_id")) if msg.get("thread_id") else None,
-                    "type": msg.get("type"),  # assistant, user, tool, status等
-                    "role": msg.get("role"),  # assistant, user, system等
+                    "type": msg.get("type"),  # assistant, user, tool, status绛?
+                    "role": msg.get("role"),  # assistant, user, system绛?
                     "is_llm_message": msg.get("is_llm_message", False),
-                    "content": content_str,     # JSON字符串格式
-                    "metadata": metadata_str,   # JSON字符串格式  
+                    "content": content_str,     # JSON瀛楃涓叉牸寮?
+                    "metadata": metadata_str,   # JSON瀛楃涓叉牸寮? 
                     "created_at": msg.get("created_at"),
                     "updated_at": msg.get("updated_at"),
                     "agent_id": str(msg.get("agent_id")) if msg.get("agent_id") else None,
@@ -4487,14 +4487,14 @@ def _format_messages_from_table(messages):
                 formatted_messages.append(formatted_message)
             
         except Exception as e:
-            logger.warning(f"跳过格式错误的消息 {msg.get('message_id', 'unknown')}: {e}")
+            logger.warning(f"璺宠繃鏍煎紡閿欒鐨勬秷鎭?{msg.get('message_id', 'unknown')}: {e}")
             continue
     
-                # 🔧 更新tool消息的assistant_message_id关联
+                # 馃敡 鏇存柊tool娑堟伅鐨刟ssistant_message_id鍏宠仈
     assistant_messages = [msg for msg in formatted_messages if msg.get('type') == 'assistant']
     tool_messages = [msg for msg in formatted_messages if msg.get('type') == 'tool']
     
-    # 创建tool_call_id到assistant_message_id的映射
+    # 鍒涘缓tool_call_id鍒癮ssistant_message_id鐨勬槧灏?
     tool_call_to_assistant = {}
     for assistant_msg in assistant_messages:
         try:
@@ -4508,9 +4508,9 @@ def _format_messages_from_table(messages):
                 if tool_call_id:
                     tool_call_to_assistant[tool_call_id] = assistant_msg.get('message_id')
         except Exception as e:
-            logger.warning(f"⚠️ 解析assistant消息content失败: {e}")
+            logger.warning(f"鈿狅笍 瑙ｆ瀽assistant娑堟伅content澶辫触: {e}")
     
-    # 更新tool消息的assistant_message_id
+    # 鏇存柊tool娑堟伅鐨刟ssistant_message_id
     updated_tool_count = 0
     for tool_msg in tool_messages:
         try:
@@ -4524,30 +4524,30 @@ def _format_messages_from_table(messages):
                 metadata['assistant_message_id'] = correct_assistant_id
                 tool_msg['metadata'] = json.dumps(metadata, ensure_ascii=False)
                 updated_tool_count += 1
-                logger.info(f"🔗 更新tool消息 {tool_msg.get('message_id')} -> assistant {correct_assistant_id}")
+                logger.info(f"馃敆 鏇存柊tool娑堟伅 {tool_msg.get('message_id')} -> assistant {correct_assistant_id}")
         except Exception as e:
-            logger.warning(f"⚠️ 更新tool消息关联失败 {tool_msg.get('message_id')}: {e}")
+            logger.warning(f"鈿狅笍 鏇存柊tool娑堟伅鍏宠仈澶辫触 {tool_msg.get('message_id')}: {e}")
     
-    # 🔍 最终统计
-    logger.info(f"🤖 最终Assistant消息数量: {len(assistant_messages)}")
-    logger.info(f"🔧 Tool消息数量: {len(tool_messages)}")
-    logger.info(f"🔗 更新了 {updated_tool_count} 个tool消息的关联")
+    # 馃攳 鏈€缁堢粺璁?
+    logger.info(f"馃 鏈€缁圓ssistant娑堟伅鏁伴噺: {len(assistant_messages)}")
+    logger.info(f"馃敡 Tool娑堟伅鏁伴噺: {len(tool_messages)}")
+    logger.info(f"馃敆 鏇存柊浜?{updated_tool_count} 涓猼ool娑堟伅鐨勫叧鑱?)
     
     return formatted_messages
 
 def _convert_user_events_to_messages(events):
-    """将用户events转换为前端期望的消息格式"""
+    """灏嗙敤鎴積vents杞崲涓哄墠绔湡鏈涚殑娑堟伅鏍煎紡"""
     user_messages = []
     
     for event in events:
         try:
-            # 🔧 解析content字段
+            # 馃敡 瑙ｆ瀽content瀛楁
             content = event.get('content')
             if isinstance(content, str):
                 import json
                 content = json.loads(content)
             
-            # 🔧 提取用户文本内容
+            # 馃敡 鎻愬彇鐢ㄦ埛鏂囨湰鍐呭
             user_text = ""
             if isinstance(content, dict) and 'parts' in content:
                 text_parts = []
@@ -4560,7 +4560,7 @@ def _convert_user_events_to_messages(events):
             else:
                 user_text = str(content)
             
-            # 🔧 构建前端期望的用户消息格式
+            # 馃敡 鏋勫缓鍓嶇鏈熸湜鐨勭敤鎴锋秷鎭牸寮?
             import json
             user_content = {
                 "role": "user",
@@ -4573,20 +4573,21 @@ def _convert_user_events_to_messages(events):
                 "type": "user",
                 "role": "user", 
                 "is_llm_message": False,
-                "content": json.dumps(user_content, ensure_ascii=False),  # JSON字符串
-                "metadata": "{}",  # 空metadata
+                "content": json.dumps(user_content, ensure_ascii=False),  # JSON瀛楃涓?
+                "metadata": "{}",  # 绌簃etadata
                 "created_at": event.get("timestamp"),
-                "updated_at": event.get("timestamp"),  # 使用timestamp作为updated_at
+                "updated_at": event.get("timestamp"),  # 浣跨敤timestamp浣滀负updated_at
                 "agent_id": None,
                 "agent_version_id": None
             }
             
             user_messages.append(formatted_message)
-            logger.debug(f"转换用户消息: {event.get('id')} - {user_text[:50]}{'...' if len(user_text) > 50 else ''}")
+            logger.debug(f"杞崲鐢ㄦ埛娑堟伅: {event.get('id')} - {user_text[:50]}{'...' if len(user_text) > 50 else ''}")
             
         except Exception as e:
-            logger.warning(f"跳过格式错误的用户事件 {event.get('id', 'unknown')}: {e}")
+            logger.warning(f"璺宠繃鏍煎紡閿欒鐨勭敤鎴蜂簨浠?{event.get('id', 'unknown')}: {e}")
             continue
     
-    logger.info(f"🔄 转换了 {len(user_messages)} 条用户消息")
+    logger.info(f"馃攧 杞崲浜?{len(user_messages)} 鏉＄敤鎴锋秷鎭?)
     return user_messages
+

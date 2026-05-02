@@ -1,13 +1,13 @@
-"""
-custom_agents = True       是否启用自定义Agent功能
-mcp_module = True          是否启用MCP模块
-templates_api = True       是否启用模板API
-triggers_api = True        是否启用触发器API
-workflows_api = True       是否启用工作流API
-knowledge_base = True      是否启用知识库
-pipedream = True           是否启用Pipedream集成
-credentials_api = True     是否启用凭据API
-default_agent = True       是否启用默认Agent
+﻿"""
+custom_agents = True       鏄惁鍚敤鑷畾涔堿gent鍔熻兘
+mcp_module = True          鏄惁鍚敤MCP妯″潡
+templates_api = True       鏄惁鍚敤妯℃澘API
+triggers_api = True        鏄惁鍚敤瑙﹀彂鍣ˋPI
+workflows_api = True       鏄惁鍚敤宸ヤ綔娴丄PI
+knowledge_base = True      鏄惁鍚敤鐭ヨ瘑搴?
+pipedream = True           鏄惁鍚敤Pipedream闆嗘垚
+credentials_api = True     鏄惁鍚敤鍑嵁API
+default_agent = True       鏄惁鍚敤榛樿Agent
 """
 
 import json
@@ -51,26 +51,26 @@ class FeatureFlagManager:
     
     async def is_enabled(self, key: str) -> bool:
         """Check if a feature flag is enabled"""
-        logger.info(f"🔍 [FLAGS] Checking if flag '{key}' is enabled...")
+        logger.info(f"馃攳 [FLAGS] Checking if flag '{key}' is enabled...")
         try:
             flag_key = f"{self.flag_prefix}{key}"
-            logger.info(f"🔍 [FLAGS] Redis key: {flag_key}")
+            logger.info(f"馃攳 [FLAGS] Redis key: {flag_key}")
             
             redis_client = await redis.get_client()
-            logger.info(f"🔍 [FLAGS] Got Redis client")
+            logger.info(f"馃攳 [FLAGS] Got Redis client")
             
             enabled = await redis_client.hget(flag_key, 'enabled')
-            logger.info(f"🔍 [FLAGS] Redis returned: {enabled}")
+            logger.info(f"馃攳 [FLAGS] Redis returned: {enabled}")
             
             result = enabled == 'true' if enabled else False
-            logger.info(f"✅ [FLAGS] Flag '{key}' enabled: {result}")
+            logger.info(f"鉁?[FLAGS] Flag '{key}' enabled: {result}")
             return result
             
         except Exception as e:
-            logger.error(f"❌ [FLAGS] Failed to check feature flag {key}: {e}")
-            logger.error(f"❌ [FLAGS] Exception type: {type(e)}")
+            logger.error(f"鉂?[FLAGS] Failed to check feature flag {key}: {e}")
+            logger.error(f"鉂?[FLAGS] Exception type: {type(e)}")
             import traceback
-            logger.error(f"❌ [FLAGS] Traceback: {traceback.format_exc()}")
+            logger.error(f"鉂?[FLAGS] Traceback: {traceback.format_exc()}")
             # Return False by default if Redis is unavailable
             return False
     
@@ -175,8 +175,8 @@ async def get_flag_details(key: str) -> Optional[Dict[str, str]]:
 
 # Feature Flags
 
-# Fufanmanus default agent feature flag
-fufanmanus_default_agent = True
+# Hephaestus default agent feature flag
+hephaestus_default_agent = True
 
 # Custom agents feature flag
 custom_agents = True
@@ -201,6 +201,7 @@ pipedream = False
 
 # Credentials API feature flag
 credentials_api = False
+
 
 
 

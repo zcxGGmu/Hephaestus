@@ -1,11 +1,11 @@
-import datetime
+﻿import datetime
 from typing import Dict, Any, List
 from agent.prompt import SYSTEM_PROMPT
 
-class FufanmanusConfig:
-    NAME = "FuFanManus"
-    DESCRIPTION = "FuFanManus is your AI assistant with access to various tools and integrations to help you with tasks across domains."
-    AVATAR = "🌞"
+class HephaestusConfig:
+    NAME = "Hephaestus"
+    DESCRIPTION = "Hephaestus is your AI assistant with access to various tools and integrations to help you with tasks across domains."
+    AVATAR = "馃尀"
     AVATAR_COLOR = "#F59E0B"
     DEFAULT_MODEL = "DeepSeek/DeepSeek-chat"
     SYSTEM_PROMPT = SYSTEM_PROMPT
@@ -66,19 +66,19 @@ class FufanmanusConfig:
 
 
 def add_tool(tool_name: str, description: str, enabled: bool = True):
-    FufanmanusConfig.DEFAULT_TOOLS[tool_name] = {
+    HephaestusConfig.DEFAULT_TOOLS[tool_name] = {
         "enabled": enabled,
         "description": description
     }
 
 def remove_tool(tool_name: str):
-    if tool_name in FufanmanusConfig.DEFAULT_TOOLS:
-        del FufanmanusConfig.DEFAULT_TOOLS[tool_name]
+    if tool_name in HephaestusConfig.DEFAULT_TOOLS:
+        del HephaestusConfig.DEFAULT_TOOLS[tool_name]
 
 def enable_tool(tool_name: str):
-    if tool_name in FufanmanusConfig.DEFAULT_TOOLS:
-        FufanmanusConfig.DEFAULT_TOOLS[tool_name]["enabled"] = True
+    if tool_name in HephaestusConfig.DEFAULT_TOOLS:
+        HephaestusConfig.DEFAULT_TOOLS[tool_name]["enabled"] = True
 
 def disable_tool(tool_name: str):  
-    if tool_name in FufanmanusConfig.DEFAULT_TOOLS:
-        FufanmanusConfig.DEFAULT_TOOLS[tool_name]["enabled"] = False 
+    if tool_name in HephaestusConfig.DEFAULT_TOOLS:
+        HephaestusConfig.DEFAULT_TOOLS[tool_name]["enabled"] = False 

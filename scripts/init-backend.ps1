@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$BackendDir = "..\\backend"
 )
 
@@ -20,9 +20,10 @@ try {
 
   python scripts/01_setup_database.py
   python scripts/02_setup_redis.py
-  python scripts/03_init_fufanmanus_table.py
+  python scripts/03_init_hephaestus_table.py
 }
 finally {
   Pop-Location
 }
+
 

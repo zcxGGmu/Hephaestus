@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Database setup script
 Help quickly configure PostgreSQL database connection and table structure
@@ -39,7 +39,7 @@ async def create_database_if_not_exists(host, port, username, password, database
         return False
 
 async def test_database_connection():
-    """测试数据库连接"""
+    """娴嬭瘯鏁版嵁搴撹繛鎺?""
     print("Test database connection...")
     
     try:
@@ -49,11 +49,11 @@ async def test_database_connection():
         print("asyncpg is not installed, please run: pip install asyncpg")
         return False
     
-    # 获取数据库连接信息
+    # 鑾峰彇鏁版嵁搴撹繛鎺ヤ俊鎭?
     print("\nPlease enter database connection information:")
     host = input("Host address (default: localhost): ").strip() or "localhost"
     port = input("Port (default: 5432): ").strip() or "5432"
-    database = input("Database name (default: fufanmanus): ").strip() or "fufanmanus"
+    database = input("Database name (default: hephaestus): ").strip() or "hephaestus"
     username = input("Username (default: postgres): ").strip() or "postgres"
     password = input("Password: ").strip()
     
@@ -61,24 +61,24 @@ async def test_database_connection():
         print("Password cannot be empty")
         return False
     
-    # 构建连接字符串
+    # 鏋勫缓杩炴帴瀛楃涓?
     database_url = f"postgresql://{username}:{password}@{host}:{port}/{database}"
     print(f"\nConnection string: postgresql://{username}:***@{host}:{port}/{database}")
     
     try:
-        # 测试连接
+        # 娴嬭瘯杩炴帴
         conn = await asyncpg.connect(database_url)
         print("Database connection successful")
         
-        # 测试查询
+        # 娴嬭瘯鏌ヨ
         result = await conn.fetchval("SELECT version()")
         print(f"PostgreSQL version: {result.split(',')[0]}")
         
         await conn.close()
         
-        # 保存配置到.env文件
-        # JWT:（JSON Web Token）是一种开放标准（RFC 7519），用于在不同系统之间安全地传递信息
-        # 让服务器和客户端之间安全地传递身份验证和授权信息，常用于登录态管理、API 授权、分布式系统单点登录等场景
+        # 淇濆瓨閰嶇疆鍒?env鏂囦欢
+        # JWT:锛圝SON Web Token锛夋槸涓€绉嶅紑鏀炬爣鍑嗭紙RFC 7519锛夛紝鐢ㄤ簬鍦ㄤ笉鍚岀郴缁熶箣闂村畨鍏ㄥ湴浼犻€掍俊鎭?
+        # 璁╂湇鍔″櫒鍜屽鎴风涔嬮棿瀹夊叏鍦颁紶閫掕韩浠介獙璇佸拰鎺堟潈淇℃伅锛屽父鐢ㄤ簬鐧诲綍鎬佺鐞嗐€丄PI 鎺堟潈銆佸垎甯冨紡绯荤粺鍗曠偣鐧诲綍绛夊満鏅?
         env_content = f"""# Database configuration
 DATABASE_URL={database_url}
 
@@ -146,7 +146,7 @@ async def main():
     print("Database setup guide")
     print("=" * 50)
     
-    # 步骤1: 测试数据库连接
+    # 姝ラ1: 娴嬭瘯鏁版嵁搴撹繛鎺?
     if not await test_database_connection():
         print("\nDatabase connection failed, please check the configuration and try again")
         return

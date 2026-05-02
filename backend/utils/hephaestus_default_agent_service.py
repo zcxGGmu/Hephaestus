@@ -1,21 +1,21 @@
-from typing import Dict, Any, Optional
+﻿from typing import Dict, Any, Optional
 from utils.logger import logger
 from services.postgresql import DBConnection
-from agent.fufanmanus import SunaSyncService
+from agent.hephaestus import SunaSyncService
 
 
 class SunaDefaultAgentService:
     def __init__(self, db: DBConnection = None):
         self._sync_service = SunaSyncService()
         self._db = db or DBConnection()
-        logger.info("🔄 SunaDefaultAgentService initialized with modular backend")
+        logger.info("馃攧 SunaDefaultAgentService initialized with modular backend")
     
     async def get_suna_default_config(self) -> Dict[str, Any]:
         current_config = self._sync_service.config_manager.get_current_config()
         return current_config.to_dict()
     
     async def sync_all_suna_agents(self) -> Dict[str, Any]:
-        logger.info("🔄 Delegating to modular sync service (preserves user customizations)")
+        logger.info("馃攧 Delegating to modular sync service (preserves user customizations)")
         result = await self._sync_service.sync_all_agents()
         
         return {
@@ -25,11 +25,11 @@ class SunaDefaultAgentService:
         }
     
     async def update_all_suna_agents(self, target_version: Optional[str] = None) -> Dict[str, Any]:
-        logger.info("🔄 Delegating to modular sync service (version auto-detected)")
+        logger.info("馃攧 Delegating to modular sync service (version auto-detected)")
         return await self.sync_all_suna_agents()
     
     async def install_for_all_users(self) -> Dict[str, Any]:
-        logger.info("🔄 Delegating to modular installation service")
+        logger.info("馃攧 Delegating to modular installation service")
         result = await self._sync_service.install_for_all_missing_users()
         
         return {
@@ -39,7 +39,7 @@ class SunaDefaultAgentService:
         }
     
     async def install_suna_agent_for_user(self, account_id: str, replace_existing: bool = False) -> Optional[str]:
-        logger.info(f"🔄 Installing Suna agent for user: {account_id}")
+        logger.info(f"馃攧 Installing Suna agent for user: {account_id}")
         
         try:
             if replace_existing:
@@ -65,5 +65,5 @@ class SunaDefaultAgentService:
             return None
     
     async def get_suna_agent_stats(self) -> Dict[str, Any]:
-        logger.info("🔄 Delegating stats to modular service")
+        logger.info("馃攧 Delegating stats to modular service")
         return await self._sync_service.get_sync_status() 

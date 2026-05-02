@@ -1,4 +1,4 @@
-"""
+﻿"""
 User Authentication Service
 """
 
@@ -20,17 +20,17 @@ class AuthService:
     def __init__(self):
         self.db = DBConnection()
         self.auth = AuthUtils()
-        self.default_app_name = "fufanmanus"  # 默认应用名称
+        self.default_app_name = "hephaestus"  # 榛樿搴旂敤鍚嶇О
     
     async def _get_client(self):
-        """获取数据库客户端"""
+        """鑾峰彇鏁版嵁搴撳鎴风"""
         await self.db.initialize()
         return await self.db.client
     
     def _user_to_model(self, user_data: dict) -> User:
-        """转换数据库用户数据为模型"""
+        """杞崲鏁版嵁搴撶敤鎴锋暟鎹负妯″瀷"""
         return User(
-            id=str(user_data['id']),  # 确保UUID转换为字符串
+            id=str(user_data['id']),  # 纭繚UUID杞崲涓哄瓧绗︿覆
             email=user_data['email'],
             name=user_data['name'],
             created_at=user_data['created_at']
@@ -42,7 +42,7 @@ class AuthService:
         
         client = await self._get_client()
         
-        # 检查用户是否已存在
+        # 妫€鏌ョ敤鎴锋槸鍚﹀凡瀛樺湪
         async with client.pool.acquire() as conn:
             existing = await conn.fetchrow(
                 "SELECT id FROM users WHERE email = $1", 
@@ -52,7 +52,7 @@ class AuthService:
         if existing:
             raise HTTPException(status_code=400, detail="Email already registered")
         
-        # 创建新用户
+        # 鍒涘缓鏂扮敤鎴?
         hashed_password = self.auth.hash_password(request.password)
         
         async with client.pool.acquire() as conn:
@@ -67,41 +67,41 @@ class AuthService:
         
         user = dict(user_record)
         
-        # 生成访问令牌和刷新令牌
+        # 鐢熸垚璁块棶浠ょ墝鍜屽埛鏂颁护鐗?
         access_token = self.auth.create_access_token(str(user['id']))
         refresh_token = self.auth.create_refresh_token()
         
-        # 存储刷新令牌
+        # 瀛樺偍鍒锋柊浠ょ墝
         await self._store_refresh_token(str(user['id']), refresh_token)
         
-        # 更新用户状态
+        # 鏇存柊鐢ㄦ埛鐘舵€?
         await self._update_user_state(client, str(user['id']), {
             'last_login': datetime.now().isoformat(),
             'login_count': 1,
             'email_verified': False
         })
         
-        # 使用默认应用名称
+        # 浣跨敤榛樿搴旂敤鍚嶇О
         app_name = self.default_app_name
         
-        # 创建注册会话（注册时先创建会话，再记录事件，用来适配ADK框架中无法使用session_id字段的情况）
+        # 鍒涘缓娉ㄥ唽浼氳瘽锛堟敞鍐屾椂鍏堝垱寤轰細璇濓紝鍐嶈褰曚簨浠讹紝鐢ㄦ潵閫傞厤ADK妗嗘灦涓棤娉曚娇鐢╯ession_id瀛楁鐨勬儏鍐碉級
         await self._create_adk_session(client, str(user['id']), {
             'registration_time': datetime.now().isoformat(),
             'registration_method': 'email_password',
             'status': 'active'
         }, app_name)
         
-        # 注册时创建FuFanManus Agent
-        from agent.fufanmanus.repository import FufanmanusAgentRepository
-        repository = FufanmanusAgentRepository()
-        await repository.create_fufanmanus_agent(str(user['id']))
+        # 娉ㄥ唽鏃跺垱寤篎uFanManus Agent
+        from agent.hephaestus.repository import HephaestusAgentRepository
+        repository = HephaestusAgentRepository()
+        await repository.create_hephaestus_agent(str(user['id']))
         
         logger.info(f"User registered: {request.email}")
         
         return AuthResponse(
             access_token=access_token,
             refresh_token=refresh_token,
-            expires_in=24 * 3600,  # 24小时
+            expires_in=24 * 3600,  # 24灏忔椂
             user=self._user_to_model(user)
         )
     
@@ -109,7 +109,7 @@ class AuthService:
         """User login"""
         client = await self._get_client()
         
-        # 查找用户（包含ADK状态字段）
+        # 鏌ユ壘鐢ㄦ埛锛堝寘鍚獳DK鐘舵€佸瓧娈碉級
         async with client.pool.acquire() as conn:
             user = await conn.fetchrow(
                 """
@@ -123,15 +123,15 @@ class AuthService:
         if not user:
             raise HTTPException(status_code=401, detail="Invalid email or password")
         
-        # 检查用户状态
+        # 妫€鏌ョ敤鎴风姸鎬?
         if user['status'] != 'active':
             raise HTTPException(status_code=401, detail="Account is not active")
         
-        # 验证密码
+        # 楠岃瘉瀵嗙爜
         if not self.auth.verify_password(request.password, user['password_hash']):
             raise HTTPException(status_code=401, detail="Invalid email or password")
         
-        # 登录前先清除该用户的所有旧refresh tokens
+        # 鐧诲綍鍓嶅厛娓呴櫎璇ョ敤鎴风殑鎵€鏈夋棫refresh tokens
         async with client.pool.acquire() as conn:
             old_tokens_result = await conn.execute(
                 "DELETE FROM refresh_tokens WHERE user_id = $1",
@@ -140,31 +140,31 @@ class AuthService:
         old_tokens_count = int(old_tokens_result.split()[-1]) if old_tokens_result else 0
         logger.info(f"Login: Cleared {old_tokens_count} old refresh tokens for user {user['id']}")
         
-        # 生成新的tokens
+        # 鐢熸垚鏂扮殑tokens
         access_token = self.auth.create_access_token(str(user['id']))
         refresh_token = self.auth.create_refresh_token()
         
-        # 存储新的刷新token
+        # 瀛樺偍鏂扮殑鍒锋柊token
         await self._store_refresh_token(str(user['id']), refresh_token)
         
-        # 更新最后登录时间（ADK兼容）
+        # 鏇存柊鏈€鍚庣櫥褰曟椂闂达紙ADK鍏煎锛?
         async with client.pool.acquire() as conn:
             await conn.execute(
                 "UPDATE users SET last_login_at = $1 WHERE id = $2",
                 datetime.now(), user['id']
             )
         
-        # 使用默认应用名称
+        # 浣跨敤榛樿搴旂敤鍚嶇О
         app_name = self.default_app_name
         
-        # 创建或更新ADK用户状态
+        # 鍒涘缓鎴栨洿鏂癆DK鐢ㄦ埛鐘舵€?
         await self._update_user_state(client, str(user['id']), {
             'last_login': datetime.now().isoformat(),
             'login_method': 'email_password',
             'status': 'active'
         }, app_name)
         
-        # 创建ADK会话
+        # 鍒涘缓ADK浼氳瘽
         session_id = await self._create_adk_session(client, str(user['id']), {
             'access_token': access_token,
             'login_time': datetime.now().isoformat(),
@@ -176,15 +176,15 @@ class AuthService:
         return AuthResponse(
             access_token=access_token,
             refresh_token=refresh_token,
-            expires_in=24 * 3600,  # 24小时
+            expires_in=24 * 3600,  # 24灏忔椂
             user=self._user_to_model(user)
         )
     
     async def refresh_token(self, request: RefreshRequest) -> RefreshResponse:
-        """刷新token"""
+        """鍒锋柊token"""
         client = await self._get_client()
         
-        # 验证刷新token
+        # 楠岃瘉鍒锋柊token
         token_hash = self.auth.hash_refresh_token(request.refresh_token)
         async with client.pool.acquire() as conn:
             result = await conn.fetchrow(
@@ -200,24 +200,24 @@ class AuthService:
         
         user_id = result['user_id']
         
-        # 删除旧的刷新token
+        # 鍒犻櫎鏃х殑鍒锋柊token
         async with client.pool.acquire() as conn:
             await conn.execute(
                 "DELETE FROM refresh_tokens WHERE token_hash = $1",
                 token_hash
             )
         
-        # 生成新的tokens
+        # 鐢熸垚鏂扮殑tokens
         access_token = self.auth.create_access_token(user_id)
         new_refresh_token = self.auth.create_refresh_token()
         
-        # 存储新的刷新token
+        # 瀛樺偍鏂扮殑鍒锋柊token
         await self._store_refresh_token(user_id, new_refresh_token)
         
         return RefreshResponse(
             access_token=access_token,
             refresh_token=new_refresh_token,
-            expires_in=24 * 3600  # 24小时
+            expires_in=24 * 3600  # 24灏忔椂
         )
     
     async def get_user(self, user_id: str) -> UserResponse:
@@ -237,34 +237,34 @@ class AuthService:
         """Logout user"""
         client = await self._get_client()
         
-        # 1. 删除refresh tokens (建议删除所有，避免token不一致问题)
+        # 1. 鍒犻櫎refresh tokens (寤鸿鍒犻櫎鎵€鏈夛紝閬垮厤token涓嶄竴鑷撮棶棰?
         async with client.pool.acquire() as conn:
             result = await conn.execute(
                 "DELETE FROM refresh_tokens WHERE user_id = $1",
                 user_id
             )
         
-        # 提取删除的行数
+        # 鎻愬彇鍒犻櫎鐨勮鏁?
         deleted_count = int(result.split()[-1]) if result else 0
         logger.info(f"Deleted {deleted_count} refresh tokens for user {user_id}")
         
-        # 2. 更新用户状态为 'offline'
+        # 2. 鏇存柊鐢ㄦ埛鐘舵€佷负 'offline'
         await self._update_user_state(client, user_id, {
             'status': 'offline',
             'logout_time': datetime.now().isoformat(),
             'last_activity': datetime.now().isoformat()
         }, self.default_app_name)
         
-        # 3. 关闭用户的所有活跃ADK sessions
+        # 3. 鍏抽棴鐢ㄦ埛鐨勬墍鏈夋椿璺傾DK sessions
         await self._close_user_sessions(client, user_id, self.default_app_name)
         
-        # 4. 记录logout事件到ADK
+        # 4. 璁板綍logout浜嬩欢鍒癆DK
         await self._log_logout_event(client, user_id, self.default_app_name)
         
         logger.info(f"User logged out completely: {user_id}")
     
     async def _store_refresh_token(self, user_id: str, refresh_token: str):
-        """存储刷新token"""
+        """瀛樺偍鍒锋柊token"""
         client = await self._get_client()
         
         token_hash = self.auth.hash_refresh_token(refresh_token)
@@ -279,10 +279,10 @@ class AuthService:
                 user_id, token_hash, expires_at, datetime.now()
             )
     
-    async def _update_user_state(self, client, user_id: str, state_data: dict, app_name: str = "fufanmanus"):
+    async def _update_user_state(self, client, user_id: str, state_data: dict, app_name: str = "hephaestus"):
         """Update user state"""
         try:
-            # 检查是否已存在用户状态
+            # 妫€鏌ユ槸鍚﹀凡瀛樺湪鐢ㄦ埛鐘舵€?
             async with client.pool.acquire() as conn:
                 existing = await conn.fetchrow(
                     "SELECT * FROM user_states WHERE app_name = $1 AND user_id = $2",
@@ -290,15 +290,15 @@ class AuthService:
                 )
             
             if existing:
-                # 更新现有状态
+                # 鏇存柊鐜版湁鐘舵€?
                 try:
-                    # 解析现有的JSON状态
+                    # 瑙ｆ瀽鐜版湁鐨凧SON鐘舵€?
                     current_state = json.loads(existing['state']) if existing['state'] else {}
                 except (json.JSONDecodeError, TypeError):
-                    # 如果解析失败，使用空字典
+                    # 濡傛灉瑙ｆ瀽澶辫触锛屼娇鐢ㄧ┖瀛楀吀
                     current_state = {}
                 
-                # 更新状态
+                # 鏇存柊鐘舵€?
                 current_state.update(state_data)
                 
                 async with client.pool.acquire() as conn:
@@ -311,7 +311,7 @@ class AuthService:
                         json.dumps(current_state), datetime.now(), app_name, user_id
                     )
             else:
-                # 创建新的用户状态
+                # 鍒涘缓鏂扮殑鐢ㄦ埛鐘舵€?
                 async with client.pool.acquire() as conn:
                     await conn.execute(
                         """
@@ -326,14 +326,14 @@ class AuthService:
         except Exception as e:
             logger.warning(f"Failed to update user state: {e}")
     
-    async def _create_adk_session(self, client, user_id: str, session_data: dict, app_name: str = "fufanmanus"):
+    async def _create_adk_session(self, client, user_id: str, session_data: dict, app_name: str = "hephaestus"):
         """Create ADK session"""
         try:
-            # 生成会话ID
+            # 鐢熸垚浼氳瘽ID
             import uuid
             session_id = str(uuid.uuid4())
             
-            # 按照ADK框架的表结构插入会话
+            # 鎸夌収ADK妗嗘灦鐨勮〃缁撴瀯鎻掑叆浼氳瘽
             async with client.pool.acquire() as conn:
                 await conn.execute(
                     """
@@ -351,15 +351,15 @@ class AuthService:
             return None
     
     async def _log_adk_event(self, client, user_id: str, event_type: str, event_data: dict, 
-                           session_id: str = None, app_name: str = "fufanmanus"):
-        """记录Google ADK事件"""
+                           session_id: str = None, app_name: str = "hephaestus"):
+        """璁板綍Google ADK浜嬩欢"""
         try:
             import uuid
             event_id = str(uuid.uuid4())
             invocation_id = str(uuid.uuid4())
             
             if session_id:
-                # 按照ADK框架的表结构插入事件
+                # 鎸夌収ADK妗嗘灦鐨勮〃缁撴瀯鎻掑叆浜嬩欢
                 async with client.pool.acquire() as conn:
                     await conn.execute(
                         """
@@ -370,7 +370,7 @@ class AuthService:
                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                         """,
                         event_id, app_name, user_id, session_id, invocation_id,
-                        "auth_service", datetime.now(), json.dumps(event_data), b''  # actions为空字节
+                        "auth_service", datetime.now(), json.dumps(event_data), b''  # actions涓虹┖瀛楄妭
                     )
                 
                 logger.info(f"Logged ADK event {event_type} for user {user_id} with session {session_id}")
@@ -381,44 +381,44 @@ class AuthService:
             logger.warning(f"Failed to log ADK event: {e}") 
 
     async def _get_app_name_for_user(self, user_id: str, context: str = "default") -> str:
-        """获取用户的应用名称
+        """鑾峰彇鐢ㄦ埛鐨勫簲鐢ㄥ悕绉?
         
         Args:
-            user_id: 用户ID
-            context: 上下文，可以是 'default', 'agent_creation', 'specific_agent' 等
+            user_id: 鐢ㄦ埛ID
+            context: 涓婁笅鏂囷紝鍙互鏄?'default', 'agent_creation', 'specific_agent' 绛?
             
         Returns:
-            app_name: 应用名称
+            app_name: 搴旂敤鍚嶇О
         """
-        # 这里可以根据用户ID和上下文动态确定app_name
-        # 例如：从数据库查询用户创建的应用，或者根据请求上下文确定
+        # 杩欓噷鍙互鏍规嵁鐢ㄦ埛ID鍜屼笂涓嬫枃鍔ㄦ€佺‘瀹歛pp_name
+        # 渚嬪锛氫粠鏁版嵁搴撴煡璇㈢敤鎴峰垱寤虹殑搴旂敤锛屾垨鑰呮牴鎹姹備笂涓嬫枃纭畾
         
         if context == "default":
             return self.default_app_name
         elif context == "agent_creation":
-            # 用户创建新agent时，可以使用特定的app_name
+            # 鐢ㄦ埛鍒涘缓鏂癮gent鏃讹紝鍙互浣跨敤鐗瑰畾鐨刟pp_name
             return f"agent_creator_{user_id}"
         else:
-            # 其他情况返回默认应用
+            # 鍏朵粬鎯呭喌杩斿洖榛樿搴旂敤
             return self.default_app_name
     
     async def create_agent_session(self, user_id: str, agent_id: str, agent_config: dict) -> str:
-        """为用户创建特定agent的会话
+        """涓虹敤鎴峰垱寤虹壒瀹歛gent鐨勪細璇?
         
         Args:
-            user_id: 用户ID
+            user_id: 鐢ㄦ埛ID
             agent_id: Agent ID
-            agent_config: Agent配置
+            agent_config: Agent閰嶇疆
             
         Returns:
-            session_id: 会话ID
+            session_id: 浼氳瘽ID
         """
         client = await self._get_client()
         
-        # 为特定agent创建app_name
+        # 涓虹壒瀹歛gent鍒涘缓app_name
         app_name = f"agent_{agent_id}"
         
-        # 创建agent会话
+        # 鍒涘缓agent浼氳瘽
         session_id = await self._create_adk_session(client, user_id, {
             'agent_id': agent_id,
             'agent_config': agent_config,
@@ -426,7 +426,7 @@ class AuthService:
             'session_type': 'agent_session'
         }, app_name)
         
-        # 记录agent创建事件
+        # 璁板綍agent鍒涘缓浜嬩欢
         if session_id:
             await self._log_adk_event(client, user_id, 'agent_session_created', {
                 'agent_id': agent_id,
@@ -437,17 +437,17 @@ class AuthService:
         return session_id
     
     async def get_user_agents(self, user_id: str) -> list:
-        """获取用户创建的所有agents
+        """鑾峰彇鐢ㄦ埛鍒涘缓鐨勬墍鏈塧gents
         
         Args:
-            user_id: 用户ID
+            user_id: 鐢ㄦ埛ID
             
         Returns:
-            agents: Agent列表
+            agents: Agent鍒楄〃
         """
         client = await self._get_client()
         
-        # 查询用户的所有agent会话
+        # 鏌ヨ鐢ㄦ埛鐨勬墍鏈塧gent浼氳瘽
         async with client.pool.acquire() as conn:
             sessions = await conn.fetch(
                 """
@@ -476,10 +476,10 @@ class AuthService:
         
         return agents
 
-    async def _close_user_sessions(self, client, user_id: str, app_name: str = "fufanmanus"):
+    async def _close_user_sessions(self, client, user_id: str, app_name: str = "hephaestus"):
         """Close all active ADK sessions for a user"""
         try:
-            # 更新所有该用户的sessions状态为closed
+            # 鏇存柊鎵€鏈夎鐢ㄦ埛鐨剆essions鐘舵€佷负closed
             async with client.pool.acquire() as conn:
                 result = await conn.execute(
                     """
@@ -498,10 +498,10 @@ class AuthService:
         except Exception as e:
             logger.warning(f"Failed to close user sessions: {e}")
     
-    async def _log_logout_event(self, client, user_id: str, app_name: str = "fufanmanus"):
+    async def _log_logout_event(self, client, user_id: str, app_name: str = "hephaestus"):
         """Log logout event to ADK"""
         try:
-            # 尝试找到最近的活跃session来记录logout事件
+            # 灏濊瘯鎵惧埌鏈€杩戠殑娲昏穬session鏉ヨ褰昹ogout浜嬩欢
             async with client.pool.acquire() as conn:
                 recent_session = await conn.fetchrow(
                     """

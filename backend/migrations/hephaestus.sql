@@ -1,12 +1,12 @@
--- ====================================================================
--- PostgreSQL Database Schema for FuFanManus
+﻿-- ====================================================================
+-- PostgreSQL Database Schema for Hephaestus
 -- Generated: 2025-09-15
 -- ====================================================================
 
--- 禁用外键检查以避免删除顺序问题
+-- 绂佺敤澶栭敭妫€鏌ヤ互閬垮厤鍒犻櫎椤哄簭闂
 SET session_replication_role = replica;
 
--- 按依赖关系顺序删除表
+-- 鎸変緷璧栧叧绯婚『搴忓垹闄よ〃
 DROP TABLE IF EXISTS "events" CASCADE;
 DROP TABLE IF EXISTS "sessions" CASCADE;
 DROP TABLE IF EXISTS "user_states" CASCADE;
@@ -24,13 +24,13 @@ DROP TABLE IF EXISTS "refresh_tokens" CASCADE;
 DROP TABLE IF EXISTS "oauth_providers" CASCADE;
 DROP TABLE IF EXISTS "users" CASCADE;
 
--- 重新启用外键检查
+-- 閲嶆柊鍚敤澶栭敭妫€鏌?
 SET session_replication_role = DEFAULT;
 
--- 创建必要的序列
+-- 鍒涘缓蹇呰鐨勫簭鍒?
 CREATE SEQUENCE IF NOT EXISTS agent_runs_id_seq;
 
--- 创建更新时间触发器函数
+-- 鍒涘缓鏇存柊鏃堕棿瑙﹀彂鍣ㄥ嚱鏁?
 CREATE OR REPLACE FUNCTION update_updated_at() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END; $$ language 'plpgsql';
 
 -- ----------------------------
@@ -73,7 +73,7 @@ CREATE TABLE "agent_runs" (
   "updated_at" timestamptz(6) DEFAULT now(),
   "agent_run_id" uuid NOT NULL DEFAULT gen_random_uuid()
 );
-COMMENT ON TABLE "agent_runs" IS '代理运行表，记录AI代理执行状态和历史';
+COMMENT ON TABLE "agent_runs" IS '浠ｇ悊杩愯琛紝璁板綍AI浠ｇ悊鎵ц鐘舵€佸拰鍘嗗彶';
 
 -- ----------------------------
 -- Table structure for agent_versions
@@ -97,12 +97,12 @@ CREATE TABLE "agent_versions" (
   "previous_version_id" varchar(128) COLLATE "pg_catalog"."default",
   "config" jsonb DEFAULT '{}'::jsonb
 );
-COMMENT ON COLUMN "agent_versions"."version_id" IS '版本唯一标识符';
-COMMENT ON COLUMN "agent_versions"."agent_id" IS '所属Agent ID';
-COMMENT ON COLUMN "agent_versions"."version_number" IS '版本号';
-COMMENT ON COLUMN "agent_versions"."version_name" IS '版本名称';
-COMMENT ON COLUMN "agent_versions"."is_active" IS '是否为活跃版本';
-COMMENT ON TABLE "agent_versions" IS 'Agent版本表 - 存储Agent的不同版本配置';
+COMMENT ON COLUMN "agent_versions"."version_id" IS '鐗堟湰鍞竴鏍囪瘑绗?;
+COMMENT ON COLUMN "agent_versions"."agent_id" IS '鎵€灞濧gent ID';
+COMMENT ON COLUMN "agent_versions"."version_number" IS '鐗堟湰鍙?;
+COMMENT ON COLUMN "agent_versions"."version_name" IS '鐗堟湰鍚嶇О';
+COMMENT ON COLUMN "agent_versions"."is_active" IS '鏄惁涓烘椿璺冪増鏈?;
+COMMENT ON TABLE "agent_versions" IS 'Agent鐗堟湰琛?- 瀛樺偍Agent鐨勪笉鍚岀増鏈厤缃?;
 
 -- ----------------------------
 -- Table structure for agent_workflows
@@ -117,7 +117,7 @@ CREATE TABLE "agent_workflows" (
   "created_at" timestamptz(6) DEFAULT now(),
   "updated_at" timestamptz(6) DEFAULT now()
 );
-COMMENT ON TABLE "agent_workflows" IS 'Agent工作流表 - 存储Agent的工作流配置';
+COMMENT ON TABLE "agent_workflows" IS 'Agent宸ヤ綔娴佽〃 - 瀛樺偍Agent鐨勫伐浣滄祦閰嶇疆';
 
 -- ----------------------------
 -- Table structure for agents
@@ -144,18 +144,18 @@ CREATE TABLE "agents" (
   "created_at" timestamptz(6) DEFAULT now(),
   "updated_at" timestamptz(6) DEFAULT now()
 );
-COMMENT ON COLUMN "agents"."agent_id" IS 'Agent唯一标识符';
-COMMENT ON COLUMN "agents"."user_id" IS '所属用户ID';
-COMMENT ON COLUMN "agents"."name" IS 'Agent名称';
-COMMENT ON COLUMN "agents"."system_prompt" IS '系统提示词';
-COMMENT ON COLUMN "agents"."model" IS '使用的模型';
-COMMENT ON COLUMN "agents"."configured_mcps" IS '已配置的MCP工具';
-COMMENT ON COLUMN "agents"."custom_mcps" IS '自定义MCP工具';
-COMMENT ON COLUMN "agents"."agentpress_tools" IS 'AgentPress工具配置';
-COMMENT ON COLUMN "agents"."is_default" IS '是否为默认Agent';
-COMMENT ON COLUMN "agents"."current_version_id" IS '当前版本ID';
-COMMENT ON COLUMN "agents"."version_count" IS '版本数量';
-COMMENT ON TABLE "agents" IS 'Agent管理表 - 存储用户的Agent配置';
+COMMENT ON COLUMN "agents"."agent_id" IS 'Agent鍞竴鏍囪瘑绗?;
+COMMENT ON COLUMN "agents"."user_id" IS '鎵€灞炵敤鎴稩D';
+COMMENT ON COLUMN "agents"."name" IS 'Agent鍚嶇О';
+COMMENT ON COLUMN "agents"."system_prompt" IS '绯荤粺鎻愮ず璇?;
+COMMENT ON COLUMN "agents"."model" IS '浣跨敤鐨勬ā鍨?;
+COMMENT ON COLUMN "agents"."configured_mcps" IS '宸查厤缃殑MCP宸ュ叿';
+COMMENT ON COLUMN "agents"."custom_mcps" IS '鑷畾涔塎CP宸ュ叿';
+COMMENT ON COLUMN "agents"."agentpress_tools" IS 'AgentPress宸ュ叿閰嶇疆';
+COMMENT ON COLUMN "agents"."is_default" IS '鏄惁涓洪粯璁gent';
+COMMENT ON COLUMN "agents"."current_version_id" IS '褰撳墠鐗堟湰ID';
+COMMENT ON COLUMN "agents"."version_count" IS '鐗堟湰鏁伴噺';
+COMMENT ON TABLE "agents" IS 'Agent绠＄悊琛?- 瀛樺偍鐢ㄦ埛鐨凙gent閰嶇疆';
 
 -- ----------------------------
 -- Table structure for app_states
@@ -165,7 +165,7 @@ CREATE TABLE "app_states" (
   "state" jsonb NOT NULL,
   "update_time" timestamp(6) NOT NULL
 );
-COMMENT ON TABLE "app_states" IS 'ADK框架应用级别状态存储';
+COMMENT ON TABLE "app_states" IS 'ADK妗嗘灦搴旂敤绾у埆鐘舵€佸瓨鍌?;
 
 -- ----------------------------
 -- Table structure for events
@@ -189,9 +189,9 @@ CREATE TABLE "events" (
   "error_message" varchar(1024) COLLATE "pg_catalog"."default",
   "interrupted" bool
 );
-COMMENT ON COLUMN "events"."session_id" IS '关联sessions表中的id字段';
-COMMENT ON COLUMN "events"."actions" IS '事件操作数据，使用pickle序列化存储';
-COMMENT ON TABLE "events" IS 'ADK框架事件记录';
+COMMENT ON COLUMN "events"."session_id" IS '鍏宠仈sessions琛ㄤ腑鐨刬d瀛楁';
+COMMENT ON COLUMN "events"."actions" IS '浜嬩欢鎿嶄綔鏁版嵁锛屼娇鐢╬ickle搴忓垪鍖栧瓨鍌?;
+COMMENT ON TABLE "events" IS 'ADK妗嗘灦浜嬩欢璁板綍';
 
 -- ----------------------------
 -- Table structure for messages
@@ -210,19 +210,19 @@ CREATE TABLE "messages" (
   "agent_version_id" uuid,
   "is_llm_message" bool NOT NULL DEFAULT false
 );
-COMMENT ON COLUMN "messages"."message_id" IS '消息唯一标识符';
-COMMENT ON COLUMN "messages"."thread_id" IS '所属线程ID';
-COMMENT ON COLUMN "messages"."project_id" IS '所属项目ID';
-COMMENT ON COLUMN "messages"."type" IS '消息类型：user, assistant, tool, system, browser_state, image_context';
-COMMENT ON COLUMN "messages"."role" IS '消息角色：user, assistant, system';
-COMMENT ON COLUMN "messages"."content" IS '消息内容（JSON格式）';
-COMMENT ON COLUMN "messages"."metadata" IS '消息元数据（JSON格式）';
-COMMENT ON COLUMN "messages"."created_at" IS '创建时间';
-COMMENT ON COLUMN "messages"."updated_at" IS '更新时间';
-COMMENT ON COLUMN "messages"."agent_id" IS '关联的代理ID';
-COMMENT ON COLUMN "messages"."agent_version_id" IS '关联的代理版本ID';
-COMMENT ON COLUMN "messages"."is_llm_message" IS '标识消息是否来自LLM (AI助手)';
-COMMENT ON TABLE "messages" IS '存储对话消息的表';
+COMMENT ON COLUMN "messages"."message_id" IS '娑堟伅鍞竴鏍囪瘑绗?;
+COMMENT ON COLUMN "messages"."thread_id" IS '鎵€灞炵嚎绋婭D';
+COMMENT ON COLUMN "messages"."project_id" IS '鎵€灞為」鐩甀D';
+COMMENT ON COLUMN "messages"."type" IS '娑堟伅绫诲瀷锛歶ser, assistant, tool, system, browser_state, image_context';
+COMMENT ON COLUMN "messages"."role" IS '娑堟伅瑙掕壊锛歶ser, assistant, system';
+COMMENT ON COLUMN "messages"."content" IS '娑堟伅鍐呭锛圝SON鏍煎紡锛?;
+COMMENT ON COLUMN "messages"."metadata" IS '娑堟伅鍏冩暟鎹紙JSON鏍煎紡锛?;
+COMMENT ON COLUMN "messages"."created_at" IS '鍒涘缓鏃堕棿';
+COMMENT ON COLUMN "messages"."updated_at" IS '鏇存柊鏃堕棿';
+COMMENT ON COLUMN "messages"."agent_id" IS '鍏宠仈鐨勪唬鐞咺D';
+COMMENT ON COLUMN "messages"."agent_version_id" IS '鍏宠仈鐨勪唬鐞嗙増鏈琁D';
+COMMENT ON COLUMN "messages"."is_llm_message" IS '鏍囪瘑娑堟伅鏄惁鏉ヨ嚜LLM (AI鍔╂墜)';
+COMMENT ON TABLE "messages" IS '瀛樺偍瀵硅瘽娑堟伅鐨勮〃';
 
 -- ----------------------------
 -- Table structure for oauth_providers
@@ -256,14 +256,14 @@ CREATE TABLE "projects" (
   "created_at" timestamptz(6) DEFAULT now(),
   "updated_at" timestamptz(6) DEFAULT now()
 );
-COMMENT ON COLUMN "projects"."project_id" IS '项目唯一标识符';
-COMMENT ON COLUMN "projects"."account_id" IS '所属用户ID';
-COMMENT ON COLUMN "projects"."name" IS '项目名称';
-COMMENT ON COLUMN "projects"."description" IS '项目描述';
-COMMENT ON COLUMN "projects"."status" IS '项目状态';
-COMMENT ON COLUMN "projects"."metadata" IS '项目元数据';
-COMMENT ON COLUMN "projects"."sandbox" IS '沙盒配置信息';
-COMMENT ON TABLE "projects" IS '项目表 - 存储用户的对话项目';
+COMMENT ON COLUMN "projects"."project_id" IS '椤圭洰鍞竴鏍囪瘑绗?;
+COMMENT ON COLUMN "projects"."account_id" IS '鎵€灞炵敤鎴稩D';
+COMMENT ON COLUMN "projects"."name" IS '椤圭洰鍚嶇О';
+COMMENT ON COLUMN "projects"."description" IS '椤圭洰鎻忚堪';
+COMMENT ON COLUMN "projects"."status" IS '椤圭洰鐘舵€?;
+COMMENT ON COLUMN "projects"."metadata" IS '椤圭洰鍏冩暟鎹?;
+COMMENT ON COLUMN "projects"."sandbox" IS '娌欑洅閰嶇疆淇℃伅';
+COMMENT ON TABLE "projects" IS '椤圭洰琛?- 瀛樺偍鐢ㄦ埛鐨勫璇濋」鐩?;
 
 -- ----------------------------
 -- Table structure for refresh_tokens
@@ -290,8 +290,8 @@ CREATE TABLE "sessions" (
   "create_time" timestamp(6) NOT NULL,
   "update_time" timestamp(6) NOT NULL
 );
-COMMENT ON COLUMN "sessions"."id" IS '会话ID，与events表中的session_id对应';
-COMMENT ON TABLE "sessions" IS 'ADK框架会话管理';
+COMMENT ON COLUMN "sessions"."id" IS '浼氳瘽ID锛屼笌events琛ㄤ腑鐨剆ession_id瀵瑰簲';
+COMMENT ON TABLE "sessions" IS 'ADK妗嗘灦浼氳瘽绠＄悊';
 
 -- ----------------------------
 -- Table structure for threads
@@ -306,13 +306,13 @@ CREATE TABLE "threads" (
   "created_at" timestamptz(6) DEFAULT now(),
   "updated_at" timestamptz(6) DEFAULT now()
 );
-COMMENT ON COLUMN "threads"."thread_id" IS '线程唯一标识符';
-COMMENT ON COLUMN "threads"."project_id" IS '所属项目ID';
-COMMENT ON COLUMN "threads"."account_id" IS '所属用户ID';
-COMMENT ON COLUMN "threads"."name" IS '线程名称';
-COMMENT ON COLUMN "threads"."status" IS '线程状态';
-COMMENT ON COLUMN "threads"."metadata" IS '线程元数据';
-COMMENT ON TABLE "threads" IS '线程表 - 存储项目中的对话线程';
+COMMENT ON COLUMN "threads"."thread_id" IS '绾跨▼鍞竴鏍囪瘑绗?;
+COMMENT ON COLUMN "threads"."project_id" IS '鎵€灞為」鐩甀D';
+COMMENT ON COLUMN "threads"."account_id" IS '鎵€灞炵敤鎴稩D';
+COMMENT ON COLUMN "threads"."name" IS '绾跨▼鍚嶇О';
+COMMENT ON COLUMN "threads"."status" IS '绾跨▼鐘舵€?;
+COMMENT ON COLUMN "threads"."metadata" IS '绾跨▼鍏冩暟鎹?;
+COMMENT ON TABLE "threads" IS '绾跨▼琛?- 瀛樺偍椤圭洰涓殑瀵硅瘽绾跨▼';
 
 -- ----------------------------
 -- Table structure for user_activities
@@ -358,10 +358,10 @@ CREATE TABLE "user_states" (
   "state" jsonb NOT NULL,
   "update_time" timestamp(6) NOT NULL
 );
-COMMENT ON TABLE "user_states" IS 'ADK框架用户级别状态存储';
+COMMENT ON TABLE "user_states" IS 'ADK妗嗘灦鐢ㄦ埛绾у埆鐘舵€佸瓨鍌?;
 
 -- ----------------------------
--- 添加主键约束
+-- 娣诲姞涓婚敭绾︽潫
 -- ----------------------------
 ALTER TABLE "agent_runs" ADD CONSTRAINT "agent_runs_pkey" PRIMARY KEY ("id");
 ALTER TABLE "agent_versions" ADD CONSTRAINT "agent_versions_pkey" PRIMARY KEY ("version_id");
@@ -381,10 +381,10 @@ ALTER TABLE "user_states" ADD CONSTRAINT "user_states_pkey" PRIMARY KEY ("app_na
 ALTER TABLE "users" ADD CONSTRAINT "users_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
--- 创建索引
+-- 鍒涘缓绱㈠紩
 -- ----------------------------
 
--- agent_runs 索引
+-- agent_runs 绱㈠紩
 CREATE INDEX "idx_agent_runs_agent_id" ON "agent_runs" USING btree ("agent_id");
 CREATE UNIQUE INDEX "idx_agent_runs_agent_run_id" ON "agent_runs" USING btree ("agent_run_id");
 CREATE INDEX "idx_agent_runs_created_at" ON "agent_runs" USING btree ("created_at");
@@ -392,32 +392,32 @@ CREATE INDEX "idx_agent_runs_started_at" ON "agent_runs" USING btree ("started_a
 CREATE INDEX "idx_agent_runs_status" ON "agent_runs" USING btree ("status");
 CREATE INDEX "idx_agent_runs_thread_id" ON "agent_runs" USING btree ("thread_id");
 
--- agent_versions 索引
+-- agent_versions 绱㈠紩
 CREATE INDEX "idx_agent_versions_agent_id" ON "agent_versions" USING btree ("agent_id");
 CREATE INDEX "idx_agent_versions_created_at" ON "agent_versions" USING btree ("created_at");
 CREATE INDEX "idx_agent_versions_is_active" ON "agent_versions" USING btree ("is_active");
 
--- agent_workflows 索引
+-- agent_workflows 绱㈠紩
 CREATE INDEX "idx_agent_workflows_agent_id" ON "agent_workflows" USING btree ("agent_id");
 CREATE INDEX "idx_agent_workflows_is_active" ON "agent_workflows" USING btree ("is_active");
 
--- agents 索引
+-- agents 绱㈠紩
 CREATE INDEX "idx_agents_created_at" ON "agents" USING btree ("created_at");
 CREATE INDEX "idx_agents_is_default" ON "agents" USING btree ("is_default");
 CREATE INDEX "idx_agents_updated_at" ON "agents" USING btree ("updated_at");
 CREATE INDEX "idx_agents_user_default" ON "agents" USING btree ("user_id", "is_default");
 CREATE INDEX "idx_agents_user_id" ON "agents" USING btree ("user_id");
 
--- app_states 索引
+-- app_states 绱㈠紩
 CREATE INDEX "idx_app_states_app_name" ON "app_states" USING btree ("app_name");
 CREATE INDEX "idx_app_states_update_time" ON "app_states" USING btree ("update_time");
 
--- events 索引
+-- events 绱㈠紩
 CREATE INDEX "idx_events_app_name_user_id_session_id" ON "events" USING btree ("app_name", "user_id", "session_id");
 CREATE INDEX "idx_events_author" ON "events" USING btree ("author");
 CREATE INDEX "idx_events_timestamp" ON "events" USING btree ("timestamp");
 
--- messages 索引
+-- messages 绱㈠紩
 CREATE INDEX "idx_messages_agent_id" ON "messages" USING btree ("agent_id");
 CREATE INDEX "idx_messages_agent_thread" ON "messages" USING btree ("agent_id", "thread_id");
 CREATE INDEX "idx_messages_agent_version_id" ON "messages" USING btree ("agent_version_id");
@@ -428,23 +428,23 @@ CREATE INDEX "idx_messages_thread_id" ON "messages" USING btree ("thread_id");
 CREATE INDEX "idx_messages_thread_type" ON "messages" USING btree ("thread_id", "type");
 CREATE INDEX "idx_messages_type" ON "messages" USING btree ("type");
 
--- oauth_providers 索引
+-- oauth_providers 绱㈠紩
 CREATE INDEX "idx_oauth_provider_user" ON "oauth_providers" USING btree ("provider", "provider_user_id");
 CREATE INDEX "idx_oauth_user_id" ON "oauth_providers" USING btree ("user_id");
 
--- projects 索引
+-- projects 绱㈠紩
 CREATE INDEX "idx_projects_account_id" ON "projects" USING btree ("account_id");
 CREATE INDEX "idx_projects_created_at" ON "projects" USING btree ("created_at");
 CREATE INDEX "idx_projects_status" ON "projects" USING btree ("status");
 CREATE INDEX "idx_projects_updated_at" ON "projects" USING btree ("updated_at");
 
--- refresh_tokens 索引
+-- refresh_tokens 绱㈠紩
 CREATE INDEX "idx_refresh_tokens_expires_at" ON "refresh_tokens" USING btree ("expires_at");
 CREATE INDEX "idx_refresh_tokens_revoked" ON "refresh_tokens" USING btree ("is_revoked");
 CREATE INDEX "idx_refresh_tokens_token_hash" ON "refresh_tokens" USING btree ("token_hash");
 CREATE INDEX "idx_refresh_tokens_user_id" ON "refresh_tokens" USING btree ("user_id");
 
--- sessions 索引
+-- sessions 绱㈠紩
 CREATE INDEX "idx_sessions_app_name" ON "sessions" USING btree ("app_name");
 CREATE INDEX "idx_sessions_app_name_user_id" ON "sessions" USING btree ("app_name", "user_id");
 CREATE INDEX "idx_sessions_app_user" ON "sessions" USING btree ("app_name", "user_id");
@@ -452,32 +452,32 @@ CREATE INDEX "idx_sessions_create_time" ON "sessions" USING btree ("create_time"
 CREATE INDEX "idx_sessions_id" ON "sessions" USING btree ("id");
 CREATE INDEX "idx_sessions_update_time" ON "sessions" USING btree ("update_time");
 
--- threads 索引
+-- threads 绱㈠紩
 CREATE INDEX "idx_threads_account_id" ON "threads" USING btree ("account_id");
 CREATE INDEX "idx_threads_created_at" ON "threads" USING btree ("created_at");
 CREATE INDEX "idx_threads_project_id" ON "threads" USING btree ("project_id");
 CREATE INDEX "idx_threads_status" ON "threads" USING btree ("status");
 
--- user_activities 索引
+-- user_activities 绱㈠紩
 CREATE INDEX "idx_activities_created_at" ON "user_activities" USING btree ("created_at");
 CREATE INDEX "idx_activities_type" ON "user_activities" USING btree ("activity_type");
 CREATE INDEX "idx_activities_user_id" ON "user_activities" USING btree ("user_id");
 
--- user_sessions 索引
+-- user_sessions 绱㈠紩
 CREATE INDEX "idx_sessions_active" ON "user_sessions" USING btree ("is_active");
 CREATE INDEX "idx_sessions_device_id" ON "user_sessions" USING btree ("device_id");
 CREATE INDEX "idx_sessions_expires_at" ON "user_sessions" USING btree ("expires_at");
 CREATE INDEX "idx_sessions_token" ON "user_sessions" USING btree ("session_token");
 CREATE INDEX "idx_sessions_user_id" ON "user_sessions" USING btree ("user_id");
 
--- user_states 索引
+-- user_states 绱㈠紩
 CREATE INDEX "idx_user_states_app_name" ON "user_states" USING btree ("app_name");
 CREATE INDEX "idx_user_states_app_name_user_id" ON "user_states" USING btree ("app_name", "user_id");
 CREATE INDEX "idx_user_states_app_user" ON "user_states" USING btree ("app_name", "user_id");
 CREATE INDEX "idx_user_states_update_time" ON "user_states" USING btree ("update_time");
 CREATE INDEX "idx_user_states_user_id" ON "user_states" USING btree ("user_id");
 
--- users 索引
+-- users 绱㈠紩
 CREATE INDEX "idx_users_created_at" ON "users" USING btree ("created_at");
 CREATE INDEX "idx_users_email" ON "users" USING btree ("email");
 CREATE INDEX "idx_users_google_id" ON "users" USING btree ("google_id");
@@ -485,7 +485,7 @@ CREATE INDEX "idx_users_provider" ON "users" USING btree ("provider");
 CREATE INDEX "idx_users_status" ON "users" USING btree ("status");
 
 -- ----------------------------
--- 唯一约束
+-- 鍞竴绾︽潫
 -- ----------------------------
 ALTER TABLE "oauth_providers" ADD CONSTRAINT "oauth_providers_provider_provider_user_id_key" UNIQUE ("provider", "provider_user_id");
 ALTER TABLE "refresh_tokens" ADD CONSTRAINT "refresh_tokens_token_hash_key" UNIQUE ("token_hash");
@@ -494,7 +494,7 @@ ALTER TABLE "users" ADD CONSTRAINT "users_email_key" UNIQUE ("email");
 ALTER TABLE "users" ADD CONSTRAINT "users_google_id_key" UNIQUE ("google_id");
 
 -- ----------------------------
--- 检查约束
+-- 妫€鏌ョ害鏉?
 -- ----------------------------
 ALTER TABLE "user_activities" ADD CONSTRAINT "valid_activity_type" CHECK (activity_type::text = ANY (ARRAY['login'::character varying, 'logout'::character varying, 'register'::character varying, 'password_change'::character varying, 'email_verify'::character varying, 'profile_update'::character varying, 'session_expire'::character varying]::text[]));
 ALTER TABLE "user_sessions" ADD CONSTRAINT "valid_device_type" CHECK (device_type::text = ANY (ARRAY['web'::character varying, 'mobile'::character varying, 'desktop'::character varying, 'unknown'::character varying]::text[]));
@@ -502,13 +502,13 @@ ALTER TABLE "users" ADD CONSTRAINT "valid_provider" CHECK (provider::text = ANY 
 ALTER TABLE "users" ADD CONSTRAINT "valid_status" CHECK (status::text = ANY (ARRAY['active'::character varying, 'inactive'::character varying, 'suspended'::character varying]::text[]));
 
 -- ----------------------------
--- 触发器
+-- 瑙﹀彂鍣?
 -- ----------------------------
 CREATE TRIGGER "update_oauth_providers_updated_at" BEFORE UPDATE ON "oauth_providers" FOR EACH ROW EXECUTE PROCEDURE "public"."update_updated_at"();
 CREATE TRIGGER "update_users_updated_at" BEFORE UPDATE ON "users" FOR EACH ROW EXECUTE PROCEDURE "public"."update_updated_at"();
 
 -- ----------------------------
--- 外键约束
+-- 澶栭敭绾︽潫
 -- ----------------------------
 ALTER TABLE "agent_versions" ADD CONSTRAINT "fk_agent_versions_agent_id" FOREIGN KEY ("agent_id") REFERENCES "agents" ("agent_id") ON DELETE CASCADE ON UPDATE NO ACTION;
 ALTER TABLE "agent_workflows" ADD CONSTRAINT "fk_agent_workflows_agent_id" FOREIGN KEY ("agent_id") REFERENCES "agents" ("agent_id") ON DELETE CASCADE ON UPDATE NO ACTION;
@@ -520,3 +520,4 @@ ALTER TABLE "threads" ADD CONSTRAINT "fk_threads_project_id" FOREIGN KEY ("proje
 ALTER TABLE "user_activities" ADD CONSTRAINT "user_activities_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "user_sessions" ("id") ON DELETE SET NULL ON UPDATE NO ACTION;
 ALTER TABLE "user_activities" ADD CONSTRAINT "user_activities_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 ALTER TABLE "user_sessions" ADD CONSTRAINT "user_sessions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+

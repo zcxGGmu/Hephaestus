@@ -1,4 +1,4 @@
-# Setup
+﻿# Setup
 
 ## Prerequisites
 
@@ -17,7 +17,7 @@ pip install -r requirements.txt
 Copy-Item .env.example .env
 python scripts/01_setup_database.py
 python scripts/02_setup_redis.py
-python scripts/03_init_fufanmanus_table.py
+python scripts/03_init_hephaestus_table.py
 ```
 
 Start the API:
@@ -62,4 +62,5 @@ Frontend:
 - `NEXT_PUBLIC_BACKEND_URL`
 - `NEXT_PUBLIC_URL`
 - `NEXT_PUBLIC_ENV_MODE`
+
 

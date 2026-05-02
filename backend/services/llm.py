@@ -1,4 +1,4 @@
-"""
+﻿"""
 LLM API interface for making calls to various language models.
 
 This module provides a unified interface for making API calls to different LLM providers
@@ -22,7 +22,7 @@ from utils.logger import logger
 from utils.config import config
 from utils.constants import MODEL_NAME_ALIASES
 
-# 🔗 Context variables for ADK callback
+# 馃敆 Context variables for ADK callback
 manual_message_id_context: contextvars.ContextVar[Optional[str]] = contextvars.ContextVar('manual_message_id', default=None)
 current_session_id_context: contextvars.ContextVar[Optional[str]] = contextvars.ContextVar('current_session_id', default=None)
 
@@ -32,22 +32,22 @@ litellm.modify_params = True
 litellm.drop_params = True
 
 def set_manual_message_id(message_id: Optional[str]):
-    """设置手动插入消息的ID到上下文中，用于回调同步invocation_id"""
+    """璁剧疆鎵嬪姩鎻掑叆娑堟伅鐨処D鍒颁笂涓嬫枃涓紝鐢ㄤ簬鍥炶皟鍚屾invocation_id"""
     manual_message_id_context.set(message_id)
     if message_id:
-        logger.debug(f"🔗 Set manual_message_id context: {message_id}")
+        logger.debug(f"馃敆 Set manual_message_id context: {message_id}")
 
 async def _sync_manual_message_invocation_id(session_id: str, adk_invocation_id: str):
-    """根据session_id找到最新的用户消息，同步其invocation_id为ADK生成的ID"""
+    """鏍规嵁session_id鎵惧埌鏈€鏂扮殑鐢ㄦ埛娑堟伅锛屽悓姝ュ叾invocation_id涓篈DK鐢熸垚鐨処D"""
     try:
         logger.info(f"Before _sync_manual_message_invocation_id: session_id={session_id}, adk_invocation_id={adk_invocation_id}")
         
-        # 获取数据库客户端
+        # 鑾峰彇鏁版嵁搴撳鎴风
         from services.postgresql import DBConnection
         db = DBConnection()
         client = await db.client
         
-        # 查找该 session_id 下最新的 author='user' 的消息
+        # 鏌ユ壘璇?session_id 涓嬫渶鏂扮殑 author='user' 鐨勬秷鎭?
         user_message_result = await client.table('events')\
             .select('id, invocation_id, timestamp')\
             .eq('session_id', session_id)\
@@ -64,7 +64,7 @@ async def _sync_manual_message_invocation_id(session_id: str, adk_invocation_id:
         message_id = user_message.get('id')
         old_invocation_id = user_message.get('invocation_id')
         
-        # 更新该用户消息的invocation_id为ADK生成的ID  
+        # 鏇存柊璇ョ敤鎴锋秷鎭殑invocation_id涓篈DK鐢熸垚鐨処D  
         update_result = await client.table('events')\
             .eq('id', message_id)\
             .update({'invocation_id': adk_invocation_id})
@@ -92,7 +92,7 @@ from google.adk.models import LlmRequest, LlmResponse # type: ignore
 
 
 
-# 常量
+# 甯搁噺
 MAX_RETRIES = 2
 RATE_LIMIT_DELAY = 30
 RETRY_DELAY = 0.1
@@ -387,7 +387,7 @@ async def make_llm_api_call(
     """
     # debug <timestamp>.json messages
     logger.info(f"Making LLM API call to model: {model_name} (Thinking: {enable_thinking}, Effort: {reasoning_effort})")
-    logger.info(f"📡 API Call: Using model {model_name}")
+    logger.info(f"馃摗 API Call: Using model {model_name}")
 
 
     params = prepare_params(
@@ -475,20 +475,20 @@ async def make_adk_api_call(
         if msg.get('user_id'):
             logger.info(f"    metadata: user_id={msg.get('user_id')}, session_id={msg.get('session_id')}, thread_id={msg.get('thread_id')}")
 
-    # 提取元数据
+    # 鎻愬彇鍏冩暟鎹?
     for message in messages:
         if isinstance(message, dict) and message.get('role') == 'user':
-            app_name = message.get('app_name', 'fufanmanus')
+            app_name = message.get('app_name', 'hephaestus')
             user_id = message.get('user_id', 'default_user')
             session_id = message.get('session_id', 'default_session')
-            thread_id = message.get('thread_id')  # 新增：提取thread_id
+            thread_id = message.get('thread_id')  # 鏂板锛氭彁鍙杢hread_id
             logger.info(f"From adk events: app_name={app_name}, user_id={user_id}, session_id={session_id}, thread_id={thread_id}")
                         
-            # 设置session_id到上下文中，供ADK回调使用
+            # 璁剧疆session_id鍒颁笂涓嬫枃涓紝渚汚DK鍥炶皟浣跨敤
             current_session_id_context.set(session_id)
             break
 
-    # 获取用户消息内容
+    # 鑾峰彇鐢ㄦ埛娑堟伅鍐呭
     user_message = None
     
     for i, msg in enumerate(reversed(messages)):
@@ -496,67 +496,67 @@ async def make_adk_api_call(
         if msg.get('role') == 'user':
             content = msg.get('content', '')
             
-            # 这里的逻辑用来适配处理多模态消息格式
+            # 杩欓噷鐨勯€昏緫鐢ㄦ潵閫傞厤澶勭悊澶氭ā鎬佹秷鎭牸寮?
             if isinstance(content, list):
-                # 多模态消息：从列表中提取文本部分
+                # 澶氭ā鎬佹秷鎭細浠庡垪琛ㄤ腑鎻愬彇鏂囨湰閮ㄥ垎
                 text_parts = []
                 for part in content:
                     if isinstance(part, dict) and part.get('type') == 'text':
                         text_parts.append(part.get('text', ''))
                 user_message = ' '.join(text_parts).strip()
                 
-                # 如果有非文本内容，记录警告
+                # 濡傛灉鏈夐潪鏂囨湰鍐呭锛岃褰曡鍛?
                 non_text_parts = [p for p in content if isinstance(p, dict) and p.get('type') != 'text']
                 if non_text_parts:
                     logger.warning(f"ADK runner only supports text input. Ignoring {len(non_text_parts)} non-text parts.")
                     
             elif isinstance(content, str):
-                # 普通文本消息
+                # 鏅€氭枃鏈秷鎭?
                 user_message = content
             else:
-                # 其他格式，尝试转换为字符串
+                # 鍏朵粬鏍煎紡锛屽皾璇曡浆鎹负瀛楃涓?
                 user_message = str(content) if content else ''
                 
             break
     
     if not user_message:
-        logger.error("未找到用户消息！")
+        logger.error("鏈壘鍒扮敤鎴锋秷鎭紒")
         raise LLMError("No user message found in messages")
 
-    # 创建用户内容
+    # 鍒涘缓鐢ㄦ埛鍐呭
     user_content = types.Content(
         role='user', 
-        parts=[types.Part(text=user_message)]  # 现在确保 user_message 是字符串
+        parts=[types.Part(text=user_message)]  # 鐜板湪纭繚 user_message 鏄瓧绗︿覆
     )
 
 
-    # 设置流式模式
+    # 璁剧疆娴佸紡妯″紡
     streaming_mode = StreamingMode.SSE if stream else StreamingMode.NONE
     
     run_config = RunConfig(streaming_mode=streaming_mode)
 
     
-    # 从模型名称解析实际使用的模型和API Key
+    # 浠庢ā鍨嬪悕绉拌В鏋愬疄闄呬娇鐢ㄧ殑妯″瀷鍜孉PI Key
     resolved_model = MODEL_NAME_ALIASES.get(model_name, model_name)
     logger.info(f"Resolved model: {resolved_model}")
     
-    # 特殊处理 DeepSeek 模型格式 (后备方案)
+    # 鐗规畩澶勭悊 DeepSeek 妯″瀷鏍煎紡 (鍚庡鏂规)
     if "DeepSeek" in model_name and "/" in model_name:
         logger.warning(f"Detected uppercase DeepSeek format: {model_name}, converting to standard format")
         resolved_model = "deepseek/deepseek-chat"
         logger.info(f"Converted to: {resolved_model}")
     
-    # 添加调试日志 - 显示MODEL_NAME_ALIASES中是否有这个映射
+    # 娣诲姞璋冭瘯鏃ュ織 - 鏄剧ずMODEL_NAME_ALIASES涓槸鍚︽湁杩欎釜鏄犲皠
     if model_name in MODEL_NAME_ALIASES:
         logger.info(f"Found alias mapping: {model_name} -> {MODEL_NAME_ALIASES[model_name]}")
     else:
         logger.warning(f" No alias mapping found for: {model_name}, available aliases: {list(MODEL_NAME_ALIASES.keys())[:10]}")
     
-    # 根据模型提供商获取对应的API Key
+    # 鏍规嵁妯″瀷鎻愪緵鍟嗚幏鍙栧搴旂殑API Key
     resolved_api_key = None
     provider = "Unknown"
     
-    # 根据模型名称确定提供商并获取API Key
+    # 鏍规嵁妯″瀷鍚嶇О纭畾鎻愪緵鍟嗗苟鑾峰彇API Key
     if "openai" in resolved_model.lower() or "gpt" in resolved_model.lower():
         resolved_api_key = config.OPENAI_API_KEY
         provider = "OpenAI"
@@ -564,7 +564,7 @@ async def make_adk_api_call(
         resolved_api_key = config.ANTHROPIC_API_KEY
         provider = "Anthropic"
     elif "deepseek" in resolved_model.lower():
-        # 优先使用DEEPSEEK_API_KEY，回退到OPENAI_API_KEY（因为DeepSeek兼容OpenAI API）
+        # 浼樺厛浣跨敤DEEPSEEK_API_KEY锛屽洖閫€鍒癘PENAI_API_KEY锛堝洜涓篋eepSeek鍏煎OpenAI API锛?
         resolved_api_key = getattr(config, 'DEEPSEEK_API_KEY', None) or config.OPENAI_API_KEY
         provider = "DeepSeek" if getattr(config, 'DEEPSEEK_API_KEY', None) else "DeepSeek (using OpenAI key)"
     elif "gemini" in resolved_model.lower():
@@ -577,7 +577,7 @@ async def make_adk_api_call(
         resolved_api_key = config.XAI_API_KEY
         provider = "xAI"
     else:
-        # 默认使用OpenAI
+        # 榛樿浣跨敤OpenAI
         resolved_api_key = config.OPENAI_API_KEY
         provider = "OpenAI (default)"
         logger.warning(f"Unrecognized model {resolved_model}, using default OpenAI configuration")
@@ -586,7 +586,7 @@ async def make_adk_api_call(
     logger.info(f"Using provider: {provider}")
     logger.info(f"API Key: {resolved_api_key}")
     
-    # 根据提供商确定 api_base
+    # 鏍规嵁鎻愪緵鍟嗙‘瀹?api_base
     resolved_api_base = None
     if "deepseek" in resolved_model.lower():
         resolved_api_base = config.DEEPSEEK_API_BASE
@@ -598,7 +598,7 @@ async def make_adk_api_call(
     
     logger.info(f"Creating LiteLlm model with model={resolved_model}")
     
-    # 创建LiteLlm模型，根据是否有api_base来决定参数
+    # 鍒涘缓LiteLlm妯″瀷锛屾牴鎹槸鍚︽湁api_base鏉ュ喅瀹氬弬鏁?
     model_params = {
         "model": resolved_model,
         "api_key": resolved_api_key
@@ -615,28 +615,28 @@ async def make_adk_api_call(
     # )
     logger.info(f"Model created successfully: model={resolved_model}, provider={provider}")
 
-    # 提取 system_prompt
-    agent_instruction = "你是我的AI助手，请根据用户的问题给出回答。"  # 默认值
+    # 鎻愬彇 system_prompt
+    agent_instruction = "浣犳槸鎴戠殑AI鍔╂墜锛岃鏍规嵁鐢ㄦ埛鐨勯棶棰樼粰鍑哄洖绛斻€?  # 榛樿鍊?
     for msg in messages:
         if msg.get('role') == 'system':
             agent_instruction = msg.get('content', agent_instruction)
             break
     
-    # 定义ADK回调函数，用于同步invocation_id（因为某条 User Messages 是手动插入，需要通过回调保持相同的 invocation_id
+    # 瀹氫箟ADK鍥炶皟鍑芥暟锛岀敤浜庡悓姝nvocation_id锛堝洜涓烘煇鏉?User Messages 鏄墜鍔ㄦ彃鍏ワ紝闇€瑕侀€氳繃鍥炶皟淇濇寔鐩稿悓鐨?invocation_id
     def before_model_callback(callback_context: CallbackContext, llm_request: LlmRequest) -> Optional[LlmResponse]:
-        """ADK回调：在LLM调用前同步invocation_id"""
+        """ADK鍥炶皟锛氬湪LLM璋冪敤鍓嶅悓姝nvocation_id"""
         try:
       
-            # 从上下文变量获取session_id
+            # 浠庝笂涓嬫枃鍙橀噺鑾峰彇session_id
             session_id = current_session_id_context.get()
             logger.info(f"From before_model_callback: session_id={session_id}")
             
-            # 获取ADK生成的invocation_id
+            # 鑾峰彇ADK鐢熸垚鐨刬nvocation_id
             adk_invocation_id = getattr(callback_context, 'invocation_id', None)
             logger.info(f"From before_model_callback: adk_invocation_id={adk_invocation_id}")
 
             if session_id and adk_invocation_id:
-                # 启动同步任务，根据session_id和author='user'查找最新用户消息进行更新
+                # 鍚姩鍚屾浠诲姟锛屾牴鎹畇ession_id鍜宎uthor='user'鏌ユ壘鏈€鏂扮敤鎴锋秷鎭繘琛屾洿鏂?
                 import asyncio
                 asyncio.create_task(_sync_manual_message_invocation_id(session_id, adk_invocation_id))
             else:
@@ -645,10 +645,10 @@ async def make_adk_api_call(
         except Exception as e:
             logger.warning(f"Failed to start invocation_id synchronization (not affecting main flow): {e}")
         
-        # 必须返回 None 让ADK继续正常执行
+        # 蹇呴』杩斿洖 None 璁〢DK缁х画姝ｅ父鎵ц
         return None
 
-    # 处理工具：将函数字典转换为ADK FunctionTool列表
+    # 澶勭悊宸ュ叿锛氬皢鍑芥暟瀛楀吀杞崲涓篈DK FunctionTool鍒楄〃
     adk_tools = []
     if tools:
         from google.adk.tools import FunctionTool # type: ignore
@@ -662,35 +662,35 @@ async def make_adk_api_call(
                     logger.error(f"tool {tool_name} conversion failed: {e}")
                     
         elif isinstance(tools, list):
-            # 如果已经是FunctionTool列表，直接使用
+            # 濡傛灉宸茬粡鏄疐unctionTool鍒楄〃锛岀洿鎺ヤ娇鐢?
             adk_tools = tools
         
         else:
             logger.error(f"Unsupported tools type: {type(tools)}")
     
  
-    # 创建 Agent 对象（带回调和工具）
+    # 鍒涘缓 Agent 瀵硅薄锛堝甫鍥炶皟鍜屽伐鍏凤級
     agent = LlmAgent(
         name=app_name,
         model=model,
         instruction=agent_instruction,
-        tools=adk_tools,  # 传递转换后的ADK工具列表
-        before_model_callback=before_model_callback  # 使用 before_model_callback
+        tools=adk_tools,  # 浼犻€掕浆鎹㈠悗鐨凙DK宸ュ叿鍒楄〃
+        before_model_callback=before_model_callback  # 浣跨敤 before_model_callback
     )
 
     logger.info(f"Agent created successfully: {agent}")
 
-    logger.info(f"agent_info：{agent}")
+    logger.info(f"agent_info锛歿agent}")
 
-    # 设置数据库会话服务
+    # 璁剧疆鏁版嵁搴撲細璇濇湇鍔?
     try:
         DATABASE_URL = os.getenv('DATABASE_URL')
         if not DATABASE_URL:
             if hasattr(config, 'DATABASE_URL') and config.DATABASE_URL:
                 DATABASE_URL = config.DATABASE_URL
             else:
-                DATABASE_URL = "postgresql://postgres:password@localhost:5432/fufanmanus"
-        # 为了日志安全，隐藏密码
+                DATABASE_URL = "postgresql://postgres:password@localhost:5432/hephaestus"
+        # 涓轰簡鏃ュ織瀹夊叏锛岄殣钘忓瘑鐮?
         from urllib.parse import urlparse, urlunparse
         parsed_url = urlparse(DATABASE_URL)
         safe_url = DATABASE_URL
@@ -703,9 +703,9 @@ async def make_adk_api_call(
         session_service = ModelOnlyDBSessionService(DATABASE_URL)
         
         
-        # 如果 ModelOnlyDBSessionService 创建成功，获取或创建会话
+        # 濡傛灉 ModelOnlyDBSessionService 鍒涘缓鎴愬姛锛岃幏鍙栨垨鍒涘缓浼氳瘽
         try:            
-            # 先尝试获取现有会话
+            # 鍏堝皾璇曡幏鍙栫幇鏈変細璇?
             existing_session = await session_service.get_session(
                 app_name=app_name, 
                 user_id=user_id, 
@@ -719,12 +719,12 @@ async def make_adk_api_call(
                 logger.warning(f"No session found for {session_id}, creating new session")
                 
         
-                # 这里可以添加数据库直接查询来找到可能的session不匹配问题
+                # 杩欓噷鍙互娣诲姞鏁版嵁搴撶洿鎺ユ煡璇㈡潵鎵惧埌鍙兘鐨剆ession涓嶅尮閰嶉棶棰?
                 try:
                     import asyncpg # type: ignore
                     conn = await asyncpg.connect(DATABASE_URL)
                     try:
-                        # 查找该用户的所有会话
+                        # 鏌ユ壘璇ョ敤鎴风殑鎵€鏈変細璇?
                         all_sessions = await conn.fetch(
                             "SELECT id, app_name, user_id, created_at FROM sessions WHERE user_id = $1 ORDER BY created_at DESC LIMIT 5",
                             user_id
@@ -733,26 +733,26 @@ async def make_adk_api_call(
                         for session in all_sessions:
                             logger.info(f"  - session_id: {session['id']}, app_name: {session['app_name']}, created_at: {session['created_at']}")
                             
-                        # 查找该session_id对应的事件数量
+                        # 鏌ユ壘璇ession_id瀵瑰簲鐨勪簨浠舵暟閲?
                         event_count = await conn.fetchval(
                             "SELECT COUNT(*) FROM events WHERE session_id = $1",
                             session_id
                         )
-                        logger.info(f"🔍 session_id {session_id} 的事件数量: {event_count}")
+                        logger.info(f"馃攳 session_id {session_id} 鐨勪簨浠舵暟閲? {event_count}")
                         
                     finally:
                         await conn.close()
                 except Exception as db_debug_error:
-                    logger.warning(f"调试查询失败: {db_debug_error}")
+                    logger.warning(f"璋冭瘯鏌ヨ澶辫触: {db_debug_error}")
                 
-                # 会话不存在，创建新的
+                # 浼氳瘽涓嶅瓨鍦紝鍒涘缓鏂扮殑
                 await session_service.create_session(app_name=app_name, user_id=user_id, session_id=session_id)
               
                 
         except Exception as session_error:
             logger.error(f"Session operation failed: {session_error}")
             
-            # 处理会话重复创建错误
+            # 澶勭悊浼氳瘽閲嶅鍒涘缓閿欒
             if "duplicate key value violates unique constraint" in str(session_error):
                 logger.info(f"Session already exists, trying to get existing session...")
                 try:
@@ -769,10 +769,10 @@ async def make_adk_api_call(
                     logger.error(f"Failed to get existing session: {get_error}")
                     raise session_error
                     
-            # 如果是数据损坏，尝试清理重建
+            # 濡傛灉鏄暟鎹崯鍧忥紝灏濊瘯娓呯悊閲嶅缓
             elif "EOFError" in str(session_error) or "Ran out of input" in str(session_error):
                 try:
-                    # 清理损坏的数据
+                    # 娓呯悊鎹熷潖鐨勬暟鎹?
                     import asyncpg # type: ignore
                     conn = await asyncpg.connect(DATABASE_URL)
                     try:
@@ -782,7 +782,7 @@ async def make_adk_api_call(
                     finally:
                         await conn.close()
                     
-                    # 重新创建会话
+                    # 閲嶆柊鍒涘缓浼氳瘽
                     await session_service.create_session(app_name=app_name, user_id=user_id, session_id=session_id)
                     logger.info(f"Recreated session: {session_id}")
                 except Exception as cleanup_error:
@@ -797,13 +797,13 @@ async def make_adk_api_call(
         traceback.print_exc()
         logger.error(f"Failed to use DatabaseSessionService, using InMemorySessionService: {e}", exc_info=True)
         
-        # 回退到内存会话服务
+        # 鍥為€€鍒板唴瀛樹細璇濇湇鍔?
         from google.adk.sessions import InMemorySessionService # type: ignore
         session_service = InMemorySessionService()
         await session_service.create_session(app_name=app_name, user_id=user_id, session_id=session_id)
         logger.info(f"InMemorySessionService created successfully: {session_id}")
 
-    # 最后验证：确保SessionService包含历史数据
+    # 鏈€鍚庨獙璇侊細纭繚SessionService鍖呭惈鍘嗗彶鏁版嵁
     try:
         final_session_check = await session_service.get_session(
             app_name=app_name, 
@@ -813,9 +813,9 @@ async def make_adk_api_call(
         if final_session_check:
             event_count = len(final_session_check.events) if hasattr(final_session_check, 'events') else 0
           
-            # 如果有历史事件，打印最近几条
+            # 濡傛灉鏈夊巻鍙蹭簨浠讹紝鎵撳嵃鏈€杩戝嚑鏉?
             if hasattr(final_session_check, 'events') and final_session_check.events:
-                for i, event in enumerate(final_session_check.events[-3:]):  # 显示最后3条
+                for i, event in enumerate(final_session_check.events[-3:]):  # 鏄剧ず鏈€鍚?鏉?
                     logger.info(f"  {i+1}. author={getattr(event, 'author', 'unknown')}, content={str(getattr(event, 'content', ''))[:50]}...")
         else:
             logger.error(f"Final session validation failed: cannot get session {session_id}")
@@ -825,11 +825,11 @@ async def make_adk_api_call(
     runner = Runner(
         agent=agent,
         app_name=app_name,
-        session_service=session_service  # 🔑 关键：传递包含历史数据的session_service
+        session_service=session_service  # 馃攽 鍏抽敭锛氫紶閫掑寘鍚巻鍙叉暟鎹殑session_service
     )
 
 
-    # 直接返回 runner.run_async 的异步生成器，就像 make_llm_api_call 返回 litellm.acompletion 一样
+    # 鐩存帴杩斿洖 runner.run_async 鐨勫紓姝ョ敓鎴愬櫒锛屽氨鍍?make_llm_api_call 杩斿洖 litellm.acompletion 涓€鏍?
     adk_generator = runner.run_async(
         user_id=user_id,
         session_id=session_id,

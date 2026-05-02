@@ -1,4 +1,4 @@
-from .template_service import (
+﻿from .template_service import (
     TemplateService,
     AgentTemplate,
     MCPRequirementValue,
@@ -25,7 +25,7 @@ from .utils import (
     build_mcp_config,
     create_mcp_requirement_from_dict,
     extract_custom_type_from_name,
-    is_fufanmanus_default_agent,
+    is_hephaestus_default_agent,
     format_template_for_response,
     format_mcp_requirements_for_response,
     filter_templates_by_tags,
@@ -49,9 +49,10 @@ __all__ = [
     "validate_template_ownership", "validate_template_access",
     "validate_installation_requirements", "build_unified_config",
     "build_mcp_config", "create_mcp_requirement_from_dict",
-    "extract_custom_type_from_name", "is_fufanmanus_default_agent",
+    "extract_custom_type_from_name", "is_hephaestus_default_agent",
     "format_template_for_response", "format_mcp_requirements_for_response",
     "filter_templates_by_tags", "search_templates_by_name",
     
     "api"
 ]
+

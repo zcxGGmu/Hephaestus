@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Optional, Tuple
+﻿from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass
 from datetime import datetime, timezone
 import json
@@ -8,7 +8,7 @@ from utils.logger import logger
 
 
 @dataclass
-class FufanmanusAgentRecord:
+class HephaestusAgentRecord:
     agent_id: str
     user_id: str
     name: str
@@ -17,7 +17,7 @@ class FufanmanusAgentRecord:
     is_active: bool
     
     @classmethod
-    def from_db_row(cls, row: Dict[str, Any]) -> 'FufanmanusAgentRecord':
+    def from_db_row(cls, row: Dict[str, Any]) -> 'HephaestusAgentRecord':
         metadata = row.get('metadata', {})
         return cls(
             agent_id=row['agent_id'],
@@ -29,11 +29,11 @@ class FufanmanusAgentRecord:
         )
 
 
-class FufanmanusAgentRepository:
+class HephaestusAgentRepository:
     def __init__(self, db: DBConnection = None):
         self.db = db or DBConnection()
     
-    async def find_all_fufanmanus_agents(self) -> List[FufanmanusAgentRecord]:
+    async def find_all_hephaestus_agents(self) -> List[HephaestusAgentRecord]:
         try:
             client = await self.db.client
             all_agents = []
@@ -43,12 +43,12 @@ class FufanmanusAgentRepository:
             while True:
                 result = await client.table('agents').select(
                     'agent_id, user_id, name, metadata'
-                ).eq('metadata->>is_fufanmanus_default', 'true').range(offset, offset + page_size - 1).execute()
+                ).eq('metadata->>is_hephaestus_default', 'true').range(offset, offset + page_size - 1).execute()
                 
                 if not result.data:
                     break
                 
-                batch_agents = [FufanmanusAgentRecord.from_db_row(row) for row in result.data]
+                batch_agents = [HephaestusAgentRecord.from_db_row(row) for row in result.data]
                 all_agents.extend(batch_agents)
                 
                 # If we got less than page_size, we've reached the end
@@ -57,15 +57,15 @@ class FufanmanusAgentRepository:
                 
                 offset += page_size
             
-            logger.info(f"Found {len(all_agents)} existing FuFanManus agents")
+            logger.info(f"Found {len(all_agents)} existing Hephaestus agents")
             return all_agents
             
         except Exception as e:
-            logger.error(f"Failed to find FuFanManus agents: {e}")
+            logger.error(f"Failed to find Hephaestus agents: {e}")
             raise
     
-    async def find_fufanmanus_agents_needing_sync(self, target_version_tag: str) -> List[FufanmanusAgentRecord]:
-        agents = await self.find_all_fufanmanus_agents()
+    async def find_hephaestus_agents_needing_sync(self, target_version_tag: str) -> List[HephaestusAgentRecord]:
+        agents = await self.find_all_hephaestus_agents()
         return [
             agent for agent in agents 
             if agent.current_version_tag != target_version_tag
@@ -117,7 +117,7 @@ class FufanmanusAgentRepository:
                     'agentpress': {}
                 },
                 'metadata': {
-                    'is_fufanmanus_default': True,
+                    'is_hephaestus_default': True,
                     'centrally_managed': True
                 }
             }
@@ -152,11 +152,11 @@ class FufanmanusAgentRepository:
             
             total_result = await client.table('agents').select(
                 'agent_id', count='exact'
-            ).eq('metadata->>is_fufanmanus_default', 'true').execute()
+            ).eq('metadata->>is_hephaestus_default', 'true').execute()
             
             total_count = total_result.count or 0
             
-            agents = await self.find_all_fufanmanus_agents()
+            agents = await self.find_all_hephaestus_agents()
             version_dist = {}
             for agent in agents:
                 version = agent.current_version_tag
@@ -172,27 +172,27 @@ class FufanmanusAgentRepository:
             logger.error(f"Failed to get agent stats: {e}")
             return {"error": str(e)}
     
-    async def create_fufanmanus_agent(
+    async def create_hephaestus_agent(
         self, 
         user_id: str,
     ) -> str:
         try:
-            from agent.fufanmanus.config import FufanmanusConfig
+            from agent.hephaestus.config import HephaestusConfig
             
             client = await self.db.client
             
             agent_data = {
                 "agent_id": str(uuid.uuid4()),
                 "user_id": user_id,
-                "name": FufanmanusConfig.NAME,
-                "model": FufanmanusConfig.DEFAULT_MODEL,
-                "system_prompt": FufanmanusConfig.SYSTEM_PROMPT,
-                "description": FufanmanusConfig.DESCRIPTION,
+                "name": HephaestusConfig.NAME,
+                "model": HephaestusConfig.DEFAULT_MODEL,
+                "system_prompt": HephaestusConfig.SYSTEM_PROMPT,
+                "description": HephaestusConfig.DESCRIPTION,
                 "is_default": True,
-                "avatar": FufanmanusConfig.AVATAR,
-                "avatar_color": FufanmanusConfig.AVATAR_COLOR,
+                "avatar": HephaestusConfig.AVATAR,
+                "avatar_color": HephaestusConfig.AVATAR_COLOR,
                 "metadata": json.dumps({
-                    "is_fufanmanus_default": True,
+                    "is_hephaestus_default": True,
                     "centrally_managed": True,
                     "installation_date": datetime.now(timezone.utc).isoformat()
                 }),
@@ -203,22 +203,22 @@ class FufanmanusAgentRepository:
             
             if result.data:
                 agent_id = result.data[0]['agent_id']
-                logger.info(f"Created minimal FuFanManus agent {agent_id} for {user_id}")
+                logger.info(f"Created minimal Hephaestus agent {agent_id} for {user_id}")
                 await self._create_initial_version(
                     agent_id=agent_id,
                     user_id=user_id,
                     system_prompt="[MANAGED]",
-                    model=FufanmanusConfig.DEFAULT_MODEL,
-                    configured_mcps=FufanmanusConfig.DEFAULT_MCPS,
-                    custom_mcps=FufanmanusConfig.DEFAULT_CUSTOM_MCPS,
-                    agentpress_tools=FufanmanusConfig.DEFAULT_TOOLS
+                    model=HephaestusConfig.DEFAULT_MODEL,
+                    configured_mcps=HephaestusConfig.DEFAULT_MCPS,
+                    custom_mcps=HephaestusConfig.DEFAULT_CUSTOM_MCPS,
+                    agentpress_tools=HephaestusConfig.DEFAULT_TOOLS
                 )
                 return agent_id
             
             raise Exception("No data returned from insert")
             
         except Exception as e:
-            logger.error(f"Failed to create FuFanManus agent for {user_id}: {e}")
+            logger.error(f"Failed to create Hephaestus agent for {user_id}: {e}")
             raise
     
     async def update_agent_metadata(
@@ -231,7 +231,7 @@ class FufanmanusAgentRepository:
             
             update_data = {
                 "metadata": {
-                    "is_fufanmanus_default": True,
+                    "is_hephaestus_default": True,
                     "centrally_managed": True,
                     "config_version": version_tag,
                     "last_central_update": datetime.now(timezone.utc).isoformat()
@@ -257,18 +257,18 @@ class FufanmanusAgentRepository:
             logger.error(f"Failed to delete agent {agent_id}: {e}")
             raise
     
-    async def find_orphaned_fufanmanus_agents(self) -> List[FufanmanusAgentRecord]:
+    async def find_orphaned_hephaestus_agents(self) -> List[HephaestusAgentRecord]:
         """
-        Find FuFanManus agents that exist but don't have proper version records.
+        Find Hephaestus agents that exist but don't have proper version records.
         These are agents that were created but the version creation process failed.
         """
         try:
             client = await self.db.client
             
-            # Get all FuFanManus agents
+            # Get all Hephaestus agents
             agents_result = await client.table('agents').select(
                 'agent_id, user_id, name, metadata'
-            ).eq('metadata->>is_fufanmanus_default', 'true').execute()
+            ).eq('metadata->>is_hephaestus_default', 'true').execute()
             
             if not agents_result.data:
                 return []
@@ -281,13 +281,13 @@ class FufanmanusAgentRepository:
             orphaned_agents = []
             for row in agents_result.data:
                 if row['agent_id'] not in agents_with_versions:
-                    orphaned_agents.append(FufanmanusAgentRecord.from_db_row(row))
+                    orphaned_agents.append(HephaestusAgentRecord.from_db_row(row))
             
-            logger.info(f"Found {len(orphaned_agents)} orphaned FuFanManus agents")
+            logger.info(f"Found {len(orphaned_agents)} orphaned Hephaestus agents")
             return orphaned_agents
             
         except Exception as e:
-            logger.error(f"Failed to find orphaned FuFanManus agents: {e}")
+            logger.error(f"Failed to find orphaned Hephaestus agents: {e}")
             raise
     
     async def create_version_record_for_existing_agent(
@@ -304,13 +304,13 @@ class FufanmanusAgentRepository:
         """
         try:
             from agent.versioning.version_service import get_version_service
-            from agent.fufanmanus.config import FufanmanusConfig
+            from agent.hephaestus.config import HephaestusConfig
             
-            # Build configuration exclusively from FufanmanusConfig and provided unified_config
-            system_prompt = FufanmanusConfig.get_system_prompt()
-            model = FufanmanusConfig.DEFAULT_MODEL
-            configured_mcps = FufanmanusConfig.DEFAULT_MCPS
-            custom_mcps = FufanmanusConfig.DEFAULT_CUSTOM_MCPS
+            # Build configuration exclusively from HephaestusConfig and provided unified_config
+            system_prompt = HephaestusConfig.get_system_prompt()
+            model = HephaestusConfig.DEFAULT_MODEL
+            configured_mcps = HephaestusConfig.DEFAULT_MCPS
+            custom_mcps = HephaestusConfig.DEFAULT_CUSTOM_MCPS
             agentpress_tools = unified_config.get('tools', {}).get('agentpress', {})
             
             # Create the version record using the version service
@@ -398,11 +398,11 @@ class FufanmanusAgentRepository:
                 agentpress_tools=agentpress_tools,
                 model=model,
                 version_name="v1",
-                change_description="Initial FuFanManus agent version"
+                change_description="Initial Hephaestus agent version"
             )
             
-            logger.info(f"Created initial version for FuFanManus agent {agent_id}")
+            logger.info(f"Created initial version for Hephaestus agent {agent_id}")
             
         except Exception as e:
-            logger.error(f"Failed to create initial version for FuFanManus agent {agent_id}: {e}")
+            logger.error(f"Failed to create initial version for Hephaestus agent {agent_id}: {e}")
             raise

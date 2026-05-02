@@ -1,4 +1,4 @@
-import { FirstBentoAnimation } from '@/components/home/first-bento-animation';
+﻿import { FirstBentoAnimation } from '@/components/home/first-bento-animation';
 import { FourthBentoAnimation } from '@/components/home/fourth-bento-animation';
 import { SecondBentoAnimation } from '@/components/home/second-bento-animation';
 import { ThirdBentoAnimation } from '@/components/home/third-bento-animation';
@@ -109,9 +109,9 @@ export const siteConfig = {
     ),
     badge: '100% OPEN SOURCE',
     githubUrl: 'https://github.com/kortix-ai/suna',
-    title: 'FuFanManus – 构建、管理和训练您的 AI 工作团队.',
+    title: 'Hephaestus 鈥?鏋勫缓銆佺鐞嗗拰璁粌鎮ㄧ殑 AI 宸ヤ綔鍥㈤槦.',
     description:
-      'FuFanManus – 从人工到 AI 迁移的最简单方式.',
+      'Hephaestus 鈥?浠庝汉宸ュ埌 AI 杩佺Щ鐨勬渶绠€鍗曟柟寮?',
     inputPlaceholder: 'Ask Suna to...',
   },
   cloudPricingItems: [
@@ -511,7 +511,7 @@ export const siteConfig = {
         id: 1,
         title: 'Request an Action',
         content:
-          'Speak or type your command—let Kortix Suna capture your intent. Your request instantly sets the process in motion.',
+          'Speak or type your command鈥攍et Kortix Suna capture your intent. Your request instantly sets the process in motion.',
         image:
           'https://images.unsplash.com/photo-1720371300677-ba4838fa0678?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
       },
@@ -608,7 +608,7 @@ export const siteConfig = {
   growthSection: {
     title: 'Open Source & Secure',
     description:
-      'Where advanced security meets complete transparency—designed to protect your data while providing full access to the code.',
+      'Where advanced security meets complete transparency鈥攄esigned to protect your data while providing full access to the code.',
     items: [
       {
         id: 1,
@@ -1231,11 +1231,11 @@ export const siteConfig = {
       text: 'Get Started for free',
       href: '/auth',
     },
-    subtext: '构建、管理和训练您的 AI 工作团队',
+    subtext: '鏋勫缓銆佺鐞嗗拰璁粌鎮ㄧ殑 AI 宸ヤ綔鍥㈤槦',
   },
   footerLinks: [
     {
-      title: 'FuFanManus',
+      title: 'Hephaestus',
       links: [
         { id: 1, title: 'About', url: 'https://kortix.ai' },
         { id: 3, title: 'Contact', url: 'mailto:hey@kortix.ai' },
@@ -1791,3 +1791,4 @@ export const siteConfig = {
 };
 
 export type SiteConfig = typeof siteConfig;
+

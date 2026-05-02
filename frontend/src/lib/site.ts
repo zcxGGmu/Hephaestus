@@ -1,5 +1,5 @@
-export const siteConfig = {
-  name: 'FuFanManus',
+﻿export const siteConfig = {
+  name: 'Hephaestus',
   url: 'https://suna.so/',
   description: 'Kortix AI',
   links: {
@@ -10,3 +10,4 @@ export const siteConfig = {
 };
 
 export type SiteConfig = typeof siteConfig;
+

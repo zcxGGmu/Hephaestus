@@ -1,48 +1,48 @@
-# FastAPI 服务初始化流程图
+﻿# FastAPI 鏈嶅姟鍒濆鍖栨祦绋嬪浘
 
-基于 `api.py` 中的 `lifespan` 函数分析的服务生命周期管理流程。
+鍩轰簬 `api.py` 涓殑 `lifespan` 鍑芥暟鍒嗘瀽鐨勬湇鍔＄敓鍛藉懆鏈熺鐞嗘祦绋嬨€?
 
-## 整体架构流程
+## 鏁翠綋鏋舵瀯娴佺▼
 
 ```mermaid
 flowchart TD
-    Start([服务启动]) --> EnvCheck{环境检查}
-    EnvCheck --> |ENV_MODE, DATABASE_URL| InitDB[初始化PostgreSQL连接池]
+    Start([鏈嶅姟鍚姩]) --> EnvCheck{鐜妫€鏌
+    EnvCheck --> |ENV_MODE, DATABASE_URL| InitDB[鍒濆鍖朠ostgreSQL杩炴帴姹燷
     
-    InitDB --> CheckDB{数据库是否存在?}
-    CheckDB --> |否| CreateDB[创建数据库]
-    CheckDB --> |是| CheckTables[检查数据库表]
+    InitDB --> CheckDB{鏁版嵁搴撴槸鍚﹀瓨鍦?}
+    CheckDB --> |鍚 CreateDB[鍒涘缓鏁版嵁搴揮
+    CheckDB --> |鏄瘄 CheckTables[妫€鏌ユ暟鎹簱琛╙
     CreateDB --> CheckTables
-    CheckTables --> AutoCreate{表是否缺失?}
-    AutoCreate --> |是| ExecSQL[执行fufanmanus.sql建表]
-    AutoCreate --> |否| InitRedis[初始化Redis连接]
+    CheckTables --> AutoCreate{琛ㄦ槸鍚︾己澶?}
+    AutoCreate --> |鏄瘄 ExecSQL[鎵цhephaestus.sql寤鸿〃]
+    AutoCreate --> |鍚 InitRedis[鍒濆鍖朢edis杩炴帴]
     ExecSQL --> InitRedis
     
-    InitRedis --> |可选组件| InitAgent[初始化Agent API]
-    InitAgent --> InitSandbox[初始化Sandbox API]
-    InitSandbox --> InitTriggers[初始化Triggers API]
+    InitRedis --> |鍙€夌粍浠秥 InitAgent[鍒濆鍖朅gent API]
+    InitAgent --> InitSandbox[鍒濆鍖朣andbox API]
+    InitSandbox --> InitTriggers[鍒濆鍖朤riggers API]
     
-    InitTriggers --> CommentedAPIs[其他API组件<br/>已注释掉]
-    CommentedAPIs -.-> |pipedream_api| Disabled1[💤]
-    CommentedAPIs -.-> |credentials_api| Disabled2[💤]
-    CommentedAPIs -.-> |template_api| Disabled3[💤]
-    CommentedAPIs -.-> |composio_api| Disabled4[💤]
+    InitTriggers --> CommentedAPIs[鍏朵粬API缁勪欢<br/>宸叉敞閲婃帀]
+    CommentedAPIs -.-> |pipedream_api| Disabled1[馃挙]
+    CommentedAPIs -.-> |credentials_api| Disabled2[馃挙]
+    CommentedAPIs -.-> |template_api| Disabled3[馃挙]
+    CommentedAPIs -.-> |composio_api| Disabled4[馃挙]
     
-    InitTriggers --> Running[🟢 服务运行中]
+    InitTriggers --> Running[馃煝 鏈嶅姟杩愯涓璢
     
-    %% 清理阶段
-    Running --> Shutdown([收到关闭信号])
-    Shutdown --> CleanAgent[清理Agent资源]
-    CleanAgent --> CloseRedis[关闭Redis连接]
-    CloseRedis --> CloseDB[断开数据库连接]
-    CloseDB --> End([服务停止])
+    %% 娓呯悊闃舵
+    Running --> Shutdown([鏀跺埌鍏抽棴淇″彿])
+    Shutdown --> CleanAgent[娓呯悊Agent璧勬簮]
+    CleanAgent --> CloseRedis[鍏抽棴Redis杩炴帴]
+    CloseRedis --> CloseDB[鏂紑鏁版嵁搴撹繛鎺
+    CloseDB --> End([鏈嶅姟鍋滄])
     
-    %% 错误处理
-    InitDB --> |失败| Error1[❌ 启动失败]
-    CheckDB --> |检查失败| Error2[❌ 启动失败]
-    CreateDB --> |创建失败| Error3[❌ 启动失败]
-    InitRedis --> |失败| Warn1[⚠️ 继续启动但记录警告]
-    InitTriggers --> |失败| Warn2[⚠️ 跳过该组件]
+    %% 閿欒澶勭悊
+    InitDB --> |澶辫触| Error1[鉂?鍚姩澶辫触]
+    CheckDB --> |妫€鏌ュけ璐 Error2[鉂?鍚姩澶辫触]
+    CreateDB --> |鍒涘缓澶辫触| Error3[鉂?鍚姩澶辫触]
+    InitRedis --> |澶辫触| Warn1[鈿狅笍 缁х画鍚姩浣嗚褰曡鍛奭
+    InitTriggers --> |澶辫触| Warn2[鈿狅笍 璺宠繃璇ョ粍浠禲
     
     style Start fill:#e1f5fe
     style Running fill:#e8f5e8
@@ -52,57 +52,57 @@ flowchart TD
     style Warn2 fill:#fff3e0
 ```
 
-## 关键组件说明
+## 鍏抽敭缁勪欢璇存槑
 
-### 🔧 核心基础设施
-- **PostgreSQL**: 主数据库，存储所有业务数据
-  - 自动创建数据库（如不存在）
-  - 基于 `fufanmanus.sql` 自动检查和创建16个核心表
-- **Redis**: 缓存和会话存储
-- **零配置启动**: 全自动数据库初始化，无需手动建库建表
+### 馃敡 鏍稿績鍩虹璁炬柦
+- **PostgreSQL**: 涓绘暟鎹簱锛屽瓨鍌ㄦ墍鏈変笟鍔℃暟鎹?
+  - 鑷姩鍒涘缓鏁版嵁搴擄紙濡備笉瀛樺湪锛?
+  - 鍩轰簬 `hephaestus.sql` 鑷姩妫€鏌ュ拰鍒涘缓16涓牳蹇冭〃
+- **Redis**: 缂撳瓨鍜屼細璇濆瓨鍌?
+- **闆堕厤缃惎鍔?*: 鍏ㄨ嚜鍔ㄦ暟鎹簱鍒濆鍖栵紝鏃犻渶鎵嬪姩寤哄簱寤鸿〃
 
-### 🎯 业务组件
-- **Agent API**: 核心AI代理服务，需要 `db` 和 `instance_id`
-- **Sandbox API**: 代码执行沙盒环境
-- **Triggers API**: 事件触发器系统
+### 馃幆 涓氬姟缁勪欢
+- **Agent API**: 鏍稿績AI浠ｇ悊鏈嶅姟锛岄渶瑕?`db` 鍜?`instance_id`
+- **Sandbox API**: 浠ｇ爜鎵ц娌欑洅鐜
+- **Triggers API**: 浜嬩欢瑙﹀彂鍣ㄧ郴缁?
 
-### 💤 暂停的组件
+### 馃挙 鏆傚仠鐨勭粍浠?
 ```
-pipedream_api      # 工作流集成
-credentials_api    # 凭证管理  
-template_api       # 模板系统
-composio_api       # Composio集成
+pipedream_api      # 宸ヤ綔娴侀泦鎴?
+credentials_api    # 鍑瘉绠＄悊  
+template_api       # 妯℃澘绯荤粺
+composio_api       # Composio闆嗘垚
 ```
 
-### 🛡️ 错误处理策略
-- **数据库连接失败**: 立即终止启动
-- **Redis连接失败**: 记录警告但继续启动
-- **可选组件失败**: 跳过该组件，不影响核心功能
+### 馃洝锔?閿欒澶勭悊绛栫暐
+- **鏁版嵁搴撹繛鎺ュけ璐?*: 绔嬪嵆缁堟鍚姩
+- **Redis杩炴帴澶辫触**: 璁板綍璀﹀憡浣嗙户缁惎鍔?
+- **鍙€夌粍浠跺け璐?*: 璺宠繃璇ョ粍浠讹紝涓嶅奖鍝嶆牳蹇冨姛鑳?
 
-## 配置依赖
+## 閰嶇疆渚濊禆
 
 ```mermaid
 graph LR
-    ENV[环境变量] --> DB_URL[DATABASE_URL]
+    ENV[鐜鍙橀噺] --> DB_URL[DATABASE_URL]
     ENV --> ENV_MODE[ENV_MODE]
     ENV --> LOG_LEVEL[LOGGING_LEVEL]
     
-    DB_URL --> PG[PostgreSQL连接]
-    ENV_MODE --> CORS[CORS策略]
-    LOG_LEVEL --> Logger[日志级别]
+    DB_URL --> PG[PostgreSQL杩炴帴]
+    ENV_MODE --> CORS[CORS绛栫暐]
+    LOG_LEVEL --> Logger[鏃ュ織绾у埆]
     
     style ENV fill:#f3e5f5
     style PG fill:#e3f2fd
     style CORS fill:#e8f5e8
 ```
 
-## 数据库表结构
+## 鏁版嵁搴撹〃缁撴瀯
 
-从 `fufanmanus.sql` 自动创建的16个核心表：
+浠?`hephaestus.sql` 鑷姩鍒涘缓鐨?6涓牳蹇冭〃锛?
 
 ```
-用户认证: users, oauth_providers, user_sessions, refresh_tokens, user_activities
-项目管理: projects, threads, messages  
-代理系统: agents, agent_versions, agent_workflows, agent_runs
-ADK框架: app_states, sessions, events, user_states
+鐢ㄦ埛璁よ瘉: users, oauth_providers, user_sessions, refresh_tokens, user_activities
+椤圭洰绠＄悊: projects, threads, messages  
+浠ｇ悊绯荤粺: agents, agent_versions, agent_workflows, agent_runs
+ADK妗嗘灦: app_states, sessions, events, user_states
 ``` 

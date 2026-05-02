@@ -1,6 +1,6 @@
-# Hephaestus
+﻿# Hephaestus
 
-Hephaestus is a consolidated monorepo for the extracted `FuFanManus` Part 1 full-stack source code.
+Hephaestus is a consolidated monorepo for the extracted `Hephaestus` Part 1 full-stack source code.
 
 ## Repository Layout
 
@@ -46,3 +46,4 @@ These scripts are PowerShell helpers for local Windows development.
 - This repository was normalized from a course package and still contains upstream migration traces.
 - Sample secrets have been replaced with placeholders.
 - Build outputs and local env files should stay out of version control.
+

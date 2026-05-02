@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+﻿import React, { useState, useEffect } from 'react'
 import { ChevronDown, User, LogIn, Lock, Bot, Zap, Code, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -34,8 +34,8 @@ const ChatDropdown = () => {
                     }}
                 >
                     <div className="flex items-center gap-2">
-                        <Image src="/kortix-symbol.svg" alt="FuFanManus" width={16} height={16} className="h-4 w-4 dark:invert" />
-                        <span>FuFanManus</span>
+                        <Image src="/kortix-symbol.svg" alt="Hephaestus" width={16} height={16} className="h-4 w-4 dark:invert" />
+                        <span>Hephaestus</span>
                         <ChevronDown size={14} className="opacity-50" />
                     </div>
                 </Button>
@@ -54,7 +54,7 @@ const ChatDropdown = () => {
                 >
                     <User size={18} />
                     <div className="flex flex-col">
-                        <span className="font-semibold text-sm">FuFanManus</span>
+                        <span className="font-semibold text-sm">Hephaestus</span>
                         <span className="text-xs text-muted-foreground">Default</span>
                     </div>
                 </DropdownMenuItem>

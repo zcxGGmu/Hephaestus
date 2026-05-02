@@ -1,10 +1,10 @@
-from typing import Dict, Any, List, Optional
+﻿from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from utils.logger import logger
 
-from .config_manager import FufanmanusConfigManager, FufanmanusConfiguration
-from .repository import FufanmanusAgentRepository, FufanmanusAgentRecord
+from .config_manager import HephaestusConfigManager, HephaestusConfiguration
+from .repository import HephaestusAgentRepository, HephaestusAgentRecord
 
 
 @dataclass
@@ -24,11 +24,11 @@ class SyncResult:
 
 class SunaSyncService:
     def __init__(self):
-        self.config_manager = FufanmanusConfigManager()
-        self.repository = FufanmanusAgentRepository()
+        self.config_manager = HephaestusConfigManager()
+        self.repository = HephaestusAgentRepository()
     
     async def sync_all_agents(self, dry_run: bool = False) -> SyncResult:
-        logger.info("🚀 Starting Suna agent metadata sync")
+        logger.info("馃殌 Starting Suna agent metadata sync")
         
         try:
             current_config = self.config_manager.get_current_config()
@@ -37,14 +37,14 @@ class SunaSyncService:
             )
             
             if not agents_needing_sync:
-                logger.info("📋 All Suna agents already have current metadata")
+                logger.info("馃搵 All Suna agents already have current metadata")
                 return SyncResult(
                     success=True,
                     synced_count=0,
                     details=[{"message": "All agents already up to date"}]
                 )
             
-            logger.info(f"📊 Updating metadata for {len(agents_needing_sync)} agents to version {current_config.version_tag}")
+            logger.info(f"馃搳 Updating metadata for {len(agents_needing_sync)} agents to version {current_config.version_tag}")
             
             if dry_run:
                 return SyncResult(
@@ -66,7 +66,7 @@ class SunaSyncService:
                         current_config.version_tag
                     )
                     success_count += 1
-                    logger.info(f"✅ Updated metadata for agent {agent.agent_id}")
+                    logger.info(f"鉁?Updated metadata for agent {agent.agent_id}")
                 except Exception as e:
                     failed_count += 1
                     error_msg = f"Failed to update agent {agent.agent_id}: {str(e)}"
@@ -89,7 +89,7 @@ class SunaSyncService:
             return SyncResult(success=False, errors=[error_msg])
     
     async def install_for_all_missing_users(self) -> SyncResult:
-        logger.info("🚀 Installing Suna agents for users who don't have them")
+        logger.info("馃殌 Installing Suna agents for users who don't have them")
         
         try:
             current_config = self.config_manager.get_current_config()
@@ -105,7 +105,7 @@ class SunaSyncService:
                     details=[{"message": "All users already have Suna agents"}]
                 )
             
-            logger.info(f"📦 Installing Suna for {len(missing_accounts)} users")
+            logger.info(f"馃摝 Installing Suna for {len(missing_accounts)} users")
             
             success_count = 0
             failed_count = 0
@@ -118,7 +118,7 @@ class SunaSyncService:
                         current_config.version_tag
                     )
                     success_count += 1
-                    logger.info(f"✅ Installed Suna for user {account_id}")
+                    logger.info(f"鉁?Installed Suna for user {account_id}")
                 except Exception as e:
                     failed_count += 1
                     error_msg = f"Failed to install for user {account_id}: {str(e)}"

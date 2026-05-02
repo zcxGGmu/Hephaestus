@@ -1,5 +1,5 @@
-async def _log_adk_user_message_event(client, user_id: str, message_content: str, session_id: str, message_id: str, app_name: str = "fufanmanus"):
-    """记录用户消息事件到ADK events表"""
+﻿async def _log_adk_user_message_event(client, user_id: str, message_content: str, session_id: str, message_id: str, app_name: str = "hephaestus"):
+    """璁板綍鐢ㄦ埛娑堟伅浜嬩欢鍒癆DK events琛?""
     try:
         import uuid
         import pickle
@@ -7,14 +7,14 @@ async def _log_adk_user_message_event(client, user_id: str, message_content: str
         event_id = str(uuid.uuid4())
         invocation_id = str(uuid.uuid4())
         
-        # 按照ADK格式构建消息内容 - 应该符合 types.Content 结构
+        # 鎸夌収ADK鏍煎紡鏋勫缓娑堟伅鍐呭 - 搴旇绗﹀悎 types.Content 缁撴瀯
         content = {
             "role": "user", 
-            "parts": [{"text": message_content}],  # ADK期望的格式
+            "parts": [{"text": message_content}],  # ADK鏈熸湜鐨勬牸寮?
             "message_id": message_id
         }
         
-        # actions 需要手动序列化为字节（这是ADK的格式要求）
+        # actions 闇€瑕佹墜鍔ㄥ簭鍒楀寲涓哄瓧鑺傦紙杩欐槸ADK鐨勬牸寮忚姹傦級
         actions_dict = {
             "skip_summarization": None,
             "state_delta": {},
@@ -24,10 +24,10 @@ async def _log_adk_user_message_event(client, user_id: str, message_content: str
             "requested_auth_configs": {}
         }
         
-        # 手动序列化 actions 字典为字节（这是ADK的格式要求）
+        # 鎵嬪姩搴忓垪鍖?actions 瀛楀吀涓哄瓧鑺傦紙杩欐槸ADK鐨勬牸寮忚姹傦級
         actions_bytes = pickle.dumps(actions_dict)
         
-        # 插入到ADK events表
+        # 鎻掑叆鍒癆DK events琛?
         async with client.pool.acquire() as conn:
             await conn.execute(
                 """

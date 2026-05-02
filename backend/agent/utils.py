@@ -1,4 +1,4 @@
-import json
+﻿import json
 from typing import Optional, List, Dict, Any
 from datetime import datetime, timezone, timedelta
 from utils.cache import Cache
@@ -142,12 +142,12 @@ async def check_agent_run_limit(client, account_id: str) -> Dict[str, Any]:
 
 async def check_agent_count_limit(client, account_id: str) -> Dict[str, Any]:
     try:
-        # 在本地模式下，允许创建几乎无限的定制Agent
+        # 鍦ㄦ湰鍦版ā寮忎笅锛屽厑璁稿垱寤哄嚑涔庢棤闄愮殑瀹氬埗Agent
         if config.ENV_MODE.value == "local":
             return {
                 'can_create': True,
-                'current_count': 0,  # 返回 0 以避免显示任何限制警告
-                'limit': 999999,     # 实际上无限
+                'current_count': 0,  # 杩斿洖 0 浠ラ伩鍏嶆樉绀轰换浣曢檺鍒惰鍛?
+                'limit': 999999,     # 瀹為檯涓婃棤闄?
                 'tier_name': 'local'
             }
         
@@ -159,22 +159,22 @@ async def check_agent_count_limit(client, account_id: str) -> Dict[str, Any]:
         except Exception as cache_error:
             logger.warning(f"Cache read failed for agent count limit {account_id}: {str(cache_error)}")
 
-        # 提取 Agent 信息
+        # 鎻愬彇 Agent 淇℃伅
         agents_result = await client.table('agents').select('agent_id, metadata').eq('user_id', account_id).execute()
         
-        non_fufanmanus_agents = []
+        non_hephaestus_agents = []
         for agent in agents_result.data or []:
             metadata = agent.get('metadata', {}) or {}
-            is_fufanmanus_default = metadata.get('is_fufanmanus_default', False)
-            if not is_fufanmanus_default:
-                non_fufanmanus_agents.append(agent)
+            is_hephaestus_default = metadata.get('is_hephaestus_default', False)
+            if not is_hephaestus_default:
+                non_hephaestus_agents.append(agent)
                 
-        current_count = len(non_fufanmanus_agents)
-        logger.debug(f"Account {account_id} has {current_count} custom agents (excluding Fufanmanus defaults)")
+        current_count = len(non_hephaestus_agents)
+        logger.debug(f"Account {account_id} has {current_count} custom agents (excluding Hephaestus defaults)")
         
 
-        # TODO: 可以根据消费金额、用户授权等做Agent的创建限制
-        # 这里不做限制，允许任意用户无限制访问
+        # TODO: 鍙互鏍规嵁娑堣垂閲戦銆佺敤鎴锋巿鏉冪瓑鍋欰gent鐨勫垱寤洪檺鍒?
+        # 杩欓噷涓嶅仛闄愬埗锛屽厑璁镐换鎰忕敤鎴锋棤闄愬埗璁块棶
         result = {
             'can_create': True,
             'current_count': current_count,
@@ -199,3 +199,4 @@ async def check_agent_count_limit(client, account_id: str) -> Dict[str, Any]:
             'limit': 999999,
             'tier_name': 'free'
         }
+

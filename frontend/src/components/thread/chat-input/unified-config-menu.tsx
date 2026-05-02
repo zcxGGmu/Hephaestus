@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -247,7 +247,7 @@ const LoggedInMenu: React.FC<UnifiedConfigMenuProps> = ({
                                     {renderAgentIcon(displayAgent)}
                                 </div>
                                 <span className="truncate text-sm">
-                                    {displayAgent?.name || 'FuFanManus'}
+                                    {displayAgent?.name || 'Hephaestus'}
                                 </span>
                                 <ChevronDown size={12} className="opacity-60" />
                             </div>
@@ -470,7 +470,7 @@ const LoggedInMenu: React.FC<UnifiedConfigMenuProps> = ({
                                 <DropdownMenuPortal>
                                     <DropdownMenuSubContent className="w-72 rounded-xl max-h-80 overflow-y-auto">
                                         {playbooksLoading ? (
-                                            <div className="px-3 py-2 text-xs text-muted-foreground">Loading…</div>
+                                            <div className="px-3 py-2 text-xs text-muted-foreground">Loading鈥?/div>
                                         ) : playbooks && playbooks.length > 0 ? (
                                             playbooks.map((wf: any) => (
                                                 <DropdownMenuItem
@@ -583,7 +583,7 @@ const GuestMenu: React.FC<UnifiedConfigMenuProps> = () => {
                                 <div className="flex-shrink-0">
                                     <KortixLogo size={16} />
                                 </div>
-                                <span className="truncate text-sm">FuFanManus</span>
+                                <span className="truncate text-sm">Hephaestus</span>
                                 <ChevronDown size={12} className="opacity-60" />
                             </div>
                         </Button>
@@ -605,5 +605,6 @@ export const UnifiedConfigMenu: React.FC<UnifiedConfigMenuProps> = (props) => {
 };
 
 export default UnifiedConfigMenu;
+
 
 

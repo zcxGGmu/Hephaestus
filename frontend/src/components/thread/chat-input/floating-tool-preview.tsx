@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CircleDashed, Maximize2 } from 'lucide-react';
 import { getToolIcon, getUserFriendlyToolName } from '@/components/thread/utils';
@@ -159,7 +159,7 @@ export const FloatingToolPreview: React.FC<FloatingToolPreviewProps> = ({
                   )} />
                   <span className="text-xs text-muted-foreground truncate">
                     {isStreaming
-                      ? `${agentName || 'FuFanManus'} is working...`
+                      ? `${agentName || 'Hephaestus'} is working...`
                       : isSuccess
                         ? "Success"
                         : "Failed"

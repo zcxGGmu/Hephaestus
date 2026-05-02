@@ -1,4 +1,4 @@
-import { ThemeProvider } from '@/components/home/theme-provider';
+﻿import { ThemeProvider } from '@/components/home/theme-provider';
 import { siteConfig } from '@/lib/site';
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     template: `%s - ${siteConfig.name}`,
   },
   description:
-    'FuFanManus 是一个通用智能体系统，帮助你轻松完成现实世界的任务。通过自然对话，FuFanManus 成为你的数字伴侣，进行研究、数据分析和日常挑战。',
+    'Hephaestus 鏄竴涓€氱敤鏅鸿兘浣撶郴缁燂紝甯姪浣犺交鏉惧畬鎴愮幇瀹炰笘鐣岀殑浠诲姟銆傞€氳繃鑷劧瀵硅瘽锛孎uFanManus 鎴愪负浣犵殑鏁板瓧浼翠荆锛岃繘琛岀爺绌躲€佹暟鎹垎鏋愬拰鏃ュ父鎸戞垬銆?,
   keywords: [
     'AI',
     'artificial intelligence',
@@ -45,13 +45,13 @@ export const metadata: Metadata = {
     'research',
     'data analysis',
   ],
-  authors: [{ name: 'FuFanManus', url: 'https://fufanmanus.com' }],
+  authors: [{ name: 'Hephaestus', url: 'https://hephaestus.com' }],
   creator:
-    'FuFanManus',
+    'Hephaestus',
   publisher:
-    'FuFanManus',
+    'Hephaestus',
   category: 'Technology',
-  applicationName: 'FuFanManus',
+  applicationName: 'Hephaestus',
   formatDetection: {
     telephone: false,
     email: false,
@@ -66,17 +66,17 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'FuFanManus - Open Source Generalist AI Worker',
+    title: 'Hephaestus - Open Source Generalist AI Worker',
     description:
-      'FuFanManus is a fully open source AI assistant that helps you accomplish real-world tasks with ease through natural conversation.',
+      'Hephaestus is a fully open source AI assistant that helps you accomplish real-world tasks with ease through natural conversation.',
     url: siteConfig.url,
-    siteName: 'FuFanManus',
+    siteName: 'Hephaestus',
     images: [
       {
         url: '/banner.png',
         width: 1200,
         height: 630,
-        alt: 'FuFanManus - Open Source Generalist AI Worker',
+        alt: 'Hephaestus - Open Source Generalist AI Worker',
         type: 'image/png',
       },
     ],
@@ -85,17 +85,17 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FuFanManus - Open Source Generalist AI Worker',
+    title: 'Hephaestus - Open Source Generalist AI Worker',
     description:
-      'FuFanManus is a fully open source AI assistant that helps you accomplish real-world tasks with ease through natural conversation.',
-    creator: '@fufanmanus',
-    site: '@fufanmanus',
+      'Hephaestus is a fully open source AI assistant that helps you accomplish real-world tasks with ease through natural conversation.',
+    creator: '@hephaestus',
+    site: '@hephaestus',
     images: [
       {
         url: '/banner.png',
         width: 1200,
         height: 630,
-        alt: 'FuFanManus - Open Source Generalist AI Worker',
+        alt: 'Hephaestus - Open Source Generalist AI Worker',
       },
     ],
   },
@@ -160,3 +160,4 @@ export default function RootLayout({
     </html>
   );
 }
+

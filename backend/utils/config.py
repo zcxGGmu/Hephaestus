@@ -1,4 +1,4 @@
-"""
+﻿"""
 Configuration management.
 
 This module provides a centralized way to access configuration settings and
@@ -209,8 +209,8 @@ class Configuration:
     MORPH_API_KEY: Optional[str] = None
     GEMINI_API_KEY: Optional[str] = None
     OPENROUTER_API_BASE: Optional[str] = "https://openrouter.ai/api/v1"
-    OR_SITE_URL: Optional[str] = "https://fufanmanus.com"
-    OR_APP_NAME: Optional[str] = "Fufanmanus"
+    OR_SITE_URL: Optional[str] = "https://hephaestus.com"
+    OR_APP_NAME: Optional[str] = "Hephaestus"
     
     # AWS Bedrock credentials
     AWS_ACCESS_KEY_ID: Optional[str] = None
@@ -228,8 +228,8 @@ class Configuration:
     # JWT Authentication configuration
     JWT_SECRET_KEY: str = "your-super-secret-jwt-key-change-this-in-production"
     JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60  # 1小时
-    REFRESH_TOKEN_EXPIRE_DAYS: int = 30    # 30天
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60  # 1灏忔椂
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 30    # 30澶?
     
     # Redis configuration (optional for simple auth testing)
     REDIS_HOST: Optional[str] = "localhost"
@@ -237,28 +237,28 @@ class Configuration:
     REDIS_PASSWORD: Optional[str] = None
     REDIS_SSL: bool = False
     
-    # PPIP/E2B 沙箱配置
+    # PPIP/E2B 娌欑閰嶇疆
     E2B_API_KEY: Optional[str] = None
-    E2B_DOMAIN: str = "sandbox.ppio.cn"  # PPIO 沙箱域名
+    E2B_DOMAIN: str = "sandbox.ppio.cn"  # PPIO 娌欑鍩熷悕
     
-    # 不同用途的沙箱模板配置
+    # 涓嶅悓鐢ㄩ€旂殑娌欑妯℃澘閰嶇疆
     SANDBOX_TEMPLATES = {
-        'code': 'br263f8awvhrqd7ss1ze',      # code-interpreter-v1: 代码解释器
-        'desktop': '4imxoe43snzcxj95hvha',   # desktop: 桌面环境 (VNC)
-        'browser': '7xvs3snis3tkuq3y8u96',   # browser-chromium: 浏览器环境
-        'base': 'txi15v1zt0q72i1gcyqb'      # base: 基础模板
+        'code': 'br263f8awvhrqd7ss1ze',      # code-interpreter-v1: 浠ｇ爜瑙ｉ噴鍣?
+        'desktop': '4imxoe43snzcxj95hvha',   # desktop: 妗岄潰鐜 (VNC)
+        'browser': '7xvs3snis3tkuq3y8u96',   # browser-chromium: 娴忚鍣ㄧ幆澧?
+        'base': 'txi15v1zt0q72i1gcyqb'      # base: 鍩虹妯℃澘
     }
     
-    # 默认模板类型 - 用桌面模板来支持 VNC 和浏览器功能
+    # 榛樿妯℃澘绫诲瀷 - 鐢ㄦ闈㈡ā鏉挎潵鏀寔 VNC 鍜屾祻瑙堝櫒鍔熻兘
     DEFAULT_SANDBOX_TYPE: str = "desktop"
-    SANDBOX_TEMPLATE_ID: Optional[str] = None  # 将在运行时设置
+    SANDBOX_TEMPLATE_ID: Optional[str] = None  # 灏嗗湪杩愯鏃惰缃?
     
     def get_sandbox_template(self, sandbox_type: Optional[str] = None) -> str:
-        """获取指定类型的沙箱模板 ID"""
+        """鑾峰彇鎸囧畾绫诲瀷鐨勬矙绠辨ā鏉?ID"""
         template_type = sandbox_type or os.getenv('SANDBOX_TYPE', self.DEFAULT_SANDBOX_TYPE)
         return self.SANDBOX_TEMPLATES.get(template_type, self.SANDBOX_TEMPLATES['desktop'])
     
-    # Daytona sandbox configuration (deprecated - 保留以供回退)
+    # Daytona sandbox configuration (deprecated - 淇濈暀浠ヤ緵鍥為€€)
     DAYTONA_API_KEY: Optional[str] = None
     DAYTONA_SERVER_URL: Optional[str] = None
     DAYTONA_TARGET: Optional[str] = None
@@ -283,10 +283,10 @@ class Configuration:
     # Sandbox configuration
     SANDBOX_IMAGE_NAME = "fufan/manus:0.1"
     
-    # 🔧 PPIP/E2B 沙箱配置已在上面定义，此处移除重复
+    # 馃敡 PPIP/E2B 娌欑閰嶇疆宸插湪涓婇潰瀹氫箟锛屾澶勭Щ闄ら噸澶?
     
-    # 保留原配置以供回退
-    SANDBOX_SNAPSHOT_NAME: str = "fufan/manus:0.1"  # Deprecated - Daytona 快照名
+    # 淇濈暀鍘熼厤缃互渚涘洖閫€
+    SANDBOX_SNAPSHOT_NAME: str = "fufan/manus:0.1"  # Deprecated - Daytona 蹇収鍚?
     SANDBOX_ENTRYPOINT = "/usr/bin/supervisord -n -c /etc/supervisor/conf.d/supervisord.conf"
 
     # LangFuse configuration

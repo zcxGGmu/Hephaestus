@@ -1,7 +1,7 @@
-"""
-Google ADK 版本：1.12.0
-Google ADK 版本的线程管理器
-实现与 ThreadManager 相同的接口，但使用 Google ADK 作为底层实现
+﻿"""
+Google ADK 鐗堟湰锛?.12.0
+Google ADK 鐗堟湰鐨勭嚎绋嬬鐞嗗櫒
+瀹炵幇涓?ThreadManager 鐩稿悓鐨勬帴鍙ｏ紝浣嗕娇鐢?Google ADK 浣滀负搴曞眰瀹炵幇
 """
 
 import json
@@ -39,12 +39,12 @@ ToolChoice = Literal["auto", "required", "none"]
 
 class ADKThreadManager:
     """
-    Google ADK 版本的线程管理器
-    实现与 ThreadManager 相同的接口，但使用 Google ADK 作为底层实现
+    Google ADK 鐗堟湰鐨勭嚎绋嬬鐞嗗櫒
+    瀹炵幇涓?ThreadManager 鐩稿悓鐨勬帴鍙ｏ紝浣嗕娇鐢?Google ADK 浣滀负搴曞眰瀹炵幇
     """
 
     def __init__(self, trace: Optional[StatefulTraceClient] = None, is_agent_builder: bool = False, target_agent_id: Optional[str] = None, agent_config: Optional[dict] = None): # type: ignore
-        """初始化 ADK 线程管理器
+        """鍒濆鍖?ADK 绾跨▼绠＄悊鍣?
 
         Args:
             trace: Optional trace client for logging
@@ -75,7 +75,7 @@ class ADKThreadManager:
         )
         self.context_manager = ContextManager()
         
-        # # ADK 组件
+        # # ADK 缁勪欢
         # self.llm_agent: Optional[LlmAgent] = None
         # self.runner: Optional[Runner] = None
         # self.session_service: Optional[DatabaseSessionService] = None
@@ -85,18 +85,18 @@ class ADKThreadManager:
         self.tool_registry.register_tool(tool_class, function_names, **kwargs)
 
     def _convert_tool_to_adk(self, tool_class: Type, **kwargs) -> Optional[BaseTool]:
-        """将工具转换为 ADK 格式
+        """灏嗗伐鍏疯浆鎹负 ADK 鏍煎紡
 
         Args:
-            tool_class: 工具类
-            **kwargs: 工具参数
+            tool_class: 宸ュ叿绫?
+            **kwargs: 宸ュ叿鍙傛暟
 
         Returns:
-            ADK 工具实例
+            ADK 宸ュ叿瀹炰緥
         """
         try:
-            # 这里需要根据具体的工具类实现转换逻辑
-            # 暂时返回 None，后续可以根据需要实现具体的转换
+            # 杩欓噷闇€瑕佹牴鎹叿浣撶殑宸ュ叿绫诲疄鐜拌浆鎹㈤€昏緫
+            # 鏆傛椂杩斿洖 None锛屽悗缁彲浠ユ牴鎹渶瑕佸疄鐜板叿浣撶殑杞崲
             logger.debug(f"Converting tool {tool_class.__name__} to ADK format")
             return None
         except Exception as e:
@@ -119,13 +119,13 @@ class ADKThreadManager:
         client = await self.db.client
 
         try:
-            # 获取事件，分批获取，避免数据库过载
+            # 鑾峰彇浜嬩欢锛屽垎鎵硅幏鍙栵紝閬垮厤鏁版嵁搴撹繃杞?
             all_events = []
             batch_size = 1000
             offset = 0
             
             while True:
-                # 从 events 表获取消息，按时间戳排序
+                # 浠?events 琛ㄨ幏鍙栨秷鎭紝鎸夋椂闂存埑鎺掑簭
                 result = await client.table('events').select(
                     'id, author, content, timestamp, session_id, user_id, app_name, invocation_id'
                 ).eq('session_id', thread_id).in_(
@@ -137,37 +137,37 @@ class ADKThreadManager:
                     
                 all_events.extend(result.data)
                 
-                # 如果获取的记录数小于 batch_size，则表示已经到达末尾
+                # 濡傛灉鑾峰彇鐨勮褰曟暟灏忎簬 batch_size锛屽垯琛ㄧず宸茬粡鍒拌揪鏈熬
                 if len(result.data) < batch_size:
                     break
                     
                 offset += batch_size
             
-            # 使用 all_events 而不是 result.data 
+            # 浣跨敤 all_events 鑰屼笉鏄?result.data 
             result_data = all_events
 
-            # 解析返回的数据，并转换为原始消息格式
+            # 瑙ｆ瀽杩斿洖鐨勬暟鎹紝骞惰浆鎹负鍘熷娑堟伅鏍煎紡
             if not result_data:
                 return []
 
-            # 将事件转换为原始消息格式，用于下游兼容
+            # 灏嗕簨浠惰浆鎹负鍘熷娑堟伅鏍煎紡锛岀敤浜庝笅娓稿吋瀹?
             messages = []
             for event in result_data:
                 try:
-                    # 确保event是字典格式
+                    # 纭繚event鏄瓧鍏告牸寮?
                     if hasattr(event, '__dict__'):
                         event = dict(event)
                     
-                    # 解析事件内容
+                    # 瑙ｆ瀽浜嬩欢鍐呭
                     content = event.get('content', {})
                     if isinstance(content, str):
                         try:
                             content = json.loads(content)
                         except json.JSONDecodeError:
-                            # 如果不是JSON，当作纯文本处理
+                            # 濡傛灉涓嶆槸JSON锛屽綋浣滅函鏂囨湰澶勭悊
                             content = {"content": content}
                     
-                    # 构建与原始 messages 表格式兼容的消息对象
+                    # 鏋勫缓涓庡師濮?messages 琛ㄦ牸寮忓吋瀹圭殑娑堟伅瀵硅薄
                     message = {
                         "role": event.get('author', 'user'),
                         "message_id": event.get('id'),
@@ -178,25 +178,25 @@ class ADKThreadManager:
                         "invocation_id": event.get('invocation_id')
                     }
                     
-                    # 处理timestamp字段，确保datetime对象被转换为字符串
+                    # 澶勭悊timestamp瀛楁锛岀‘淇漝atetime瀵硅薄琚浆鎹负瀛楃涓?
                     if message.get('timestamp') and hasattr(message['timestamp'], 'isoformat'):
                         message['timestamp'] = message['timestamp'].isoformat()
                     
-                    # 处理内容格式 - 兼容原始格式和ADK格式
+                    # 澶勭悊鍐呭鏍煎紡 - 鍏煎鍘熷鏍煎紡鍜孉DK鏍煎紡
                     if isinstance(content, dict):
-                        # 处理ADK格式 {"role": "user", "parts": [{"text": "..."}]}
+                        # 澶勭悊ADK鏍煎紡 {"role": "user", "parts": [{"text": "..."}]}
                         if 'parts' in content and isinstance(content['parts'], list):
-                            # 提取ADK parts中的文本内容
+                            # 鎻愬彇ADK parts涓殑鏂囨湰鍐呭
                             text_parts = []
                             for part in content['parts']:
                                 if isinstance(part, dict) and 'text' in part:
                                     text_parts.append(part['text'])
                             message["content"] = ' '.join(text_parts).strip()
-                        # 如果存在：处理原始格式 {"role": "user", "content": "..."}
+                        # 濡傛灉瀛樺湪锛氬鐞嗗師濮嬫牸寮?{"role": "user", "content": "..."}
                         elif 'content' in content:
                             message["content"] = content['content']
                         else:
-                            # 如果都没有，将整个对象转为字符串（向后兼容）
+                            # 濡傛灉閮芥病鏈夛紝灏嗘暣涓璞¤浆涓哄瓧绗︿覆锛堝悜鍚庡吋瀹癸級
                             message["content"] = json.dumps(content)
                     else:
                         message["content"] = str(content)
@@ -234,46 +234,46 @@ class ADKThreadManager:
         enable_context_manager: bool = True,
         generation: Optional[StatefulGenerationClient] = None, # type: ignore
     ) -> Union[Dict[str, Any], AsyncGenerator]:
-        """使用 ADK Runner 执行线程
+        """浣跨敤 ADK Runner 鎵ц绾跨▼
 
         Args:
-            thread_id: 线程ID
-            system_prompt: 系统提示词
-            stream: 是否使用流式响应
-            temporary_message: 临时消息
-            llm_model: 模型名称
-            llm_temperature: 温度参数
-            llm_max_tokens: 最大token数
-            tool_choice: 工具选择
-            enable_thinking: 是否启用思考
-            reasoning_effort: 推理努力程度
-            enable_context_manager: 是否启用上下文管理器
-            user_id: 用户ID
-            user_message: 用户消息
-            **kwargs: 其他参数
+            thread_id: 绾跨▼ID
+            system_prompt: 绯荤粺鎻愮ず璇?
+            stream: 鏄惁浣跨敤娴佸紡鍝嶅簲
+            temporary_message: 涓存椂娑堟伅
+            llm_model: 妯″瀷鍚嶇О
+            llm_temperature: 娓╁害鍙傛暟
+            llm_max_tokens: 鏈€澶oken鏁?
+            tool_choice: 宸ュ叿閫夋嫨
+            enable_thinking: 鏄惁鍚敤鎬濊€?
+            reasoning_effort: 鎺ㄧ悊鍔姏绋嬪害
+            enable_context_manager: 鏄惁鍚敤涓婁笅鏂囩鐞嗗櫒
+            user_id: 鐢ㄦ埛ID
+            user_message: 鐢ㄦ埛娑堟伅
+            **kwargs: 鍏朵粬鍙傛暟
 
         Yields:
-            响应事件
+            鍝嶅簲浜嬩欢
         """
         logger.info(f"current thread_id: {thread_id}")
         logger.info(f"current llm_model: {llm_model}")
 
-        # 确保 processor_config 不为 None
+        # 纭繚 processor_config 涓嶄负 None
         config = processor_config or ProcessorConfig()
 
-        # 如果 max_xml_tool_calls 指定且未在 config 中设置，则应用
+        # 濡傛灉 max_xml_tool_calls 鎸囧畾涓旀湭鍦?config 涓缃紝鍒欏簲鐢?
         if max_xml_tool_calls > 0 and not config.max_xml_tool_calls:
             config.max_xml_tool_calls = max_xml_tool_calls
 
-        # 创建一个工作副本，以便可能修改
+        # 鍒涘缓涓€涓伐浣滃壇鏈紝浠ヤ究鍙兘淇敼
         working_system_prompt = system_prompt.copy()
 
-        # 控制是否需要自动继续，因为工具调用完成原因
+        # 鎺у埗鏄惁闇€瑕佽嚜鍔ㄧ户缁紝鍥犱负宸ュ叿璋冪敤瀹屾垚鍘熷洜
         # Control whether we need to auto-continue due to tool_calls finish reason
         auto_continue = True
         auto_continue_count = 0
 
-        # 共享状态，用于连续流式输出
+        # 鍏变韩鐘舵€侊紝鐢ㄤ簬杩炵画娴佸紡杈撳嚭
         continuous_state = {
             'accumulated_content': '',
             'thread_run_id': None
@@ -281,18 +281,18 @@ class ADKThreadManager:
 
         async def _run_once(temp_msg=None):
             try:
-                # 确保 config 在当前作用域可用
+                # 纭繚 config 鍦ㄥ綋鍓嶄綔鐢ㄥ煙鍙敤
                 nonlocal config
-                # 注意：config 现在保证存在，因为上面的检查
+                # 娉ㄦ剰锛歝onfig 鐜板湪淇濊瘉瀛樺湪锛屽洜涓轰笂闈㈢殑妫€鏌?
 
-                # 1. 从线程获取消息，用于 LLM 调用
+                # 1. 浠庣嚎绋嬭幏鍙栨秷鎭紝鐢ㄤ簬 LLM 璋冪敤
                 messages = await self.get_llm_messages(thread_id)
 
-                # 2. 检查 token 计数，再继续
+                # 2. 妫€鏌?token 璁℃暟锛屽啀缁х画
                 token_count = 0
                 try:
                     from litellm.utils import token_counter # type: ignore
-                    # 使用修改后的working_system_prompt进行token计数
+                    # 浣跨敤淇敼鍚庣殑working_system_prompt杩涜token璁℃暟
                     token_count = token_counter(model=llm_model, messages=[working_system_prompt] + messages)
                     token_threshold = self.context_manager.token_threshold
                     logger.info(f"Thread {thread_id} token count: {token_count}/{token_threshold} ({(token_count/token_threshold)*100:.1f}%)")
@@ -300,37 +300,37 @@ class ADKThreadManager:
                 except Exception as e:
                     logger.error(f"Error counting tokens or summarizing: {str(e)}")
 
-                # 3. 预处理输入消息，准备LLM调用 + 添加临时消息（如果存在）
-                # 使用修改后的working_system_prompt，可能包含XML示例
+                # 3. 棰勫鐞嗚緭鍏ユ秷鎭紝鍑嗗LLM璋冪敤 + 娣诲姞涓存椂娑堟伅锛堝鏋滃瓨鍦級
+                # 浣跨敤淇敼鍚庣殑working_system_prompt锛屽彲鑳藉寘鍚玐ML绀轰緥
                 prepared_messages = [working_system_prompt]
 
-                # 找到最后一个用户消息的索引
+                # 鎵惧埌鏈€鍚庝竴涓敤鎴锋秷鎭殑绱㈠紩
                 last_user_index = -1
                 for i, msg in enumerate(messages):
                     if isinstance(msg, dict) and msg.get('role') == 'user':
                         last_user_index = i
 
-                # 插入临时消息，如果存在，插入到最后一个用户消息之前
+                # 鎻掑叆涓存椂娑堟伅锛屽鏋滃瓨鍦紝鎻掑叆鍒版渶鍚庝竴涓敤鎴锋秷鎭箣鍓?
                 if temp_msg and last_user_index >= 0:
                     prepared_messages.extend(messages[:last_user_index])
                     prepared_messages.append(temp_msg)
                     prepared_messages.extend(messages[last_user_index:])
                     logger.info("Added temporary message before the last user message")
                 else:
-                    # 如果没有用户消息或没有临时消息，则添加所有消息
+                    # 濡傛灉娌℃湁鐢ㄦ埛娑堟伅鎴栨病鏈変复鏃舵秷鎭紝鍒欐坊鍔犳墍鏈夋秷鎭?
                     prepared_messages.extend(messages)
                     if temp_msg:
                         prepared_messages.append(temp_msg)
                         logger.info("Added temporary message to the end of prepared messages")
 
-                # 🔧 修复：移除可能导致重复输出的临时助手消息逻辑
-                # Agent应该基于数据库中已保存的消息历史来自动继续，而不是重复临时内容
+                # 馃敡 淇锛氱Щ闄ゅ彲鑳藉鑷撮噸澶嶈緭鍑虹殑涓存椂鍔╂墜娑堟伅閫昏緫
+                # Agent搴旇鍩轰簬鏁版嵁搴撲腑宸蹭繚瀛樼殑娑堟伅鍘嗗彶鏉ヨ嚜鍔ㄧ户缁紝鑰屼笉鏄噸澶嶄复鏃跺唴瀹?
                 if auto_continue_count > 0:
                     logger.info(f"Auto-continue round {auto_continue_count}: using existing message history as context")
      
                 prepared_messages = self.context_manager.compress_messages(prepared_messages, llm_model)
 
-                # 5. 准备大模型调用
+                # 5. 鍑嗗澶фā鍨嬭皟鐢?
                 try:
                     # import datatime
                     # if generation:
@@ -351,13 +351,13 @@ class ADKThreadManager:
                     from services.llm import make_adk_api_call
                     
                     tool_functions = available_functions
-                    # 将构建好的提示词实际发送到大模型中                    
+                    # 灏嗘瀯寤哄ソ鐨勬彁绀鸿瘝瀹為檯鍙戦€佸埌澶фā鍨嬩腑                    
                     llm_response = await make_adk_api_call(
                         prepared_messages, 
                         llm_model,
                         temperature=llm_temperature,
                         max_tokens=llm_max_tokens,
-                        tools=tool_functions,  # 🔧 传递工具函数字典
+                        tools=tool_functions,  # 馃敡 浼犻€掑伐鍏峰嚱鏁板瓧鍏?
                         tool_choice=tool_choice if config.native_tool_calling else "none",
                         stream=stream,
                         enable_thinking=enable_thinking,
@@ -368,7 +368,7 @@ class ADKThreadManager:
                     logger.error(f"Failed to make LLM API call: {str(e)}", exc_info=True)
                     raise
 
-                # 6. 这样开始处理ADK返回的异步生成器
+                # 6. 杩欐牱寮€濮嬪鐞咥DK杩斿洖鐨勫紓姝ョ敓鎴愬櫒
                 if stream:
                     logger.info("Processing ADK streaming response")
 
@@ -424,19 +424,19 @@ class ADKThreadManager:
                     "message": str(e)
                 }
 
-        # 定义一个包装器生成器，处理自动继续逻辑
+        # 瀹氫箟涓€涓寘瑁呭櫒鐢熸垚鍣紝澶勭悊鑷姩缁х画閫昏緫
         async def auto_continue_wrapper():
-            print("我先进入的auto_continue_wrapper")
+            print("鎴戝厛杩涘叆鐨刟uto_continue_wrapper")
             nonlocal auto_continue, auto_continue_count
 
             while auto_continue and (native_max_auto_continues == 0 or auto_continue_count < native_max_auto_continues):
-                # 重置 auto_continue 用于此迭代
+                # 閲嶇疆 auto_continue 鐢ㄤ簬姝よ凯浠?
                 auto_continue = False
 
-                # 运行一次线程，传递可能修改后的系统提示
-                # 仅在第一次迭代时传递 temp_msg
+                # 杩愯涓€娆＄嚎绋嬶紝浼犻€掑彲鑳戒慨鏀瑰悗鐨勭郴缁熸彁绀?
+                # 浠呭湪绗竴娆¤凯浠ｆ椂浼犻€?temp_msg
                 try:
-                    print("我在这里要开始执行 _run_once")
+                    print("鎴戝湪杩欓噷瑕佸紑濮嬫墽琛?_run_once")
                     response_gen = await _run_once(temporary_message if auto_continue_count == 0 else None)
 
                     # Handle error responses
@@ -444,26 +444,26 @@ class ADKThreadManager:
                         logger.error(f"Error in auto_continue_wrapper: {response_gen.get('message', 'Unknown error')}")
                         yield response_gen
                         return  # Exit the generator on error
-                    print("我在这里要获取 response_gen 的属性了")
+                    print("鎴戝湪杩欓噷瑕佽幏鍙?response_gen 鐨勫睘鎬т簡")
                     # Process each chunk
                     try:
                         if hasattr(response_gen, '__aiter__'):
                             from typing import AsyncGenerator, cast
                             async for chunk in cast(AsyncGenerator, response_gen):
                                 
-                                # 🔧 添加：检测工具执行完成，立即终止
+                                # 馃敡 娣诲姞锛氭娴嬪伐鍏锋墽琛屽畬鎴愶紝绔嬪嵆缁堟
                                 if chunk.get('type') == 'status':
                                     try:
                                         content = json.loads(chunk.get('content', '{}'))
                                         status_type = content.get('status_type')
                                         
-                                        # 检测到工具完成，立即终止整个流程
+                                        # 妫€娴嬪埌宸ュ叿瀹屾垚锛岀珛鍗崇粓姝㈡暣涓祦绋?
                                         if status_type == 'tool_completed':
-                                            logger.info("🔧 检测到工具执行完成，立即终止流程")
-                                            yield chunk  # 先输出工具完成状态
-                                            return  # 🔧 彻底终止，不再处理任何后续内容
+                                            logger.info("馃敡 妫€娴嬪埌宸ュ叿鎵ц瀹屾垚锛岀珛鍗崇粓姝㈡祦绋?)
+                                            yield chunk  # 鍏堣緭鍑哄伐鍏峰畬鎴愮姸鎬?
+                                            return  # 馃敡 褰诲簳缁堟锛屼笉鍐嶅鐞嗕换浣曞悗缁唴瀹?
                                             
-                                        # 其他status处理逻辑
+                                        # 鍏朵粬status澶勭悊閫昏緫
                                         if content.get('finish_reason') == 'length':
                                             logger.info(f"Detected finish_reason='length', auto-continuing ({auto_continue_count + 1}/{native_max_auto_continues})")
                                             auto_continue = True
@@ -534,26 +534,26 @@ class ADKThreadManager:
                     "content": f"\n[Agent reached maximum auto-continue limit of {native_max_auto_continues}]"
                 }        
 
-        # 如果自动继续被禁用 (native_max_auto_continues=0), 只运行一次
+        # 濡傛灉鑷姩缁х画琚鐢?(native_max_auto_continues=0), 鍙繍琛屼竴娆?
         if native_max_auto_continues == 0:
-            print("自动继续被禁用 (native_max_auto_continues=0)")
+            print("鑷姩缁х画琚鐢?(native_max_auto_continues=0)")
             # Pass the potentially modified system prompt and temp message
             return await _run_once(temporary_message)
         
-        # 否则返回自动继续包装器生成器
+        # 鍚﹀垯杩斿洖鑷姩缁х画鍖呰鍣ㄧ敓鎴愬櫒
         return auto_continue_wrapper()
         
         # try:
         #     # if not self.runner or not self.session:
         #     #     raise RuntimeError("ADK components not initialized. Call setup() first.")
             
-        #     # # 准备用户输入
+        #     # # 鍑嗗鐢ㄦ埛杈撳叆
         #     # if user_message:
         #     #     message_text = user_message
         #     # elif temporary_message:
-        #     #     # 处理临时消息
+        #     #     # 澶勭悊涓存椂娑堟伅
         #     #     if isinstance(temporary_message.get('content'), list):
-        #     #         # 如果是多模态消息，提取文本内容
+        #     #         # 濡傛灉鏄妯℃€佹秷鎭紝鎻愬彇鏂囨湰鍐呭
         #     #         text_parts = []
         #     #         for part in temporary_message['content']:
         #     #             if isinstance(part, dict) and part.get('type') == 'text':
@@ -566,13 +566,13 @@ class ADKThreadManager:
             
         #     # logger.debug(f"Prepared user message: {message_text[:100]}...")
             
-        #     message_text = "如何理解黑洞？"
+        #     message_text = "濡備綍鐞嗚В榛戞礊锛?
 
         #     from google.genai import types # type:ignore
-        #     # 创建用户内容
+        #     # 鍒涘缓鐢ㄦ埛鍐呭
         #     user_content = content = types.Content(role='user', parts=[types.Part(text=message_text)])
         #     print(f"user_content: {user_content}")
-        #     # 使用 ADK Runner 执行
+        #     # 浣跨敤 ADK Runner 鎵ц
 
         #     from google.adk.agents.run_config import RunConfig, StreamingMode # type: ignore
         #     run_config = RunConfig(streaming_mode=StreamingMode.SSE)
@@ -588,13 +588,13 @@ class ADKThreadManager:
 
         #     print(f"system_prompt: {system_prompt}")
         #     init_agent = LlmAgent(
-        #         name="fufanmanus_basic_agent",
+        #         name="hephaestus_basic_agent",
         #         model=model,
         #         instruction=system_prompt
         #     )
 
 
-        #     # 使用数据库会话服务
+        #     # 浣跨敤鏁版嵁搴撲細璇濇湇鍔?
         #     DB_CONFIG = {
         #         'host': 'localhost',
         #         'port': 5432,
@@ -609,28 +609,28 @@ class ADKThreadManager:
         #     from google.adk.sessions import DatabaseSessionService # type: ignore
         #     session_service = DatabaseSessionService(DATABASE_URL)
 
-        #     # 创建会话
-        #     APP_NAME = "fufanmanus"
+        #     # 鍒涘缓浼氳瘽
+        #     APP_NAME = "hephaestus"
         #     USER_ID = "f7a2a1ab-a233-49b4-abdc-c58c650cfa06"
         #     SESSION_ID = thread_id
 
-        #     print("开始创建数据库session")
+        #     print("寮€濮嬪垱寤烘暟鎹簱session")
         #     await session_service.create_session(
         #         app_name=APP_NAME, 
         #         user_id=USER_ID,
         #         session_id=SESSION_ID
         #     )
-        #     print("数据库session创建成功")
+        #     print("鏁版嵁搴搒ession鍒涘缓鎴愬姛")
 
-        #     # 创建runner
+        #     # 鍒涘缓runner
         #     runner = Runner(
         #         agent=init_agent,
-        #         app_name="fufanmanus",
+        #         app_name="hephaestus",
         #         session_service=session_service
         #     )
-        #     print("开始执行runner：")
+        #     print("寮€濮嬫墽琛宺unner锛?)
 
-        #     # 执行代理运行的流式输出
+        #     # 鎵ц浠ｇ悊杩愯鐨勬祦寮忚緭鍑?
         #     async for event in runner.run_async(
         #         user_id=USER_ID,
         #         session_id=SESSION_ID,
@@ -639,7 +639,7 @@ class ADKThreadManager:
         #     ):
         #         if event.content and event.content.parts and event.content.parts[0].text:
         #             current_text = event.content.parts[0].text
-        #             print(current_text, end="", flush=True)  # 直接输出增量
+        #             print(current_text, end="", flush=True)  # 鐩存帴杈撳嚭澧為噺
                 
                     
         # except Exception as e:
@@ -652,34 +652,34 @@ class ADKThreadManager:
         is_public: bool = False,
         metadata: Optional[Dict[str, Any]] = None
     ) -> str:
-        """创建新线程（与 ThreadManager 保持接口一致）
+        """鍒涘缓鏂扮嚎绋嬶紙涓?ThreadManager 淇濇寔鎺ュ彛涓€鑷达級
 
         Args:
-            account_id: 账户ID
-            project_id: 项目ID
-            is_public: 是否公开
-            metadata: 元数据
+            account_id: 璐︽埛ID
+            project_id: 椤圭洰ID
+            is_public: 鏄惁鍏紑
+            metadata: 鍏冩暟鎹?
 
         Returns:
-            线程ID
+            绾跨▼ID
         """
         logger.debug(f"Creating new thread (account_id: {account_id}, project_id: {project_id}, is_public: {is_public})")
         client = await self.db.client
 
-        # 准备线程数据
+        # 鍑嗗绾跨▼鏁版嵁
         thread_data = {
             'is_public': is_public,
             'metadata': metadata or {}
         }
 
-        # 添加可选字段
+        # 娣诲姞鍙€夊瓧娈?
         if account_id:
             thread_data['account_id'] = account_id
         if project_id:
             thread_data['project_id'] = project_id
 
         try:
-            # 插入线程并获取线程ID
+            # 鎻掑叆绾跨▼骞惰幏鍙栫嚎绋婭D
             result = await client.table('threads').insert(thread_data).execute()
             
             if result.data and len(result.data) > 0 and isinstance(result.data[0], dict) and 'thread_id' in result.data[0]:
@@ -723,10 +723,10 @@ class ADKThreadManager:
         logger.debug(f"Adding message of type '{type}' to thread {thread_id} (agent: {agent_id}, version: {agent_version_id})")
         client = await self.db.client
 
-        # 准备插入数据 - 根据messages表的实际结构
+        # 鍑嗗鎻掑叆鏁版嵁 - 鏍规嵁messages琛ㄧ殑瀹為檯缁撴瀯
         data_to_insert = {
             'thread_id': thread_id,
-            'project_id': '00000000-0000-0000-0000-000000000000',  # 临时使用默认project_id
+            'project_id': '00000000-0000-0000-0000-000000000000',  # 涓存椂浣跨敤榛樿project_id
             'type': type,
             'is_llm_message': is_llm_message,
             'role': 'assistant' if type == 'assistant' else 'user' if type == 'user' else 'system',
@@ -734,14 +734,14 @@ class ADKThreadManager:
             'metadata': json.dumps(metadata) if metadata else '{}',
         }
         
-        # 直接添加agent信息到字段中
+        # 鐩存帴娣诲姞agent淇℃伅鍒板瓧娈典腑
         if agent_id:
             data_to_insert['agent_id'] = agent_id
         if agent_version_id:
             data_to_insert['agent_version_id'] = agent_version_id
 
         try:
-            # 插入消息
+            # 鎻掑叆娑堟伅
             result = await client.table('messages').insert(data_to_insert)
             logger.info(f"Successfully added message to thread {thread_id}")
 
@@ -754,3 +754,4 @@ class ADKThreadManager:
         except Exception as e:
             logger.error(f"Failed to add message to thread {thread_id}: {str(e)}", exc_info=True)
             raise
+

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, useEffect } from 'react';
+﻿import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { CircleDashed, CheckCircle, AlertTriangle } from 'lucide-react';
 import { UnifiedMessage, ParsedContent, ParsedMetadata } from '@/components/thread/types';
 import { FileAttachmentGrid } from '@/components/thread/file-attachment';
@@ -303,7 +303,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
     project,
     debugMode = false,
     isPreviewMode = false,
-    agentName = 'FuFanManus',
+    agentName = 'Hephaestus',
     agentAvatar = <KortixLogo size={16} />,
     emptyStateComponent,
     threadMetadata,
@@ -325,18 +325,18 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
         : "flex-1 overflow-y-auto scrollbar-thin scrollbar-track-secondary/0 scrollbar-thumb-primary/10 scrollbar-thumb-rounded-full hover:scrollbar-thumb-primary/10 py-4 pb-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60";
 
     // In playback mode, we use visibleMessages instead of messages
-    // 过滤拆分的assistant消息，只显示主消息
+    // 杩囨护鎷嗗垎鐨刟ssistant娑堟伅锛屽彧鏄剧ず涓绘秷鎭?
     const filteredMessages = messages.filter(message => {
-        // 对于assistant消息，检查是否为拆分消息
+        // 瀵逛簬assistant娑堟伅锛屾鏌ユ槸鍚︿负鎷嗗垎娑堟伅
         if (message.type === 'assistant' && message.metadata) {
             try {
                 const metadata = JSON.parse(message.metadata);
-                // 如果是拆分消息且不是主消息（tool_index > 0），则过滤掉
+                // 濡傛灉鏄媶鍒嗘秷鎭笖涓嶆槸涓绘秷鎭紙tool_index > 0锛夛紝鍒欒繃婊ゆ帀
                 if (metadata.split_for_frontend === true && metadata.tool_index > 0) {
                     return false;
                 }
             } catch (e) {
-                // metadata解析失败时保留消息
+                // metadata瑙ｆ瀽澶辫触鏃朵繚鐣欐秷鎭?
             }
         }
         return true;
@@ -352,7 +352,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                 name: 'Agent Builder',
                 avatar: (
                     <div className="h-5 w-5 flex items-center justify-center rounded text-xs">
-                        <span className="text-lg">🤖</span>
+                        <span className="text-lg">馃</span>
                     </div>
                 )
             };
@@ -371,7 +371,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                 name: 'Agent Builder',
                 avatar: (
                     <div className="h-5 w-5 flex items-center justify-center rounded text-xs">
-                        <span className="text-lg">🤖</span>
+                        <span className="text-lg">馃</span>
                     </div>
                 )
             };
@@ -428,7 +428,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
         // Fallback: if this is a Suna default agent, always show KortixLogo
         if (isSunaDefaultAgent) {
             return {
-                name: agentName || 'FuFanManus',
+                name: agentName || 'Hephaestus',
                 avatar: (
                     <div className="h-5 w-5 flex items-center justify-center rounded text-xs">
                         <KortixLogo size={16} />
@@ -438,7 +438,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
         }
 
         return {
-            name: agentName || 'FuFanManus',
+            name: agentName || 'Hephaestus',
             avatar: agentAvatar
         };
     }, [threadMetadata, displayMessages, agentName, agentAvatar, agentMetadata, agentData]);
@@ -511,7 +511,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
     const shouldShowEmpty = displayMessages.length === 0 && !streamingTextContent && !streamingToolCall &&
         !streamingText && !currentToolCall && agentStatus === 'idle';
     
-    console.log('🔍 [ThreadContent] 最终状态:', {
+    console.log('馃攳 [ThreadContent] 鏈€缁堢姸鎬?', {
         displayMessagesLength: displayMessages.length,
         shouldShowEmpty,
         agentStatus
@@ -834,13 +834,13 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                                                                         const parsedContent = safeJsonParse<ParsedContent>(message.content, {});
                                                                         const msgKey = message.message_id || `submsg-assistant-${msgIndex}`;
 
-                                                                        // 区分流式消息和历史消息的处理逻辑
+                                                                        // 鍖哄垎娴佸紡娑堟伅鍜屽巻鍙叉秷鎭殑澶勭悊閫昏緫
                                                                         let finalContent;
                                                                         if (msgKey.includes('streaming') || msgKey.includes('playback')) {
-                                                                            // 流式消息：使用解析后的内容
+                                                                            // 娴佸紡娑堟伅锛氫娇鐢ㄨВ鏋愬悗鐨勫唴瀹?
                                                                             finalContent = parsedContent.content;
                                                                         } else {
-                                                                            // 历史消息：优先使用解析后的内容，失败则使用原始内容
+                                                                            // 鍘嗗彶娑堟伅锛氫紭鍏堜娇鐢ㄨВ鏋愬悗鐨勫唴瀹癸紝澶辫触鍒欎娇鐢ㄥ師濮嬪唴瀹?
                                                                             finalContent = parsedContent.content || message.content;
                                                                         }
                                                                         
@@ -1099,3 +1099,4 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
 };
 
 export default ThreadContent; 
+

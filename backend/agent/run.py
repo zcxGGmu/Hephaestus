@@ -1,4 +1,4 @@
-import os
+﻿import os
 import json
 import asyncio
 import datetime
@@ -34,11 +34,11 @@ from services.langfuse import langfuse
 try:
     from langfuse.client import StatefulTraceClient # type: ignore
 except ImportError:
-    # 对于 langfuse 3.x 版本，尝试不同的导入路径
+    # 瀵逛簬 langfuse 3.x 鐗堟湰锛屽皾璇曚笉鍚岀殑瀵煎叆璺緞
     try:
         from langfuse import StatefulTraceClient # type: ignore
     except ImportError:
-        # 如果都失败，使用 Any 类型
+        # 濡傛灉閮藉け璐ワ紝浣跨敤 Any 绫诲瀷
         from typing import Any
         StatefulTraceClient = Any
 
@@ -75,8 +75,8 @@ class ToolManager:
         self.thread_id = thread_id
     
     def register_all_tools(self):
-        # 测试现有工具注册流程
-        logger.info("我现在开始加载工具！！！！")
+        # 娴嬭瘯鐜版湁宸ュ叿娉ㄥ唽娴佺▼
+        logger.info("鎴戠幇鍦ㄥ紑濮嬪姞杞藉伐鍏凤紒锛侊紒锛?)
         from agent.tools.simple_test_tool import SimpleTestTool
         self.thread_manager.add_tool(SimpleTestTool)
 
@@ -248,7 +248,7 @@ class ToolManager:
 #                         "schema": schema
 #                     }
             
-#             logger.info(f"⚡ Registered {len(updated_schemas)} MCP tools (Redis cache enabled)")
+#             logger.info(f"鈿?Registered {len(updated_schemas)} MCP tools (Redis cache enabled)")
 #             return mcp_wrapper_instance
 #         except Exception as e:
 #             logger.error(f"Failed to initialize MCP tools: {e}")
@@ -310,7 +310,7 @@ class PromptManager:
         #         logger.error(f"Error listing MCP tools: {e}")
         #         mcp_info += "- Error loading MCP tool list\n"
             
-        #     mcp_info += "\n🚨 CRITICAL MCP TOOL RESULT INSTRUCTIONS 🚨\n"
+        #     mcp_info += "\n馃毃 CRITICAL MCP TOOL RESULT INSTRUCTIONS 馃毃\n"
         #     mcp_info += "When you use ANY MCP (Model Context Protocol) tools:\n"
         #     mcp_info += "1. ALWAYS read and use the EXACT results returned by the MCP tool\n"
         #     mcp_info += "2. For search tools: ONLY cite URLs, sources, and information from the actual search results\n"
@@ -340,21 +340,21 @@ class PromptManager:
 
 class MessageManager:
     """
-    消息管理器类
+    娑堟伅绠＄悊鍣ㄧ被
     
-    负责构建临时消息，包括浏览器状态和图像上下文信息。
-    这些临时消息会在AI处理用户请求时作为上下文信息提供给模型。
+    璐熻矗鏋勫缓涓存椂娑堟伅锛屽寘鎷祻瑙堝櫒鐘舵€佸拰鍥惧儚涓婁笅鏂囦俊鎭€?
+    杩欎簺涓存椂娑堟伅浼氬湪AI澶勭悊鐢ㄦ埛璇锋眰鏃朵綔涓轰笂涓嬫枃淇℃伅鎻愪緵缁欐ā鍨嬨€?
     """
     
     def __init__(self, client, thread_id: str, model_name: str, trace: Optional[StatefulTraceClient]): # type: ignore
         """
-        初始化消息管理器
+        鍒濆鍖栨秷鎭鐞嗗櫒
         
         Args:
-            client: 数据库客户端，用于查询消息表
-            thread_id: 线程ID，用于标识特定的对话线程
-            model_name: 模型名称，用于判断是否支持图像处理
-            trace: 追踪客户端，用于日志记录
+            client: 鏁版嵁搴撳鎴风锛岀敤浜庢煡璇㈡秷鎭〃
+            thread_id: 绾跨▼ID锛岀敤浜庢爣璇嗙壒瀹氱殑瀵硅瘽绾跨▼
+            model_name: 妯″瀷鍚嶇О锛岀敤浜庡垽鏂槸鍚︽敮鎸佸浘鍍忓鐞?
+            trace: 杩借釜瀹㈡埛绔紝鐢ㄤ簬鏃ュ織璁板綍
         """
         self.client = client
         self.thread_id = thread_id
@@ -363,47 +363,47 @@ class MessageManager:
     
     async def build_temporary_message(self) -> Optional[dict]:
         """
-        构建临时消息
+        鏋勫缓涓存椂娑堟伅
         
-        这个方法会：
-        1. 获取最新的浏览器状态信息（包括截图）
-        2. 获取最新的图像上下文信息
-        3. 将这些信息组合成一个临时消息，供AI模型使用
+        杩欎釜鏂规硶浼氾細
+        1. 鑾峰彇鏈€鏂扮殑娴忚鍣ㄧ姸鎬佷俊鎭紙鍖呮嫭鎴浘锛?
+        2. 鑾峰彇鏈€鏂扮殑鍥惧儚涓婁笅鏂囦俊鎭?
+        3. 灏嗚繖浜涗俊鎭粍鍚堟垚涓€涓复鏃舵秷鎭紝渚汚I妯″瀷浣跨敤
         
         Returns:
-            Optional[dict]: 包含浏览器状态和图像信息的临时消息，如果没有相关信息则返回None
+            Optional[dict]: 鍖呭惈娴忚鍣ㄧ姸鎬佸拰鍥惧儚淇℃伅鐨勪复鏃舵秷鎭紝濡傛灉娌℃湁鐩稿叧淇℃伅鍒欒繑鍥濶one
         """
-        temp_message_content_list = []  # 存储临时消息的内容列表
+        temp_message_content_list = []  # 瀛樺偍涓存椂娑堟伅鐨勫唴瀹瑰垪琛?
 
-        # 获取最新的浏览器状态消息
+        # 鑾峰彇鏈€鏂扮殑娴忚鍣ㄧ姸鎬佹秷鎭?
         latest_browser_state_msg = await self.client.table('messages').select('*').eq('thread_id', self.thread_id).eq('type', 'browser_state').order('created_at', desc=True).limit(1).execute()
         
         if latest_browser_state_msg.data and len(latest_browser_state_msg.data) > 0:
             try:
-                # 解析浏览器状态内容
+                # 瑙ｆ瀽娴忚鍣ㄧ姸鎬佸唴瀹?
                 browser_content = latest_browser_state_msg.data[0]["content"]
                 if isinstance(browser_content, str):
                     browser_content = json.loads(browser_content)
                 
-                # 提取截图信息
-                screenshot_base64 = browser_content.get("screenshot_base64")  # Base64编码的截图
-                screenshot_url = browser_content.get("image_url")  # 截图的URL地址
+                # 鎻愬彇鎴浘淇℃伅
+                screenshot_base64 = browser_content.get("screenshot_base64")  # Base64缂栫爜鐨勬埅鍥?
+                screenshot_url = browser_content.get("image_url")  # 鎴浘鐨刄RL鍦板潃
                 
-                # 复制浏览器状态文本，移除截图相关字段
+                # 澶嶅埗娴忚鍣ㄧ姸鎬佹枃鏈紝绉婚櫎鎴浘鐩稿叧瀛楁
                 browser_state_text = browser_content.copy()
                 browser_state_text.pop('screenshot_base64', None)
                 browser_state_text.pop('image_url', None)
 
-                # 如果有浏览器状态文本信息，添加到临时消息中
+                # 濡傛灉鏈夋祻瑙堝櫒鐘舵€佹枃鏈俊鎭紝娣诲姞鍒颁复鏃舵秷鎭腑
                 if browser_state_text:
                     temp_message_content_list.append({
                         "type": "text",
                         "text": f"The following is the current state of the browser:\n{json.dumps(browser_state_text, indent=2)}"
                     })
                 
-                # 检查模型是否支持图像处理（Gemini、Anthropic、OpenAI）
+                # 妫€鏌ユā鍨嬫槸鍚︽敮鎸佸浘鍍忓鐞嗭紙Gemini銆丄nthropic銆丱penAI锛?
                 if 'gemini' in self.model_name.lower() or 'anthropic' in self.model_name.lower() or 'openai' in self.model_name.lower():
-                    # 优先使用URL，如果没有则使用Base64
+                    # 浼樺厛浣跨敤URL锛屽鏋滄病鏈夊垯浣跨敤Base64
                     if screenshot_url:
                         temp_message_content_list.append({
                             "type": "image_url",
@@ -423,27 +423,27 @@ class MessageManager:
             except Exception as e:
                 logger.error(f"Error parsing browser state: {e}")
 
-        # 获取最新的图像上下文消息
+        # 鑾峰彇鏈€鏂扮殑鍥惧儚涓婁笅鏂囨秷鎭?
         latest_image_context_msg = await self.client.table('messages').select('*').eq('thread_id', self.thread_id).eq('type', 'image_context').order('created_at', desc=True).limit(1).execute()
         
         if latest_image_context_msg.data and len(latest_image_context_msg.data) > 0:
             try:
-                # 解析图像上下文内容
+                # 瑙ｆ瀽鍥惧儚涓婁笅鏂囧唴瀹?
                 image_context_content = latest_image_context_msg.data[0]["content"] if isinstance(latest_image_context_msg.data[0]["content"], dict) else json.loads(latest_image_context_msg.data[0]["content"])
                 
-                # 提取图像信息
-                base64_image = image_context_content.get("base64")  # Base64编码的图像
-                mime_type = image_context_content.get("mime_type")  # 图像的MIME类型
-                file_path = image_context_content.get("file_path", "unknown file")  # 图像文件路径
+                # 鎻愬彇鍥惧儚淇℃伅
+                base64_image = image_context_content.get("base64")  # Base64缂栫爜鐨勫浘鍍?
+                mime_type = image_context_content.get("mime_type")  # 鍥惧儚鐨凪IME绫诲瀷
+                file_path = image_context_content.get("file_path", "unknown file")  # 鍥惧儚鏂囦欢璺緞
 
-                # 如果有图像数据，添加到临时消息中
+                # 濡傛灉鏈夊浘鍍忔暟鎹紝娣诲姞鍒颁复鏃舵秷鎭腑
                 if base64_image and mime_type:
-                    # 添加图像描述文本
+                    # 娣诲姞鍥惧儚鎻忚堪鏂囨湰
                     temp_message_content_list.append({
                         "type": "text",
                         "text": f"Here is the image you requested to see: '{file_path}'"
                     })
-                    # 添加图像URL
+                    # 娣诲姞鍥惧儚URL
                     temp_message_content_list.append({
                         "type": "image_url",
                         "image_url": {
@@ -451,13 +451,13 @@ class MessageManager:
                         }
                     })
 
-                # 处理完图像上下文后，删除该消息（避免重复使用）
+                # 澶勭悊瀹屽浘鍍忎笂涓嬫枃鍚庯紝鍒犻櫎璇ユ秷鎭紙閬垮厤閲嶅浣跨敤锛?
                 await self.client.table('messages').delete().eq('message_id', latest_image_context_msg.data[0]["message_id"]).execute()
                 
             except Exception as e:
                 logger.error(f"Error parsing image context: {e}")
 
-        # 如果有临时消息内容，返回格式化的消息
+        # 濡傛灉鏈変复鏃舵秷鎭唴瀹癸紝杩斿洖鏍煎紡鍖栫殑娑堟伅
         if temp_message_content_list:
             return {"role": "user", "content": temp_message_content_list}
         return None
@@ -475,7 +475,7 @@ class AgentRunner:
             else:
                 logger.info(f"Using existing trace")
      
-            # 使用 Google ADK 框架承接服务
+            # 浣跨敤 Google ADK 妗嗘灦鎵挎帴鏈嶅姟
             self.thread_manager = ADKThreadManager(
                         trace=self.config.trace, 
                         is_agent_builder=self.config.is_agent_builder or False, 
@@ -484,17 +484,17 @@ class AgentRunner:
                     )
             logger.info(f"ADKThreadManager created successfully")
 
-            # 初始化数据库客户端
+            # 鍒濆鍖栨暟鎹簱瀹㈡埛绔?
             self.client = await self.thread_manager.db.client
             logger.info(f"Database client initialized successfully")
 
-            # 获取账户ID
+            # 鑾峰彇璐︽埛ID
             from utils.auth_utils import AuthUtils
             self.account_id = await AuthUtils.get_account_id_from_thread(self.client, self.config.thread_id)
             if not self.account_id: 
                 raise ValueError("Could not determine account ID for thread")
 
-            # 获取项目信息
+            # 鑾峰彇椤圭洰淇℃伅
             project = await self.client.table('projects').select('*').eq('project_id', self.config.project_id).execute()
             if not project.data or len(project.data) == 0:
                 raise ValueError(f"Project {self.config.project_id} not found")
@@ -502,7 +502,7 @@ class AgentRunner:
             project_data = project.data[0]
             sandbox_info = project_data.get('sandbox', {})
 
-            # 处理 sandbox_info 可能是字符串的情况
+            # 澶勭悊 sandbox_info 鍙兘鏄瓧绗︿覆鐨勬儏鍐?
             if isinstance(sandbox_info, str):
                 try:
                     import json
@@ -511,8 +511,8 @@ class AgentRunner:
                     sandbox_info = {}
 
             if not sandbox_info.get('id'):
-                # 沙箱是懒加载的，当需要时创建和持久化沙箱元数据
-                # 如果沙箱不存在，工具会调用 `_ensure_sandbox()` 来创建和持久化沙箱元数据
+                # 娌欑鏄噿鍔犺浇鐨勶紝褰撻渶瑕佹椂鍒涘缓鍜屾寔涔呭寲娌欑鍏冩暟鎹?
+                # 濡傛灉娌欑涓嶅瓨鍦紝宸ュ叿浼氳皟鐢?`_ensure_sandbox()` 鏉ュ垱寤哄拰鎸佷箙鍖栨矙绠卞厓鏁版嵁
                 logger.info(f"No sandbox found for project {self.config.project_id}; will create lazily when needed")
             
         except Exception as setup_error:
@@ -521,9 +521,9 @@ class AgentRunner:
         
     async def setup_tools(self):
         tool_manager = ToolManager(self.thread_manager, self.config.project_id, self.config.thread_id)
-        if self.config.agent_config and self.config.agent_config.get('is_fufanmanus_default', False):
+        if self.config.agent_config and self.config.agent_config.get('is_hephaestus_default', False):
             tool_manager.register_all_tools()
-            logger.info("register all tools success！")
+            logger.info("register all tools success锛?)
 
     
     def get_max_tokens(self) -> Optional[int]:
@@ -556,22 +556,22 @@ class AgentRunner:
         )
         logger.info(f"system_message created successfully")
 
-        # 初始化迭代次数
+        # 鍒濆鍖栬凯浠ｆ鏁?
         iteration_count = 0
 
-        # 初始化继续执行标志
+        # 鍒濆鍖栫户缁墽琛屾爣蹇?
         continue_execution = True
 
-        # 获取最新消息 - 从events表获取
+        # 鑾峰彇鏈€鏂版秷鎭?- 浠巈vents琛ㄨ幏鍙?
         latest_user_message = await self.client.table('events').select('*').eq('session_id', self.config.thread_id).order('timestamp', desc=True).limit(10).execute()
         logger.info(f"Event table query result: {len(latest_user_message.data) if latest_user_message.data else 0}")
 
-        # 提取用户请求内容
+        # 鎻愬彇鐢ㄦ埛璇锋眰鍐呭
         user_request = None
         if latest_user_message.data and len(latest_user_message.data) > 0:
             logger.info(f"Latest 10 messages author list: {[msg.get('author') for msg in latest_user_message.data]}")
             
-            # 找到最新的用户消息
+            # 鎵惧埌鏈€鏂扮殑鐢ㄦ埛娑堟伅
             for i, event in enumerate(latest_user_message.data):
                 if event.get('author') == 'user':
                     content = event.get('content', {})
@@ -579,14 +579,14 @@ class AgentRunner:
                     logger.info(f"Found user message[{i}]: content={content}, timestamp={timestamp}")
                     
                     import json
-                    # 解析content字段
+                    # 瑙ｆ瀽content瀛楁
                     if isinstance(content, str):
                         try:
                             content = json.loads(content)
                         except json.JSONDecodeError:
                             content = {"content": content}
                     
-                    # 提取用户请求
+                    # 鎻愬彇鐢ㄦ埛璇锋眰
                     if isinstance(content, dict):
                         user_request = content.get('content', '')
                         logger.info(f"Extracted user request: {user_request}")
@@ -597,10 +597,10 @@ class AgentRunner:
 
         message_manager = MessageManager(self.client, self.config.thread_id, self.config.model_name, self.config.trace)
 
-        # 进入循环执行
+        # 杩涘叆寰幆鎵ц
         while continue_execution and iteration_count < self.config.max_iterations:
             iteration_count += 1          
-            logger.info(f"Looping：continue_execution={continue_execution}, iteration_count={iteration_count}, max_iterations={self.config.max_iterations}")
+            logger.info(f"Looping锛歝ontinue_execution={continue_execution}, iteration_count={iteration_count}, max_iterations={self.config.max_iterations}")
         
             temporary_message = await message_manager.build_temporary_message()
             logger.info(f"temporary_message created successfully: {temporary_message}")
@@ -608,7 +608,7 @@ class AgentRunner:
             
             generation = self.config.trace.generation(name="thread_manager.run_thread") if self.config.trace else None
             try:          
-                # 获取可用函数
+                # 鑾峰彇鍙敤鍑芥暟
                 available_functions = self.thread_manager.tool_registry.get_available_functions()
                 logger.info(f"Get available functions: {list(available_functions.keys())}")
                 
@@ -622,7 +622,7 @@ class AgentRunner:
                         llm_max_tokens=1024,
                         tool_choice="auto",
                         available_functions = available_functions,
-                        max_xml_tool_calls=0, # 这里不设置限制
+                        max_xml_tool_calls=0, # 杩欓噷涓嶈缃檺鍒?
                         temporary_message=temporary_message,
                         processor_config=ProcessorConfig(
                             xml_tool_calling=True,
@@ -655,7 +655,7 @@ class AgentRunner:
                         index = 0
                         tool_call_assistant_map: Dict[str, str] = {}
                         async for chunk in response:
-                            # 拆分包含多个 tool_calls 的最终 assistant 消息，并建立 tool_call_id → assistant_message_id 的映射
+                            # 鎷嗗垎鍖呭惈澶氫釜 tool_calls 鐨勬渶缁?assistant 娑堟伅锛屽苟寤虹珛 tool_call_id 鈫?assistant_message_id 鐨勬槧灏?
                             try:
                                 if isinstance(chunk, dict) and chunk.get('type') == 'assistant':
                                     metadata_obj = chunk.get('metadata', {})
@@ -683,7 +683,7 @@ class AgentRunner:
                                             except Exception:
                                                 base_dt = datetime.now(timezone.utc)
                                             for i, tc in enumerate(tool_calls):
-                                                # 🔧 生成确定性UUID，与后端拆分逻辑保持一致
+                                                # 馃敡 鐢熸垚纭畾鎬UID锛屼笌鍚庣鎷嗗垎閫昏緫淇濇寔涓€鑷?
                                                 tool_call_id = tc.get('id') if isinstance(tc, dict) else f"unknown_{i}"
                                                 import hashlib
                                                 seed_data = f"assistant_split_{tool_call_id}_{self.config.thread_id}_{i}_v1"
@@ -699,20 +699,20 @@ class AgentRunner:
                                                 new_chunk = dict(chunk)
                                                 new_chunk['message_id'] = new_assistant_id
                                                 new_chunk['content'] = json.dumps(new_content)
-                                                # 设置严格递增的 created_at，避免前端 key 抖动
+                                                # 璁剧疆涓ユ牸閫掑鐨?created_at锛岄伩鍏嶅墠绔?key 鎶栧姩
                                                 try:
                                                     new_dt = base_dt + timedelta(milliseconds=i)
                                                     new_chunk['created_at'] = new_dt.isoformat()
                                                 except Exception:
                                                     pass
-                                                # 为每页提供稳定顺序号
+                                                # 涓烘瘡椤垫彁渚涚ǔ瀹氶『搴忓彿
                                                 try:
                                                     metadata_copy = dict(metadata_obj) if isinstance(metadata_obj, dict) else {}
                                                     metadata_copy['tool_index'] = i
                                                     new_chunk['metadata'] = json.dumps(metadata_copy)
                                                 except Exception:
                                                     pass
-                                                # 记录映射，供后续 tool 结果重写assistant_message_id
+                                                # 璁板綍鏄犲皠锛屼緵鍚庣画 tool 缁撴灉閲嶅啓assistant_message_id
                                                 try:
                                                     tool_call_id = tc.get('id') if isinstance(tc, dict) else None
                                                     if tool_call_id:
@@ -722,12 +722,12 @@ class AgentRunner:
                                                 all_chunk.append({"index": index, "chunk": new_chunk})
                                                 index += 1
                                                 yield new_chunk
-                                            # 不再下发原始的合并assistant，直接进入下一条chunk
+                                            # 涓嶅啀涓嬪彂鍘熷鐨勫悎骞禷ssistant锛岀洿鎺ヨ繘鍏ヤ笅涓€鏉hunk
                                             continue
                             except Exception:
                                 pass
 
-                            # 重写每个工具结果的 assistant_message_id，指向对应拆分后的 assistant 消息
+                            # 閲嶅啓姣忎釜宸ュ叿缁撴灉鐨?assistant_message_id锛屾寚鍚戝搴旀媶鍒嗗悗鐨?assistant 娑堟伅
                             try:
                                 if isinstance(chunk, dict) and chunk.get('type') == 'tool':
                                     metadata_obj = chunk.get('metadata', {})
@@ -769,7 +769,7 @@ class AgentRunner:
                                         elif content_obj.get('xml_tag_name'):
                                             last_tool_call = content_obj['xml_tag_name']
 
-                                    # 将包含 tool_call_id 的状态消息也补充 assistant_message_id，便于前端按页更新进度
+                                    # 灏嗗寘鍚?tool_call_id 鐨勭姸鎬佹秷鎭篃琛ュ厖 assistant_message_id锛屼究浜庡墠绔寜椤垫洿鏂拌繘搴?
                                     tool_call_id_in_status = metadata.get('tool_call_id') or content_obj.get('tool_call_id')
                                     if tool_call_id_in_status:
                                         mapped_assistant_id = tool_call_assistant_map.get(str(tool_call_id_in_status))
@@ -822,7 +822,7 @@ class AgentRunner:
                             generation.end(output=full_response, status_message="agent_stopped")
                         continue_execution = False
                     else:
-                        # ✅ 正常完成一轮对话后，也要终止循环（除非需要继续执行任务）
+                        # 鉁?姝ｅ父瀹屾垚涓€杞璇濆悗锛屼篃瑕佺粓姝㈠惊鐜紙闄ら潪闇€瑕佺户缁墽琛屼换鍔★級
                         continue_execution = False
 
                 except Exception as e:
@@ -857,21 +857,21 @@ class AgentRunner:
         #         agent_should_terminate = False
         #         error_detected = False
         #         full_response = ""
-        #         final_response_text = None  # ✅ 用于存储is_final_response的内容
-        #         adk_call_completed = False  # ✅ 标记单次ADK调用是否完成
+        #         final_response_text = None  # 鉁?鐢ㄤ簬瀛樺偍is_final_response鐨勫唴瀹?
+        #         adk_call_completed = False  # 鉁?鏍囪鍗曟ADK璋冪敤鏄惁瀹屾垚
 
         #         try:
         #             all_chunk = []
         #             if hasattr(response, '__aiter__') and not isinstance(response, dict):
         #                 async for chunk in response:
         #                     print(f"current chunk: {chunk}")
-        #                     # ✅ 基于实际事件格式的处理逻辑
+        #                     # 鉁?鍩轰簬瀹為檯浜嬩欢鏍煎紡鐨勫鐞嗛€昏緫
         #                     if isinstance(chunk, dict):
         #                         chunk_type = chunk.get('type')
         #                         chunk_content = chunk.get('content', '{}')
         #                         chunk_metadata = chunk.get('metadata', '{}')
                                 
-        #                         # 解析JSON字符串
+        #                         # 瑙ｆ瀽JSON瀛楃涓?
         #                         try:
         #                             if isinstance(chunk_content, str):
         #                                 content_data = json.loads(chunk_content)
@@ -886,41 +886,41 @@ class AgentRunner:
         #                             content_data = {}
         #                             metadata_data = {}
                                 
-        #                         # ✅ 检查assistant消息的完成状态
+        #                         # 鉁?妫€鏌ssistant娑堟伅鐨勫畬鎴愮姸鎬?
         #                         if chunk_type == 'assistant' and metadata_data.get('stream_status') == 'complete':
         #                             if content_data.get('content'):
         #                                 final_response_text = content_data['content']
-        #                                 logger.info(f"🎯 检测到完整assistant回复: {final_response_text[:100]}...")
+        #                                 logger.info(f"馃幆 妫€娴嬪埌瀹屾暣assistant鍥炲: {final_response_text[:100]}...")
                                 
-        #                         # ✅ 检查finish状态（类似is_final_response）
+        #                         # 鉁?妫€鏌inish鐘舵€侊紙绫讳技is_final_response锛?
         #                         elif chunk_type == 'status' and content_data.get('status_type') == 'finish':
         #                             if content_data.get('finish_reason') == 'final':
-        #                                 logger.info(f"🏁 检测到final finish状态")
-        #                                 # 这表示当前回合的最终响应
+        #                                 logger.info(f"馃弫 妫€娴嬪埌final finish鐘舵€?)
+        #                                 # 杩欒〃绀哄綋鍓嶅洖鍚堢殑鏈€缁堝搷搴?
                                 
-        #                         # ✅ 检查thread_run_end（调用完全结束）
+        #                         # 鉁?妫€鏌hread_run_end锛堣皟鐢ㄥ畬鍏ㄧ粨鏉燂級
         #                         elif chunk_type == 'status' and content_data.get('status_type') == 'thread_run_end':
-        #                             logger.info(f"🎯 检测到thread_run_end，ADK调用完全结束")
+        #                             logger.info(f"馃幆 妫€娴嬪埌thread_run_end锛孉DK璋冪敤瀹屽叏缁撴潫")
         #                             adk_call_completed = True
                                 
-        #                         # ✅ 检查错误状态
+        #                         # 鉁?妫€鏌ラ敊璇姸鎬?
         #                         elif chunk_type == 'status' and chunk.get('status') == 'error':
         #                             error_detected = True
         #                             yield chunk
         #                             continue
                         
-        #                         # ✅ 检查工具调用和终止条件 (如果还有其他逻辑需要)
+        #                         # 鉁?妫€鏌ュ伐鍏疯皟鐢ㄥ拰缁堟鏉′欢 (濡傛灉杩樻湁鍏朵粬閫昏緫闇€瑕?
         #                         if chunk_type == 'assistant':
-        #                             # 🔧 从ADK格式中正确提取文本
+        #                             # 馃敡 浠嶢DK鏍煎紡涓纭彁鍙栨枃鏈?
         #                             assistant_text = ""
         #                             if content_data.get('content'):
-        #                                 # 旧格式：{"content": "text"}
+        #                                 # 鏃ф牸寮忥細{"content": "text"}
         #                                 assistant_text = str(content_data['content'])
         #                             elif content_data.get('parts'):
-        #                                 # ADK格式：{"role": "model", "parts": [{"text": "..."}]}
+        #                                 # ADK鏍煎紡锛歿"role": "model", "parts": [{"text": "..."}]}
         #                                 for part in content_data['parts']:
         #                                     if isinstance(part, dict) and 'text' in part:
-        #                                         # 🔧 修复：安全处理part['text']，防止list类型导致拼接错误
+        #                                         # 馃敡 淇锛氬畨鍏ㄥ鐞唒art['text']锛岄槻姝ist绫诲瀷瀵艰嚧鎷兼帴閿欒
         #                                         part_text = part['text']
         #                                         if isinstance(part_text, list):
         #                                             part_text = ''.join(str(item) for item in part_text)
@@ -929,14 +929,14 @@ class AgentRunner:
         #                                         assistant_text += part_text
                                     
         #                             if assistant_text:
-        #                                 # 🔧 修复：确保full_response拼接的类型安全
+        #                                 # 馃敡 淇锛氱‘淇漟ull_response鎷兼帴鐨勭被鍨嬪畨鍏?
         #                                 if not isinstance(full_response, str):
         #                                     full_response = str(full_response)
         #                                 if not isinstance(assistant_text, str):
         #                                     assistant_text = str(assistant_text)
         #                                 full_response += assistant_text
                                     
-        #                             # 检查XML工具调用
+        #                             # 妫€鏌ML宸ュ叿璋冪敤
         #                             if isinstance(assistant_text, str):
         #                                 if '</ask>' in assistant_text:
         #                                     last_tool_call = 'ask'
@@ -950,10 +950,10 @@ class AgentRunner:
 
         #                     yield chunk
                         
-        #                 # ✅ 当async for循环结束时，说明事件流耗尽
+        #                 # 鉁?褰揳sync for寰幆缁撴潫鏃讹紝璇存槑浜嬩欢娴佽€楀敖
         #                 if not adk_call_completed:
         #                     adk_call_completed = True
-        #                     logger.info(f"🏁 ADK事件流耗尽，单次调用完成")
+        #                     logger.info(f"馃弫 ADK浜嬩欢娴佽€楀敖锛屽崟娆¤皟鐢ㄥ畬鎴?)
 
                       
         #             else:
@@ -981,43 +981,43 @@ class AgentRunner:
         #         }
         #         break
             
-        #     # ✅ 外层循环终止判断（基于实际事件）
+        #     # 鉁?澶栧眰寰幆缁堟鍒ゆ柇锛堝熀浜庡疄闄呬簨浠讹級
         #     if error_detected:
-        #         logger.info(f"🚨 检测到错误，终止执行")
+        #         logger.info(f"馃毃 妫€娴嬪埌閿欒锛岀粓姝㈡墽琛?)
         #         if generation:
         #             generation.end(output=full_response, status_message="error_detected", level="ERROR")
         #         break
                 
-        #     # ✅ 基于实际ADK事件的终止判断
+        #     # 鉁?鍩轰簬瀹為檯ADK浜嬩欢鐨勭粓姝㈠垽鏂?
         #     if agent_should_terminate or last_tool_call in ['ask', 'complete', 'web-browser-takeover']:
-        #         logger.info(f"🛑 Agent明确终止: agent_should_terminate={agent_should_terminate}, last_tool_call={last_tool_call}")
+        #         logger.info(f"馃洃 Agent鏄庣‘缁堟: agent_should_terminate={agent_should_terminate}, last_tool_call={last_tool_call}")
         #         if generation:
         #             generation.end(output=full_response, status_message="agent_stopped")
         #         continue_execution = False
-        #         logger.info(f"🛑 设置continue_execution=False，应该退出循环")
+        #         logger.info(f"馃洃 璁剧疆continue_execution=False锛屽簲璇ラ€€鍑哄惊鐜?)
                 
         #     elif adk_call_completed:
-        #         # ✅ ADK调用完成后，继续下一次迭代让Agent执行更多任务
-        #         logger.info(f"✅ ADK调用完成，继续执行更多任务 (iteration {iteration_count}/{self.config.max_iterations})")
+        #         # 鉁?ADK璋冪敤瀹屾垚鍚庯紝缁х画涓嬩竴娆¤凯浠ｈAgent鎵ц鏇村浠诲姟
+        #         logger.info(f"鉁?ADK璋冪敤瀹屾垚锛岀户缁墽琛屾洿澶氫换鍔?(iteration {iteration_count}/{self.config.max_iterations})")
         #         if final_response_text:
-        #             logger.info(f"📝 本轮响应预览: {final_response_text[:200]}...")
-        #         # continue_execution保持True，让Agent继续执行任务
+        #             logger.info(f"馃摑 鏈疆鍝嶅簲棰勮: {final_response_text[:200]}...")
+        #         # continue_execution淇濇寔True锛岃Agent缁х画鎵ц浠诲姟
                 
         #     else:
-        #         # ✅ 其他情况
-        #         logger.info(f"❓ 未明确的ADK状态 (completed={adk_call_completed}, final_text={bool(final_response_text)})，继续尝试")
+        #         # 鉁?鍏朵粬鎯呭喌
+        #         logger.info(f"鉂?鏈槑纭殑ADK鐘舵€?(completed={adk_call_completed}, final_text={bool(final_response_text)})锛岀户缁皾璇?)
             
         #     if generation:
         #         generation.end(output=full_response)
 
-        # # 🔍 循环结束日志
-        # logger.info(f"🏁 Agent执行循环结束: continue_execution={continue_execution}, iteration_count={iteration_count}")
-        # logger.info(f"🏁 最终状态: max_iterations={self.config.max_iterations}")
-        # #                     # ✅ 官方推荐：用is_final_response()获取最终可展示文本
+        # # 馃攳 寰幆缁撴潫鏃ュ織
+        # logger.info(f"馃弫 Agent鎵ц寰幆缁撴潫: continue_execution={continue_execution}, iteration_count={iteration_count}")
+        # logger.info(f"馃弫 鏈€缁堢姸鎬? max_iterations={self.config.max_iterations}")
+        # #                     # 鉁?瀹樻柟鎺ㄨ崘锛氱敤is_final_response()鑾峰彇鏈€缁堝彲灞曠ず鏂囨湰
         # #                     if hasattr(chunk, 'is_final_response') and chunk.is_final_response():
         # #                         if hasattr(chunk, 'content') and chunk.content and hasattr(chunk.content, 'parts') and chunk.content.parts:
         # #                             final_response_text = chunk.content.parts[0].text
-        # #                             logger.info(f"🎯 检测到final_response: {final_response_text[:100]}...")
+        # #                             logger.info(f"馃幆 妫€娴嬪埌final_response: {final_response_text[:100]}...")
                             
         # #                     if isinstance(chunk, dict) and chunk.get('type') == 'status' and chunk.get('status') == 'error':
         # #                         error_detected = True
@@ -1073,38 +1073,38 @@ class AgentRunner:
 
         # #                     yield chunk
                         
-        # #                 # ✅ 当async for循环结束时，说明这次ADK调用的事件流已耗尽
+        # #                 # 鉁?褰揳sync for寰幆缁撴潫鏃讹紝璇存槑杩欐ADK璋冪敤鐨勪簨浠舵祦宸茶€楀敖
         # #                 adk_call_completed = True
-        # #                 logger.info(f"🏁 ADK事件流耗尽，单次调用完成")
+        # #                 logger.info(f"馃弫 ADK浜嬩欢娴佽€楀敖锛屽崟娆¤皟鐢ㄥ畬鎴?)
                         
         # #             else:
         # #                 error_detected = True
 
         # #             if error_detected:
-        # #                 logger.info(f"🚨 检测到错误，终止执行")
+        # #                 logger.info(f"馃毃 妫€娴嬪埌閿欒锛岀粓姝㈡墽琛?)
         # #                 if generation:
         # #                     generation.end(output=full_response, status_message="error_detected", level="ERROR")
         # #                 break
                         
-        # #             # ✅ 基于官方建议的外层循环终止判断
+        # #             # 鉁?鍩轰簬瀹樻柟寤鸿鐨勫灞傚惊鐜粓姝㈠垽鏂?
         # #             if agent_should_terminate or last_tool_call in ['ask', 'complete', 'web-browser-takeover']:
-        # #                 logger.info(f"🛑 Agent明确终止: agent_should_terminate={agent_should_terminate}, last_tool_call={last_tool_call}")
+        # #                 logger.info(f"馃洃 Agent鏄庣‘缁堟: agent_should_terminate={agent_should_terminate}, last_tool_call={last_tool_call}")
         # #                 if generation:
         # #                     generation.end(output=full_response, status_message="agent_stopped")
         # #                 continue_execution = False
-        # #                 logger.info(f"🛑 设置continue_execution=False，应该退出循环")
+        # #                 logger.info(f"馃洃 璁剧疆continue_execution=False锛屽簲璇ラ€€鍑哄惊鐜?)
         # #             elif adk_call_completed and final_response_text:
-        # #                 # ✅ ADK调用完成且有最终响应文本，通常表示一轮完整对话结束
-        # #                 logger.info(f"✅ ADK调用完成且有最终响应，默认终止外层循环")
-        # #                 logger.info(f"📝 最终响应预览: {final_response_text[:200]}...")
+        # #                 # 鉁?ADK璋冪敤瀹屾垚涓旀湁鏈€缁堝搷搴旀枃鏈紝閫氬父琛ㄧず涓€杞畬鏁村璇濈粨鏉?
+        # #                 logger.info(f"鉁?ADK璋冪敤瀹屾垚涓旀湁鏈€缁堝搷搴旓紝榛樿缁堟澶栧眰寰幆")
+        # #                 logger.info(f"馃摑 鏈€缁堝搷搴旈瑙? {final_response_text[:200]}...")
         # #                 continue_execution = False
         # #             elif adk_call_completed and not final_response_text:
-        # #                 # ✅ ADK调用完成但没有最终响应文本，可能需要继续
-        # #                 logger.info(f"⚠️ ADK调用完成但无最终响应文本，继续下一次迭代")
-        # #                 # continue_execution保持True，继续下一次迭代
+        # #                 # 鉁?ADK璋冪敤瀹屾垚浣嗘病鏈夋渶缁堝搷搴旀枃鏈紝鍙兘闇€瑕佺户缁?
+        # #                 logger.info(f"鈿狅笍 ADK璋冪敤瀹屾垚浣嗘棤鏈€缁堝搷搴旀枃鏈紝缁х画涓嬩竴娆¤凯浠?)
+        # #                 # continue_execution淇濇寔True锛岀户缁笅涓€娆¤凯浠?
         # #             else:
-        # #                 # ✅ 其他情况，可能是ADK内部错误或异常状态
-        # #                 logger.info(f"❓ 未明确的ADK状态 (completed={adk_call_completed}, final_text={bool(final_response_text)})，继续尝试")
+        # #                 # 鉁?鍏朵粬鎯呭喌锛屽彲鑳芥槸ADK鍐呴儴閿欒鎴栧紓甯哥姸鎬?
+        # #                 logger.info(f"鉂?鏈槑纭殑ADK鐘舵€?(completed={adk_call_completed}, final_text={bool(final_response_text)})锛岀户缁皾璇?)
 
         # #         except Exception as e:
         # #             error_msg = f"Error during response streaming: {str(e)}"
@@ -1129,35 +1129,35 @@ class AgentRunner:
         # #     if generation:
         # #         generation.end(output=full_response)
 
-        # # # 🔍 循环结束日志
-        # # logger.info(f"🏁 Agent执行循环结束: continue_execution={continue_execution}, iteration_count={iteration_count}")
-        # # logger.info(f"🏁 最终状态: max_iterations={self.config.max_iterations}")
+        # # # 馃攳 寰幆缁撴潫鏃ュ織
+        # # logger.info(f"馃弫 Agent鎵ц寰幆缁撴潫: continue_execution={continue_execution}, iteration_count={iteration_count}")
+        # # logger.info(f"馃弫 鏈€缁堢姸鎬? max_iterations={self.config.max_iterations}")
 
         # asyncio.create_task(asyncio.to_thread(lambda: langfuse.flush()))
 
 
     # async def run(self) -> AsyncGenerator[Dict[str, Any], None]:
-        # """运行Agent，支持ADK和ThreadManager两种模式"""
-        # print(f"🚀 ===== AgentRunner.run()开始执行 =====")
+        # """杩愯Agent锛屾敮鎸丄DK鍜孴hreadManager涓ょ妯″紡"""
+        # print(f"馃殌 ===== AgentRunner.run()寮€濮嬫墽琛?=====")
         # try:
-        #     # 检查使用哪种模式
+        #     # 妫€鏌ヤ娇鐢ㄥ摢绉嶆ā寮?
         #     if self.adk_runner and self.adk_session:
-        #         print(f"  🔄 使用ADK模式执行...")
+        #         print(f"  馃攧 浣跨敤ADK妯″紡鎵ц...")
         #         async for event in self._run_with_adk():
         #             yield event
         #     elif self.thread_manager:
-        #         print(f"  🔄 使用ThreadManager模式执行...")
+        #         print(f"  馃攧 浣跨敤ThreadManager妯″紡鎵ц...")
         #         async for event in self._run_with_thread_manager():
         #             yield event
         #     else:
         #         raise RuntimeError("Neither ADK Runner nor ThreadManager initialized. Call setup() first.")
             
-        #     print(f"  ✅ AgentRunner.run()执行完成")
+        #     print(f"  鉁?AgentRunner.run()鎵ц瀹屾垚")
             
         # except Exception as run_error:
-        #     print(f"  ❌ AgentRunner.run()执行失败: {run_error}")
-        #     print(f"  📋 错误详情: {traceback.format_exc()}")
-        #     # 返回错误事件
+        #     print(f"  鉂?AgentRunner.run()鎵ц澶辫触: {run_error}")
+        #     print(f"  馃搵 閿欒璇︽儏: {traceback.format_exc()}")
+        #     # 杩斿洖閿欒浜嬩欢
         #     yield {
         #         "type": "error",
         #         "content": f"Agent execution failed: {str(run_error)}",
@@ -1165,37 +1165,37 @@ class AgentRunner:
         #     }
     
     async def _run_with_adk(self) -> AsyncGenerator[Dict[str, Any], None]:
-        """使用ADK Runner执行"""
+        """浣跨敤ADK Runner鎵ц"""
         try:
-            print(f"  📝 准备用户输入...")
-            # 准备用户输入内容
+            print(f"  馃摑 鍑嗗鐢ㄦ埛杈撳叆...")
+            # 鍑嗗鐢ㄦ埛杈撳叆鍐呭
             user_content = types.Content(
                 role='user',
                 parts=[types.Part.from_text(text=self.config.user_message or "Hello")]
             )
-            print(f"  ✅ 用户输入准备完成")
+            print(f"  鉁?鐢ㄦ埛杈撳叆鍑嗗瀹屾垚")
             
-            print(f"  🔄 开始ADK Runner执行...")
-            # 使用ADK Runner执行
+            print(f"  馃攧 寮€濮婣DK Runner鎵ц...")
+            # 浣跨敤ADK Runner鎵ц
             async for event in self.adk_runner.run_async(
                 user_id=self.adk_session.user_id,
                 content=user_content,
                 session_id=self.adk_session.id
             ):
-                print(f"  📨 收到ADK事件: {event.type}")
+                print(f"  馃摠 鏀跺埌ADK浜嬩欢: {event.type}")
                 
-                # 将ADK事件转换为你的格式
+                # 灏咥DK浜嬩欢杞崲涓轰綘鐨勬牸寮?
                 converted_event = self._convert_adk_event_to_format(event)
                 if converted_event:
                     yield converted_event
                 
-                # 检查是否完成
+                # 妫€鏌ユ槸鍚﹀畬鎴?
                 if event.type == "assistant_response_end":
-                    print(f"  ✅ ADK执行完成")
+                    print(f"  鉁?ADK鎵ц瀹屾垚")
                     break
                     
         except Exception as adk_error:
-            print(f"  ❌ ADK执行失败: {adk_error}")
+            print(f"  鉂?ADK鎵ц澶辫触: {adk_error}")
             yield {
                 "type": "error",
                 "content": f"ADK execution failed: {str(adk_error)}",
@@ -1203,11 +1203,11 @@ class AgentRunner:
             }
     
     async def _run_with_thread_manager(self) -> AsyncGenerator[Dict[str, Any], None]:
-        """使用ThreadManager执行（回退模式）"""
+        """浣跨敤ThreadManager鎵ц锛堝洖閫€妯″紡锛?""
         try:
-            print(f"  📝 准备ThreadManager执行...")
+            print(f"  馃摑 鍑嗗ThreadManager鎵ц...")
             
-            # 构建临时消息
+            # 鏋勫缓涓存椂娑堟伅
             temporary_message = None
             if self.client:
                 try:
@@ -1219,14 +1219,14 @@ class AgentRunner:
                     )
                     temporary_message = await message_manager.build_temporary_message()
                     if temporary_message:
-                        print(f"  ✅ 临时消息构建成功")
+                        print(f"  鉁?涓存椂娑堟伅鏋勫缓鎴愬姛")
                     else:
-                        print(f"  ℹ️ 没有临时消息")
+                        print(f"  鈩癸笍 娌℃湁涓存椂娑堟伅")
                 except Exception as msg_error:
-                    print(f"  ⚠️ 构建临时消息失败: {msg_error}")
+                    print(f"  鈿狅笍 鏋勫缓涓存椂娑堟伅澶辫触: {msg_error}")
                     temporary_message = None
             
-            # 构建系统提示
+            # 鏋勫缓绯荤粺鎻愮ず
             system_prompt = PromptManager.build_system_prompt(
                 model_name=self.config.model_name,
                 agent_config=self.config.agent_config,
@@ -1234,7 +1234,7 @@ class AgentRunner:
                 thread_id=self.config.thread_id
             )
             
-            # 使用原有的ThreadManager逻辑
+            # 浣跨敤鍘熸湁鐨凾hreadManager閫昏緫
             response = await self.thread_manager.run_thread(
                 thread_id=self.config.thread_id,
                 system_prompt=system_prompt,
@@ -1246,7 +1246,7 @@ class AgentRunner:
                 enable_context_manager=self.config.enable_context_manager
             )
             
-            # 处理响应
+            # 澶勭悊鍝嶅簲
             if response:
                 yield {
                     "type": "assistant",
@@ -1254,10 +1254,10 @@ class AgentRunner:
                     "metadata": {"thread_run_id": self.config.agent_run_id}
                 }
             
-            print(f"  ✅ ThreadManager执行完成")
+            print(f"  鉁?ThreadManager鎵ц瀹屾垚")
             
         except Exception as tm_error:
-            print(f"  ❌ ThreadManager执行失败: {tm_error}")
+            print(f"  鉂?ThreadManager鎵ц澶辫触: {tm_error}")
             yield {
                 "type": "error",
                 "content": f"ThreadManager execution failed: {str(tm_error)}",
@@ -1265,7 +1265,7 @@ class AgentRunner:
             }
     
     def _convert_adk_event_to_format(self, adk_event) -> Optional[Dict[str, Any]]:
-        """将ADK事件转换为你的格式"""
+        """灏咥DK浜嬩欢杞崲涓轰綘鐨勬牸寮?""
         try:
             if adk_event.type == "assistant_response_start":
                 return {
@@ -1275,13 +1275,13 @@ class AgentRunner:
                 }
             
             elif adk_event.type == "assistant_response":
-                # 处理助手响应
+                # 澶勭悊鍔╂墜鍝嶅簲
                 content = adk_event.content
                 if content and hasattr(content, 'parts'):
                     text_content = ""
                     for part in content.parts:
                         if hasattr(part, 'text'):
-                            # 🔧 确保类型安全，防止字符串拼接错误
+                            # 馃敡 纭繚绫诲瀷瀹夊叏锛岄槻姝㈠瓧绗︿覆鎷兼帴閿欒
                             part_text = part.text
                             if isinstance(part_text, list):
                                 part_text = ''.join(str(item) for item in part_text)
@@ -1296,7 +1296,7 @@ class AgentRunner:
                     }
             
             elif adk_event.type == "tool_started":
-                # 处理工具调用
+                # 澶勭悊宸ュ叿璋冪敤
                 return {
                     "type": "status",
                     "content": {
@@ -1309,7 +1309,7 @@ class AgentRunner:
                 }
             
             elif adk_event.type == "tool_result":
-                # 处理工具结果
+                # 澶勭悊宸ュ叿缁撴灉
                 return {
                     "type": "tool",
                     "content": {
@@ -1321,7 +1321,7 @@ class AgentRunner:
                 }
             
             elif adk_event.type == "assistant_response_end":
-                # 处理响应结束
+                # 澶勭悊鍝嶅簲缁撴潫
                 return {
                     "type": "status",
                     "content": {"status_type": "assistant_response_end"},
@@ -1331,7 +1331,7 @@ class AgentRunner:
             return None
             
         except Exception as convert_error:
-            print(f"  ⚠️ 事件转换失败: {convert_error}")
+            print(f"  鈿狅笍 浜嬩欢杞崲澶辫触: {convert_error}")
             return None
 
 from agentpress.adk_thread_manager import ADKThreadManager
@@ -1378,19 +1378,19 @@ async def run_agent(
         thread_id=thread_id,
         project_id=project_id,
         stream=stream,
-        native_max_auto_continues=native_max_auto_continues, # 控制 AI Agent 自动继续对话的最大次数
-        max_iterations=max_iterations, # Agent 最大迭代次数
+        native_max_auto_continues=native_max_auto_continues, # 鎺у埗 AI Agent 鑷姩缁х画瀵硅瘽鐨勬渶澶ф鏁?
+        max_iterations=max_iterations, # Agent 鏈€澶ц凯浠ｆ鏁?
         model_name=effective_model,
-        enable_thinking=enable_thinking,  # 是否启用思考
-        reasoning_effort=reasoning_effort,  # 思考力度
+        enable_thinking=enable_thinking,  # 鏄惁鍚敤鎬濊€?
+        reasoning_effort=reasoning_effort,  # 鎬濊€冨姏搴?
         enable_context_manager=enable_context_manager,
-        agent_config=agent_config,  # Agent 配置
+        agent_config=agent_config,  # Agent 閰嶇疆
         trace=trace,
-        is_agent_builder=is_agent_builder,  # 是否是 Agent 构建器
-        target_agent_id=target_agent_id,  # 目标 Agent ID
+        is_agent_builder=is_agent_builder,  # 鏄惁鏄?Agent 鏋勫缓鍣?
+        target_agent_id=target_agent_id,  # 鐩爣 Agent ID
     )
 
-    # 创建 Runner 
+    # 鍒涘缓 Runner 
     runner = AgentRunner(config)
     logger.info(f"AgentRunner created successfully: {runner}")
     

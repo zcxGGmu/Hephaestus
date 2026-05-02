@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 SUNA AGENT INSTALLER
 
@@ -27,7 +27,7 @@ from pathlib import Path
 backend_dir = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(backend_dir))
 
-from agent.fufanmanus import SunaSyncService
+from agent.hephaestus import SunaSyncService
 from utils.logger import logger
 
 # Global flag for graceful shutdown
@@ -35,22 +35,22 @@ shutdown_requested = False
 
 def signal_handler(signum, frame):
     global shutdown_requested
-    print_warning(f"\n🛑 Shutdown signal received ({signal.Signals(signum).name})")
+    print_warning(f"\n馃洃 Shutdown signal received ({signal.Signals(signum).name})")
     print_info("Finishing current batch before shutdown...")
     print_info("Re-run the same command to resume where you left off")
     shutdown_requested = True
 
 def print_success(message: str):
-    print(f"✅ {message}")
+    print(f"鉁?{message}")
 
 def print_error(message: str):
-    print(f"❌ {message}")
+    print(f"鉂?{message}")
 
 def print_info(message: str):
-    print(f"ℹ️  {message}")
+    print(f"鈩癸笍  {message}")
 
 def print_warning(message: str):
-    print(f"⚠️  {message}")
+    print(f"鈿狅笍  {message}")
 
 
 class SunaManagerCLI:
@@ -59,7 +59,7 @@ class SunaManagerCLI:
     
     async def cleanup_command(self):
         """Clean up broken agents (agents without versions) caused by termination"""
-        print("🧹 Cleaning up broken Suna agents (agents without versions)")
+        print("馃Ч Cleaning up broken Suna agents (agents without versions)")
         
         try:
             # Find broken agents
@@ -96,7 +96,7 @@ class SunaManagerCLI:
             if failed_count > 0:
                 print_warning(f"Failed to clean up {failed_count} agents")
             
-            print_info("💡 Now run: python suna_manager.py install")
+            print_info("馃挕 Now run: python suna_manager.py install")
             print_info("   The install will recreate these users' agents properly")
             
         except Exception as e:
@@ -136,7 +136,7 @@ class SunaManagerCLI:
     
     async def status_command(self):
         """Show status of Suna agent installation"""
-        print("📊 Suna Agent Installation Status")
+        print("馃搳 Suna Agent Installation Status")
         
         try:
             client = await self.sync_service.repository.db.client
@@ -182,14 +182,14 @@ class SunaManagerCLI:
             
             if broken_count > 0:
                 print_warning(f"Broken agents (no version): {broken_count}")
-                print_info("💡 Run: python suna_manager.py cleanup")
+                print_info("馃挕 Run: python suna_manager.py cleanup")
             else:
                 print_success("All agents have proper versions!")
             
             remaining = total_accounts - (total_agents - broken_count)
             if remaining > 0:
                 print_info(f"Users needing Suna: {remaining}")
-                print_info("💡 Run: python suna_manager.py install")
+                print_info("馃挕 Run: python suna_manager.py install")
             else:
                 print_success("All users have Suna agents!")
             
@@ -200,9 +200,9 @@ class SunaManagerCLI:
     async def install_command(self, batch_size: int = 100):
         global shutdown_requested
         
-        print(f"🚀 Installing Suna for users who don't have it (batch size: {batch_size})")
+        print(f"馃殌 Installing Suna for users who don't have it (batch size: {batch_size})")
         print_info(f"Concurrent processing will dramatically improve performance for large user bases")
-        print_info("💡 Safe to interrupt: completed users won't be re-processed on restart")
+        print_info("馃挕 Safe to interrupt: completed users won't be re-processed on restart")
         
         start_time = time.time()
         
@@ -249,7 +249,7 @@ class SunaManagerCLI:
                 estimated_sequential = result.synced_count * 0.5
                 time_saved = estimated_sequential - duration
                 if time_saved > 60:
-                    print_info(f"⚡ Concurrent processing saved ~{time_saved/60:.1f} minutes vs sequential")
+                    print_info(f"鈿?Concurrent processing saved ~{time_saved/60:.1f} minutes vs sequential")
         else:
             print_error("Installation completed with errors!")
             
@@ -257,8 +257,8 @@ class SunaManagerCLI:
             print_warning(f"Failed to install for {result.failed_count} users")
             if result.failed_count <= 5:
                 for error in result.errors:
-                    print(f"  💥 {error}")
-            print_info("💡 Re-run the same command to retry failed installations")
+                    print(f"  馃挜 {error}")
+            print_info("馃挕 Re-run the same command to retry failed installations")
     
     async def _install_with_progress(self, batch_size: int, total_needed: int):
         global shutdown_requested
@@ -271,13 +271,13 @@ class SunaManagerCLI:
             missing_accounts = [acc for acc in all_accounts if acc not in existing_account_ids]
             
             if not missing_accounts:
-                from agent.fufanmanus.sync_service import SyncResult
+                from agent.hephaestus.sync_service import SyncResult
                 return SyncResult(
                     success=True,
                     details=[{"message": "All users already have Suna agents"}]
                 )
             
-            logger.info(f"📦 Installing Suna for {len(missing_accounts)} users in batches of {batch_size}")
+            logger.info(f"馃摝 Installing Suna for {len(missing_accounts)} users in batches of {batch_size}")
             
             total_success = 0
             total_failed = 0
@@ -285,14 +285,14 @@ class SunaManagerCLI:
             
             for i in range(0, len(missing_accounts), batch_size):
                 if shutdown_requested:
-                    print_warning("🛑 Graceful shutdown requested - stopping after current batch")
+                    print_warning("馃洃 Graceful shutdown requested - stopping after current batch")
                     break
                     
                 batch = missing_accounts[i:i + batch_size]
                 batch_num = (i // batch_size) + 1
                 total_batches = (len(missing_accounts) + batch_size - 1) // batch_size
                 
-                print_info(f"🔄 Processing batch {batch_num}/{total_batches} ({len(batch)} users)")
+                print_info(f"馃攧 Processing batch {batch_num}/{total_batches} ({len(batch)} users)")
                 
                 try:
                     success_count, failed_count, errors = await self.sync_service._process_batch(batch)
@@ -302,7 +302,7 @@ class SunaManagerCLI:
                     all_errors.extend(errors)
                     
                     progress_pct = ((total_success + total_failed) / len(missing_accounts)) * 100
-                    print_info(f"✅ Batch {batch_num}/{total_batches} completed: {success_count} success, {failed_count} failed ({progress_pct:.1f}% total progress)")
+                    print_info(f"鉁?Batch {batch_num}/{total_batches} completed: {success_count} success, {failed_count} failed ({progress_pct:.1f}% total progress)")
                     
                 except Exception as e:
                     batch_error = f"Batch {batch_num} failed: {str(e)}"
@@ -317,9 +317,9 @@ class SunaManagerCLI:
             if shutdown_requested:
                 final_message += " (interrupted - safe to resume)"
             
-            logger.info(f"🎉 Installation completed: {final_message}")
+            logger.info(f"馃帀 Installation completed: {final_message}")
             
-            from agent.fufanmanus.sync_service import SyncResult
+            from agent.hephaestus.sync_service import SyncResult
             return SyncResult(
                 success=total_failed == 0 and not shutdown_requested,
                 synced_count=total_success,
@@ -336,15 +336,15 @@ class SunaManagerCLI:
         except Exception as e:
             error_msg = f"Installation operation failed: {str(e)}"
             logger.error(error_msg)
-            from agent.fufanmanus.sync_service import SyncResult
+            from agent.hephaestus.sync_service import SyncResult
             return SyncResult(success=False, errors=[error_msg])
 
     async def repair_command(self):
         """Repair orphaned Suna agents by creating missing versions and fixing broken pointers"""
-        print("🛠️  Repairing orphaned Suna agents and fixing broken version pointers")
+        print("馃洜锔? Repairing orphaned Suna agents and fixing broken version pointers")
         try:
             from datetime import datetime, timezone
-            from agent.fufanmanus.config import FufanmanusConfig
+            from agent.hephaestus.config import HephaestusConfig
             from agent.versioning.version_service import get_version_service
 
             repo = self.sync_service.repository
@@ -355,10 +355,10 @@ class SunaManagerCLI:
 
             # Unified config in the structure expected by repository repair helpers
             unified_config = {
-                "system_prompt": FufanmanusConfig.get_system_prompt(),
-                "model": FufanmanusConfig.DEFAULT_MODEL,
+                "system_prompt": HephaestusConfig.get_system_prompt(),
+                "model": HephaestusConfig.DEFAULT_MODEL,
                 "tools": {
-                    "agentpress": FufanmanusConfig.DEFAULT_TOOLS
+                    "agentpress": HephaestusConfig.DEFAULT_TOOLS
                 }
             }
 
@@ -447,7 +447,7 @@ async def main():
     signal.signal(signal.SIGTERM, signal_handler)
     
     parser = argparse.ArgumentParser(
-        description="🌞 Suna Agent Manager - Concurrent Installation",
+        description="馃尀 Suna Agent Manager - Concurrent Installation",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__
     )
@@ -455,7 +455,7 @@ async def main():
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
     
     # Install command
-    install_parser = subparsers.add_parser('install', help='📦 Install Suna for users who don\'t have it')
+    install_parser = subparsers.add_parser('install', help='馃摝 Install Suna for users who don\'t have it')
     install_parser.add_argument(
         '--batch-size', 
         type=int, 
@@ -464,13 +464,13 @@ async def main():
     )
     
     # Cleanup command
-    subparsers.add_parser('cleanup', help='🧹 Clean up broken agents (agents without versions)')
+    subparsers.add_parser('cleanup', help='馃Ч Clean up broken agents (agents without versions)')
     
     # Status command
-    subparsers.add_parser('status', help='📊 Show installation status and statistics')
+    subparsers.add_parser('status', help='馃搳 Show installation status and statistics')
 
     # Repair command
-    subparsers.add_parser('repair', help='🛠️  Repair orphaned Suna agents and fix broken version pointers')
+    subparsers.add_parser('repair', help='馃洜锔? Repair orphaned Suna agents and fix broken version pointers')
     
     args = parser.parse_args()
     
@@ -494,7 +494,7 @@ async def main():
             
     except KeyboardInterrupt:
         print_warning("Operation cancelled by user")
-        print_info("💡 Safe to re-run - completed users won't be re-processed")
+        print_info("馃挕 Safe to re-run - completed users won't be re-processed")
     except Exception as e:
         print_error(f"Unexpected error: {str(e)}")
         logger.error(f"CLI error: {str(e)}")
