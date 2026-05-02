@@ -11,6 +11,8 @@ It combines a Next.js frontend, a FastAPI backend, PostgreSQL persistence, Redis
   Next.js 15 + React 18 application for chat, agent interaction, projects, threads, and tool visualization.
 - `backend/`
   FastAPI backend for authentication, project/thread/message management, agent execution, sandbox integration, and worker orchestration.
+- `website/`
+  Standalone static marketing / product website intended for public-facing landing-page deployment.
 - `docs/`
   Setup notes, architecture notes, repository structure notes, and project analysis documents.
 - `scripts/`
@@ -85,6 +87,7 @@ flowchart LR
 Hephaestus/
   backend/
   frontend/
+  website/
   docs/
     analysis/
   scripts/
@@ -168,6 +171,12 @@ Default frontend URL:
 http://localhost:3000
 ```
 
+Website directory:
+
+```text
+website/index.html
+```
+
 ## Helper Scripts
 
 Root scripts:
@@ -187,6 +196,8 @@ Root scripts:
 - [Development notes](docs/development.md)
 - [Repository structure](docs/repository.md)
 - [Analysis documents](docs/analysis)
+- [Website directory](website/README.md)
+- [Website deployment workflow](.github/workflows/deploy-website.yml)
 
 ## Important Notes
 
@@ -201,4 +212,3 @@ Root scripts:
 - Decide whether some upstream compatibility modules should remain in-repo
 - Add shared lint/test/dev orchestration at the root level
 - Continue simplifying naming and internal module conventions where needed
-

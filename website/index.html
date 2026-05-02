@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hephaestus | Product-grade Generalist Agent Platform</title>
+    <meta
+      name="description"
+      content="Hephaestus is a product-grade generalist agent platform that connects threads, tools, workers, persistence, and sandbox execution into one coherent system."
+    />
+    <meta
+      name="keywords"
+      content="Hephaestus, AI agent, generalist agent, workflow execution, sandbox runtime, FastAPI, Next.js, product website"
+    />
+    <link rel="icon" href="./assets/favicon.png" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="topbar">
+        <div class="container nav">
+          <a class="brand" href="#hero">
+            <span class="brand-mark">H</span>
+            <span class="brand-copy">
+              <span class="brand-overline">Generalist Agent Platform</span>
+              <span class="brand-name">Hephaestus</span>
+            </span>
+          </a>
+          <nav class="nav-links">
+            <a href="#overview">Overview</a>
+            <a href="#architecture">Architecture</a>
+            <a href="#flow">Flow</a>
+            <a href="#capabilities">Capabilities</a>
+            <a href="#start">Quick Start</a>
+          </nav>
+          <div class="nav-actions">
+            <a class="button button-ghost" href="https://github.com/zcxGGmu/Hephaestus" target="_blank" rel="noreferrer">GitHub</a>
+            <a class="button button-primary" href="#start">Launch Story</a>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section id="hero" class="hero section">
+          <div class="container hero-grid">
+            <div class="hero-copy">
+              <div class="eyebrow">
+                <span>System-level Agent Product</span>
+                <span class="dot"></span>
+                <span>面向真实执行的智能体产品层</span>
+              </div>
+              <h1>
+                Build a product surface
+                <span>around agent execution, not just chat output.</span>
+              </h1>
+              <p class="lead">
+                Hephaestus turns a generalist agent stack into a coherent product: threads,
+                tool calls, background workers, persistent state, and sandbox execution all
+                connected through one system narrative.
+              </p>
+              <p class="support">
+                它不是“再做一个聊天页面”，而是把 Agent 的运行上下文、工具层、执行流、
+                状态落库和产品界面真正组织成一个可以部署、演化、协作的系统。
+              </p>
+              <div class="hero-actions">
+                <a class="button button-primary" href="https://github.com/zcxGGmu/Hephaestus" target="_blank" rel="noreferrer">Open Repository</a>
+                <a class="button button-secondary" href="#architecture">See Architecture</a>
+                <a class="button button-text" href="#flow">Execution Flow</a>
+              </div>
+
+              <div id="overview" class="stats-grid">
+                <article class="stat-card">
+                  <span class="stat-label">Full-stack product surface</span>
+                  <strong>Next.js + FastAPI</strong>
+                  <p>前后端一体化产品界面与执行中枢</p>
+                </article>
+                <article class="stat-card">
+                  <span class="stat-label">Async execution backbone</span>
+                  <strong>Redis + Dramatiq</strong>
+                  <p>面向长任务与流式反馈的异步底座</p>
+                </article>
+                <article class="stat-card">
+                  <span class="stat-label">Persistent thread memory</span>
+                  <strong>PostgreSQL</strong>
+                  <p>用户、项目、线程、消息、运行记录统一落库</p>
+                </article>
+                <article class="stat-card">
+                  <span class="stat-label">Tool-centric runtime</span>
+                  <strong>Sandbox-first</strong>
+                  <p>围绕工具、文件、浏览器与执行环境组织能力</p>
+                </article>
+              </div>
+            </div>
+
+            <aside class="hero-panel">
+              <div class="panel-header">
+                <div>
+                  <span class="panel-label">Runtime board</span>
+                  <h2>Research · Execute · Return</h2>
+                </div>
+                <span class="status-pill">Worker online</span>
+              </div>
+              <div class="thread-card">
+                <span>Thread input</span>
+                <p>“Research a topic, open the browser, inspect files, and summarize findings in one stream.”</p>
+              </div>
+              <div class="panel-grid">
+                <article class="panel-card">
+                  <h3>Execution stack</h3>
+                  <p>FastAPI · Redis · Worker · Sandbox</p>
+                  <ul>
+                    <li>Queued background runs</li>
+                    <li>Streaming assistant and tool updates</li>
+                    <li>Persistent thread and message state</li>
+                  </ul>
+                </article>
+                <article class="preview-card">
+                  <div class="preview-copy">
+                    <h3>Product surface preview</h3>
+                    <p>把 Agent 工具执行结果真正呈现在产品界面里，而不是只落到日志里。</p>
+                  </div>
+                  <img src="./assets/mac.png" alt="Hephaestus product preview" />
+                </article>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="container">
+            <div class="section-intro">
+              <div class="eyebrow">
+                <span>Why Hephaestus</span>
+                <span class="dot"></span>
+                <span>为什么它更像产品而不是演示页</span>
+              </div>
+              <h2>A product website for an agent system should explain execution, not just promise intelligence.</h2>
+              <p>
+                The landing page is structured to feel like a system narrative. It shows what the platform is,
+                how it runs, where state lives, and how a user request becomes a sequence of observable actions.
+              </p>
+            </div>
+
+            <div class="pillar-grid">
+              <article class="content-card">
+                <h3>Generalist Agent Core</h3>
+                <span>通用智能体中枢</span>
+                <p>Hephaestus is an action-oriented agent system, not just a chat shell. Models, tools, threads, and runtime state are coordinated as one product surface.</p>
+              </article>
+              <article class="content-card">
+                <h3>Long-running Task Flow</h3>
+                <span>长任务流与后台执行</span>
+                <p>Tasks can be queued, streamed, resumed, and observed through a worker-driven execution flow suitable for real-world automation.</p>
+              </article>
+              <article class="content-card">
+                <h3>Composable Tool Layer</h3>
+                <span>可组合工具层</span>
+                <p>File operations, browser actions, shell execution, and future integrations can be rendered as structured tool surfaces instead of opaque outputs.</p>
+              </article>
+              <article class="content-card">
+                <h3>Ownable Deployment Model</h3>
+                <span>可自主管理的部署形态</span>
+                <p>The platform is intentionally shaped for local or private deployment, giving teams ownership over credentials, data, workflows, and behavior.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="architecture" class="section section-alt">
+          <div class="container">
+            <div class="section-intro">
+              <div class="eyebrow">
+                <span>Architecture Surface</span>
+                <span class="dot"></span>
+                <span>系统分层与协作边界</span>
+              </div>
+              <h2>From UI to execution to state, every layer has a visible role.</h2>
+              <p>
+                Instead of hiding the stack behind vague AI language, the site shows the product as a concrete layered system:
+                interface, application logic, execution orchestration, and durable state.
+              </p>
+            </div>
+
+            <div class="architecture-grid">
+              <article class="content-card">
+                <span>交互层</span>
+                <h3>Interface Layer</h3>
+                <ul>
+                  <li>Landing site</li>
+                  <li>Project dashboard</li>
+                  <li>Thread view</li>
+                  <li>Tool panels</li>
+                  <li>Auth and onboarding</li>
+                </ul>
+              </article>
+              <article class="content-card">
+                <span>应用层</span>
+                <h3>Application Layer</h3>
+                <ul>
+                  <li>FastAPI routes</li>
+                  <li>Auth service</li>
+                  <li>Agent API</li>
+                  <li>Sandbox API</li>
+                  <li>Thread and project management</li>
+                </ul>
+              </article>
+              <article class="content-card">
+                <span>执行层</span>
+                <h3>Execution Layer</h3>
+                <ul>
+                  <li>Redis coordination</li>
+                  <li>Dramatiq worker</li>
+                  <li>Agent runtime</li>
+                  <li>Tool dispatch</li>
+                  <li>Streaming responses</li>
+                </ul>
+              </article>
+              <article class="content-card">
+                <span>状态层</span>
+                <h3>State Layer</h3>
+                <ul>
+                  <li>PostgreSQL</li>
+                  <li>Agent runs</li>
+                  <li>Messages</li>
+                  <li>Sessions</li>
+                  <li>Workflow metadata</li>
+                </ul>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="flow" class="section">
+          <div class="container">
+            <div class="section-intro">
+              <div class="eyebrow">
+                <span>Execution Flow</span>
+                <span class="dot"></span>
+                <span>用户意图到工具执行的完整路径</span>
+              </div>
+              <h2>Hephaestus is built around observable execution.</h2>
+              <p>
+                What matters is not only that an agent can act, but that the system makes the process understandable:
+                queued runs, tool use, streaming updates, and persisted thread state.
+              </p>
+            </div>
+
+            <div class="flow-grid">
+              <article class="flow-step">
+                <span class="step-index">01</span>
+                <h3>User Intent</h3>
+                <span>用户发起任务</span>
+                <p>A user creates or continues a thread from the frontend and sends a structured request.</p>
+              </article>
+              <article class="flow-step">
+                <span class="step-index">02</span>
+                <h3>API Orchestration</h3>
+                <span>后端接管上下文</span>
+                <p>The backend persists thread context, prepares run records, and coordinates execution setup.</p>
+              </article>
+              <article class="flow-step">
+                <span class="step-index">03</span>
+                <h3>Queued Execution</h3>
+                <span>任务入队</span>
+                <p>Redis and Dramatiq hand the task to a worker so long-running jobs do not block the request cycle.</p>
+              </article>
+              <article class="flow-step">
+                <span class="step-index">04</span>
+                <h3>Agent Runtime</h3>
+                <span>Agent 实际执行</span>
+                <p>The runtime uses tools, files, shell, browser, or sandbox-backed actions while preserving intermediate state.</p>
+              </article>
+              <article class="flow-step">
+                <span class="step-index">05</span>
+                <h3>Streaming Return</h3>
+                <span>结果流式返回</span>
+                <p>Structured updates are pushed back to the UI so users can observe reasoning, tools, and outputs in real time.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="capabilities" class="section section-alt">
+          <div class="container split">
+            <div class="section-intro compact">
+              <div class="eyebrow">
+                <span>Capability Matrix</span>
+                <span class="dot"></span>
+                <span>产品能力矩阵</span>
+              </div>
+              <h2>A landing page should map the product surface, not hide it.</h2>
+              <p>
+                Hephaestus is strongest when it clearly shows what layers are available:
+                retrieval, execution, sandbox operations, and workflow-ready orchestration.
+              </p>
+              <div class="content-card note-card">
+                <h3>Design direction</h3>
+                <p>参考站点的科技叙事感与结构密度，但内容完全重写为 Hephaestus 的产品心智和系统分层。</p>
+              </div>
+            </div>
+
+            <div class="capability-grid">
+              <article class="content-card">
+                <h3>Research and Retrieval</h3>
+                <span>研究与检索</span>
+                <ul>
+                  <li>Thread-aware context</li>
+                  <li>Structured agent outputs</li>
+                  <li>Expandable knowledge-oriented flows</li>
+                </ul>
+              </article>
+              <article class="content-card">
+                <h3>Execution and Automation</h3>
+                <span>执行与自动化</span>
+                <ul>
+                  <li>Shell and file actions</li>
+                  <li>Background run orchestration</li>
+                  <li>Worker-friendly execution model</li>
+                </ul>
+              </article>
+              <article class="content-card">
+                <h3>Browser and Sandbox</h3>
+                <span>浏览器与沙箱</span>
+                <ul>
+                  <li>Sandbox-centric design</li>
+                  <li>Tool rendering for browser tasks</li>
+                  <li>Support for richer task surfaces</li>
+                </ul>
+              </article>
+              <article class="content-card">
+                <h3>Workflow-ready Foundation</h3>
+                <span>面向工作流的底座</span>
+                <ul>
+                  <li>Projects + threads + runs</li>
+                  <li>Versionable agent concepts</li>
+                  <li>Composable future integrations</li>
+                </ul>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="start" class="section">
+          <div class="container">
+            <div class="section-intro center">
+              <div class="eyebrow">
+                <span>Quick Start</span>
+                <span class="dot"></span>
+                <span>从环境初始化到可运行系统</span>
+              </div>
+              <h2>From repository clone to a running system in three short stages.</h2>
+              <p>
+                The product website should also prove that the platform is buildable, inspectable, and runnable by a technical team.
+              </p>
+            </div>
+
+            <div class="start-grid">
+              <article class="terminal-card">
+                <div class="terminal-head">
+                  <span>Prepare backend</span>
+                  <strong>初始化后端环境</strong>
+                </div>
+                <pre><code>cd backend
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt</code></pre>
+              </article>
+              <article class="terminal-card">
+                <div class="terminal-head">
+                  <span>Configure services</span>
+                  <strong>配置数据库与 Redis</strong>
+                </div>
+                <pre><code>Copy-Item .env.example .env
+python scripts/01_setup_database.py
+python scripts/02_setup_redis.py
+python scripts/03_init_hephaestus_table.py</code></pre>
+              </article>
+              <article class="terminal-card">
+                <div class="terminal-head">
+                  <span>Run the system</span>
+                  <strong>启动前后端与 Worker</strong>
+                </div>
+                <pre><code># terminal 1
+python api.py
+
+# terminal 2
+dramatiq run_agent_background
+
+# terminal 3
+cd ../frontend
+npm install
+npm run dev</code></pre>
+              </article>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <div class="container footer-grid">
+          <div class="footer-copy">
+            <div class="eyebrow">
+              <span>Open Project Surface</span>
+              <span class="dot"></span>
+              <span>把系统叙事、工程结构和执行逻辑放在同一页</span>
+            </div>
+            <h2>Build the website as if the runtime itself matters.</h2>
+            <p>
+              Hephaestus deserves a product site that explains what users see, how engineers extend it,
+              and how tasks actually move through the stack.
+            </p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="https://github.com/zcxGGmu/Hephaestus" target="_blank" rel="noreferrer">Explore the repository</a>
+              <a class="button button-secondary" href="https://github.com/zcxGGmu/Hephaestus/tree/main/docs" target="_blank" rel="noreferrer">Read the docs</a>
+            </div>
+          </div>
+
+          <div class="doc-links">
+            <a class="doc-card" href="https://github.com/zcxGGmu/Hephaestus/blob/main/docs/setup.md" target="_blank" rel="noreferrer">
+              <span>Setup Guide</span>
+              <strong>Install and boot the system</strong>
+            </a>
+            <a class="doc-card" href="https://github.com/zcxGGmu/Hephaestus/blob/main/docs/architecture.md" target="_blank" rel="noreferrer">
+              <span>Architecture Notes</span>
+              <strong>See the runtime layers</strong>
+            </a>
+            <a class="doc-card" href="https://github.com/zcxGGmu/Hephaestus/tree/main/docs/analysis" target="_blank" rel="noreferrer">
+              <span>Analysis Documents</span>
+              <strong>Read the deeper project breakdown</strong>
+            </a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
