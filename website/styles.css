@@ -56,6 +56,33 @@ a { color: inherit; text-decoration: none; }
 .nav-links { display: flex; align-items: center; gap: 28px; font-size: 14px; color: var(--muted); }
 .nav-links a:hover { color: var(--ink); }
 .nav-actions, .hero-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.lang { display: none; }
+body[data-lang="en"] .lang-en { display: inline; }
+body[data-lang="zh"] .lang-zh { display: inline; }
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.84);
+}
+.lang-button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.lang-button.is-active {
+  background: var(--slate);
+  color: white;
+}
 
 .button {
   display: inline-flex; align-items: center; justify-content: center; min-height: 44px;
@@ -239,6 +266,18 @@ a { color: inherit; text-decoration: none; }
 .deployment-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+.feature-card,
+.deployment-card {
+  position: relative;
+}
+.feature-card::after,
+.deployment-card::after {
+  content: '';
+  position: absolute;
+  inset: auto 20px 0 20px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(245,158,11,0.35), transparent);
+}
 .flow-grid { display: grid; gap: 18px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .step-index {
   display: inline-flex !important; align-items: center; justify-content: center; width: 42px; height: 42px;
@@ -293,6 +332,12 @@ a { color: inherit; text-decoration: none; }
 .faq-item[open] summary {
   border-bottom: 1px solid var(--line);
   margin-bottom: 18px;
+}
+.faq-item summary {
+  transition: background 180ms ease;
+}
+.faq-item:hover summary {
+  background: rgba(255,255,255,0.36);
 }
 
 @media (max-width: 1200px) {

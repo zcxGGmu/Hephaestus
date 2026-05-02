@@ -15,7 +15,7 @@
     <link rel="icon" href="./assets/favicon.png" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
-  <body>
+  <body data-lang="en">
     <div class="site-shell">
       <header class="topbar">
         <div class="container nav">
@@ -26,19 +26,52 @@
               <span class="brand-name">Hephaestus</span>
             </span>
           </a>
+
           <nav class="nav-links">
-            <a href="#overview">Overview</a>
-            <a href="#architecture">Architecture</a>
-            <a href="#flow">Flow</a>
-            <a href="#capabilities">Capabilities</a>
-            <a href="#use-cases">Use Cases</a>
-            <a href="#compare">Compare</a>
-            <a href="#start">Quick Start</a>
-            <a href="#faq">FAQ</a>
+            <a href="#overview">
+              <span class="lang lang-en">Overview</span>
+              <span class="lang lang-zh">概览</span>
+            </a>
+            <a href="#architecture">
+              <span class="lang lang-en">Architecture</span>
+              <span class="lang lang-zh">架构</span>
+            </a>
+            <a href="#flow">
+              <span class="lang lang-en">Flow</span>
+              <span class="lang lang-zh">流程</span>
+            </a>
+            <a href="#capabilities">
+              <span class="lang lang-en">Capabilities</span>
+              <span class="lang lang-zh">能力</span>
+            </a>
+            <a href="#use-cases">
+              <span class="lang lang-en">Use Cases</span>
+              <span class="lang lang-zh">场景</span>
+            </a>
+            <a href="#compare">
+              <span class="lang lang-en">Compare</span>
+              <span class="lang lang-zh">对比</span>
+            </a>
+            <a href="#start">
+              <span class="lang lang-en">Quick Start</span>
+              <span class="lang lang-zh">开始</span>
+            </a>
+            <a href="#faq">
+              <span class="lang lang-en">FAQ</span>
+              <span class="lang lang-zh">问答</span>
+            </a>
           </nav>
+
           <div class="nav-actions">
+            <div class="lang-toggle" aria-label="Language switcher">
+              <button class="lang-button is-active" data-set-lang="en" type="button">EN</button>
+              <button class="lang-button" data-set-lang="zh" type="button">中</button>
+            </div>
             <a class="button button-ghost" href="https://github.com/zcxGGmu/Hephaestus" target="_blank" rel="noreferrer">GitHub</a>
-            <a class="button button-primary" href="#start">Launch Story</a>
+            <a class="button button-primary" href="#start">
+              <span class="lang lang-en">Launch Story</span>
+              <span class="lang lang-zh">开始了解</span>
+            </a>
           </div>
         </div>
       </header>
@@ -48,49 +81,70 @@
           <div class="container hero-grid">
             <div class="hero-copy">
               <div class="eyebrow">
-                <span>System-level Agent Product</span>
-                <span class="dot"></span>
-                <span>面向真实执行的智能体产品层</span>
+                <span class="lang lang-en">System-level Agent Product</span>
+                <span class="lang lang-zh">面向真实执行的智能体产品层</span>
               </div>
               <h1>
-                Build a product surface
-                <span>around agent execution, not just chat output.</span>
+                <span class="lang lang-en">Build a product surface around agent execution, not just chat output.</span>
+                <span class="lang lang-zh">把 Agent 执行流做成产品界面，而不只是一个聊天输出框。</span>
               </h1>
               <p class="lead">
-                Hephaestus turns a generalist agent stack into a coherent product: threads,
-                tool calls, background workers, persistent state, and sandbox execution all
-                connected through one system narrative.
+                <span class="lang lang-en">
+                  Hephaestus turns a generalist agent stack into a coherent product: threads, tool calls, background workers,
+                  persistent state, and sandbox execution all connected through one system narrative.
+                </span>
+                <span class="lang lang-zh">
+                  Hephaestus 把通用智能体栈组织成一个完整产品：线程、工具调用、后台 Worker、持久化状态和沙箱执行被统一收进同一个系统叙事中。
+                </span>
               </p>
               <p class="support">
-                它不是“再做一个聊天页面”，而是把 Agent 的运行上下文、工具层、执行流、
-                状态落库和产品界面真正组织成一个可以部署、演化、协作的系统。
+                <span class="lang lang-en">
+                  This is not about building another AI chat homepage. It is about presenting context, execution, tools,
+                  persistence, and UX as one understandable operating surface.
+                </span>
+                <span class="lang lang-zh">
+                  这不是“再做一个 AI 聊天首页”，而是把上下文、执行、工具、状态落库和产品体验真正组合成一个可部署、可演化、可协作的操作界面。
+                </span>
               </p>
               <div class="hero-actions">
-                <a class="button button-primary" href="https://github.com/zcxGGmu/Hephaestus" target="_blank" rel="noreferrer">Open Repository</a>
-                <a class="button button-secondary" href="#architecture">See Architecture</a>
-                <a class="button button-text" href="#flow">Execution Flow</a>
+                <a class="button button-primary" href="https://github.com/zcxGGmu/Hephaestus" target="_blank" rel="noreferrer">
+                  <span class="lang lang-en">Open Repository</span>
+                  <span class="lang lang-zh">查看仓库</span>
+                </a>
+                <a class="button button-secondary" href="#architecture">
+                  <span class="lang lang-en">See Architecture</span>
+                  <span class="lang lang-zh">查看架构</span>
+                </a>
+                <a class="button button-text" href="#flow">
+                  <span class="lang lang-en">Execution Flow</span>
+                  <span class="lang lang-zh">执行流程</span>
+                </a>
               </div>
 
               <div id="overview" class="stats-grid">
                 <article class="stat-card">
                   <span class="stat-label">Full-stack product surface</span>
                   <strong>Next.js + FastAPI</strong>
-                  <p>前后端一体化产品界面与执行中枢</p>
+                  <p class="lang lang-en">A unified front and back product surface for interface and orchestration.</p>
+                  <p class="lang lang-zh">前后端一体化的产品界面与执行编排中枢。</p>
                 </article>
                 <article class="stat-card">
                   <span class="stat-label">Async execution backbone</span>
                   <strong>Redis + Dramatiq</strong>
-                  <p>面向长任务与流式反馈的异步底座</p>
+                  <p class="lang lang-en">An async backbone for long-running tasks and streamed updates.</p>
+                  <p class="lang lang-zh">面向长任务与流式反馈的异步执行底座。</p>
                 </article>
                 <article class="stat-card">
                   <span class="stat-label">Persistent thread memory</span>
                   <strong>PostgreSQL</strong>
-                  <p>用户、项目、线程、消息、运行记录统一落库</p>
+                  <p class="lang lang-en">Users, projects, threads, messages, and runs live in one durable state layer.</p>
+                  <p class="lang lang-zh">用户、项目、线程、消息和运行记录统一沉淀到持久化状态层。</p>
                 </article>
                 <article class="stat-card">
                   <span class="stat-label">Tool-centric runtime</span>
                   <strong>Sandbox-first</strong>
-                  <p>围绕工具、文件、浏览器与执行环境组织能力</p>
+                  <p class="lang lang-en">Capabilities are organized around tools, files, browser actions, and runtime environments.</p>
+                  <p class="lang lang-zh">系统能力围绕工具、文件、浏览器动作和执行环境进行组织。</p>
                 </article>
               </div>
             </div>
@@ -99,28 +153,44 @@
               <div class="panel-header">
                 <div>
                   <span class="panel-label">Runtime board</span>
-                  <h2>Research · Execute · Return</h2>
+                  <h2 class="lang lang-en">Research · Execute · Return</h2>
+                  <h2 class="lang lang-zh">研究 · 执行 · 返回</h2>
                 </div>
-                <span class="status-pill">Worker online</span>
+                <span class="status-pill">
+                  <span class="lang lang-en">Worker online</span>
+                  <span class="lang lang-zh">Worker 在线</span>
+                </span>
               </div>
               <div class="thread-card">
                 <span>Thread input</span>
-                <p>“Research a topic, open the browser, inspect files, and summarize findings in one stream.”</p>
+                <p class="lang lang-en">“Research a topic, open the browser, inspect files, and summarize findings in one stream.”</p>
+                <p class="lang lang-zh">“研究一个主题、打开浏览器、检查文件，并把结论以流式方式返回。”</p>
               </div>
               <div class="panel-grid">
                 <article class="panel-card">
                   <h3>Execution stack</h3>
                   <p>FastAPI · Redis · Worker · Sandbox</p>
                   <ul>
-                    <li>Queued background runs</li>
-                    <li>Streaming assistant and tool updates</li>
-                    <li>Persistent thread and message state</li>
+                    <li>
+                      <span class="lang lang-en">Queued background runs</span>
+                      <span class="lang lang-zh">后台排队执行的长任务</span>
+                    </li>
+                    <li>
+                      <span class="lang lang-en">Streaming assistant and tool updates</span>
+                      <span class="lang lang-zh">助手响应与工具状态的流式更新</span>
+                    </li>
+                    <li>
+                      <span class="lang lang-en">Persistent thread and message state</span>
+                      <span class="lang lang-zh">可追踪的线程与消息状态持久化</span>
+                    </li>
                   </ul>
                 </article>
                 <article class="preview-card">
                   <div class="preview-copy">
-                    <h3>Product surface preview</h3>
-                    <p>把 Agent 工具执行结果真正呈现在产品界面里，而不是只落到日志里。</p>
+                    <h3 class="lang lang-en">Product surface preview</h3>
+                    <h3 class="lang lang-zh">产品界面预览</h3>
+                    <p class="lang lang-en">Tool execution results belong in the product interface, not buried in hidden logs.</p>
+                    <p class="lang lang-zh">工具执行结果应该直接进入产品界面，而不是埋在看不见的日志里。</p>
                   </div>
                   <img src="./assets/mac.png" alt="Hephaestus product preview" />
                 </article>
@@ -133,37 +203,48 @@
           <div class="container">
             <div class="section-intro">
               <div class="eyebrow">
-                <span>Why Hephaestus</span>
-                <span class="dot"></span>
-                <span>为什么它更像产品而不是演示页</span>
+                <span class="lang lang-en">Why Hephaestus</span>
+                <span class="lang lang-zh">为什么它更像产品而不是演示页</span>
               </div>
-              <h2>A product website for an agent system should explain execution, not just promise intelligence.</h2>
-              <p>
-                The landing page is structured to feel like a system narrative. It shows what the platform is,
-                how it runs, where state lives, and how a user request becomes a sequence of observable actions.
+              <h2 class="lang lang-en">A product website for an agent system should explain execution, not just promise intelligence.</h2>
+              <h2 class="lang lang-zh">面向智能体系统的产品官网，应该解释执行机制，而不只是强调“它很聪明”。</h2>
+              <p class="lang lang-en">
+                The landing page is structured to feel like a system narrative. It shows what the platform is, how it runs,
+                where state lives, and how a user request becomes a sequence of observable actions.
+              </p>
+              <p class="lang lang-zh">
+                这个落地页按“系统叙事”来组织内容：平台是什么、如何运行、状态落在哪里，以及用户请求如何变成一连串可观察的执行步骤。
               </p>
             </div>
 
             <div class="pillar-grid">
               <article class="content-card">
                 <h3>Generalist Agent Core</h3>
-                <span>通用智能体中枢</span>
-                <p>Hephaestus is an action-oriented agent system, not just a chat shell. Models, tools, threads, and runtime state are coordinated as one product surface.</p>
+                <span class="lang lang-en">A generalist execution core</span>
+                <span class="lang lang-zh">通用智能体执行中枢</span>
+                <p class="lang lang-en">Hephaestus is an action-oriented agent system, not just a chat shell. Models, tools, threads, and runtime state are coordinated as one product surface.</p>
+                <p class="lang lang-zh">Hephaestus 是一个以行动为导向的智能体系统，而不是单纯的聊天壳。模型、工具、线程和运行时状态被统一组织成产品表面。</p>
               </article>
               <article class="content-card">
                 <h3>Long-running Task Flow</h3>
-                <span>长任务流与后台执行</span>
-                <p>Tasks can be queued, streamed, resumed, and observed through a worker-driven execution flow suitable for real-world automation.</p>
+                <span class="lang lang-en">Long-running async execution</span>
+                <span class="lang lang-zh">长任务与后台执行流</span>
+                <p class="lang lang-en">Tasks can be queued, streamed, resumed, and observed through a worker-driven execution flow suitable for real-world automation.</p>
+                <p class="lang lang-zh">任务可以排队、流式返回、恢复执行并被持续观察，更适合真实世界自动化而不是一次性回答。</p>
               </article>
               <article class="content-card">
                 <h3>Composable Tool Layer</h3>
-                <span>可组合工具层</span>
-                <p>File operations, browser actions, shell execution, and future integrations can be rendered as structured tool surfaces instead of opaque outputs.</p>
+                <span class="lang lang-en">Structured tool surfaces</span>
+                <span class="lang lang-zh">可组合的工具层</span>
+                <p class="lang lang-en">File operations, browser actions, shell execution, and future integrations are rendered as structured tool surfaces instead of opaque outputs.</p>
+                <p class="lang lang-zh">文件操作、浏览器动作、Shell 执行和未来集成能力，都以结构化工具界面呈现，而不是模糊输出。</p>
               </article>
               <article class="content-card">
                 <h3>Ownable Deployment Model</h3>
-                <span>可自主管理的部署形态</span>
-                <p>The platform is intentionally shaped for local or private deployment, giving teams ownership over credentials, data, workflows, and behavior.</p>
+                <span class="lang lang-en">Deployment you can control</span>
+                <span class="lang lang-zh">可控的部署形态</span>
+                <p class="lang lang-en">The platform is intentionally shaped for local or private deployment, giving teams ownership over credentials, data, workflows, and behavior.</p>
+                <p class="lang lang-zh">平台天然适合本地或私有部署，让团队真正掌控凭证、数据、工作流与智能体行为。</p>
               </article>
             </div>
           </div>
@@ -173,60 +254,67 @@
           <div class="container">
             <div class="section-intro">
               <div class="eyebrow">
-                <span>Architecture Surface</span>
-                <span class="dot"></span>
-                <span>系统分层与协作边界</span>
+                <span class="lang lang-en">Architecture Surface</span>
+                <span class="lang lang-zh">系统分层与协作边界</span>
               </div>
-              <h2>From UI to execution to state, every layer has a visible role.</h2>
-              <p>
+              <h2 class="lang lang-en">From UI to execution to state, every layer has a visible role.</h2>
+              <h2 class="lang lang-zh">从界面到执行再到状态层，每一层都应该有可见的职责。</h2>
+              <p class="lang lang-en">
                 Instead of hiding the stack behind vague AI language, the site shows the product as a concrete layered system:
                 interface, application logic, execution orchestration, and durable state.
+              </p>
+              <p class="lang lang-zh">
+                我们不想用抽象 AI 语言掩盖技术栈，而是把产品清晰地呈现成一个分层系统：界面层、应用逻辑层、执行编排层和持久状态层。
               </p>
             </div>
 
             <div class="architecture-grid">
               <article class="content-card">
-                <span>交互层</span>
-                <h3>Interface Layer</h3>
+                <span class="lang lang-en">Interface layer</span>
+                <span class="lang lang-zh">交互层</span>
+                <h3>UI & Product Surface</h3>
                 <ul>
-                  <li>Landing site</li>
-                  <li>Project dashboard</li>
-                  <li>Thread view</li>
-                  <li>Tool panels</li>
-                  <li>Auth and onboarding</li>
+                  <li><span class="lang lang-en">Landing site</span><span class="lang lang-zh">产品官网</span></li>
+                  <li><span class="lang lang-en">Project dashboard</span><span class="lang lang-zh">项目控制台</span></li>
+                  <li><span class="lang lang-en">Thread view</span><span class="lang lang-zh">线程视图</span></li>
+                  <li><span class="lang lang-en">Tool panels</span><span class="lang lang-zh">工具面板</span></li>
+                  <li><span class="lang lang-en">Auth and onboarding</span><span class="lang lang-zh">认证与引导</span></li>
                 </ul>
               </article>
               <article class="content-card">
-                <span>应用层</span>
-                <h3>Application Layer</h3>
+                <span class="lang lang-en">Application layer</span>
+                <span class="lang lang-zh">应用层</span>
+                <h3>API & Service Logic</h3>
                 <ul>
-                  <li>FastAPI routes</li>
-                  <li>Auth service</li>
-                  <li>Agent API</li>
-                  <li>Sandbox API</li>
-                  <li>Thread and project management</li>
+                  <li><span class="lang lang-en">FastAPI routes</span><span class="lang lang-zh">FastAPI 路由</span></li>
+                  <li><span class="lang lang-en">Auth service</span><span class="lang lang-zh">认证服务</span></li>
+                  <li><span class="lang lang-en">Agent API</span><span class="lang lang-zh">Agent API</span></li>
+                  <li><span class="lang lang-en">Sandbox API</span><span class="lang lang-zh">沙箱 API</span></li>
+                  <li><span class="lang lang-en">Thread and project management</span><span class="lang lang-zh">线程与项目管理</span></li>
                 </ul>
               </article>
               <article class="content-card">
-                <span>执行层</span>
-                <h3>Execution Layer</h3>
+                <span class="lang lang-en">Execution layer</span>
+                <span class="lang lang-zh">执行层</span>
+                <h3>Queue, Worker, Runtime</h3>
                 <ul>
-                  <li>Redis coordination</li>
-                  <li>Dramatiq worker</li>
-                  <li>Agent runtime</li>
-                  <li>Tool dispatch</li>
-                  <li>Streaming responses</li>
+                  <li><span class="lang lang-en">Redis coordination</span><span class="lang lang-zh">Redis 协调</span></li>
+                  <li><span class="lang lang-en">Dramatiq worker</span><span class="lang lang-zh">Dramatiq Worker</span></li>
+                  <li><span class="lang lang-en">Agent runtime</span><span class="lang lang-zh">Agent Runtime</span></li>
+                  <li><span class="lang lang-en">Tool dispatch</span><span class="lang lang-zh">工具调度</span></li>
+                  <li><span class="lang lang-en">Streaming responses</span><span class="lang lang-zh">流式响应</span></li>
                 </ul>
               </article>
               <article class="content-card">
-                <span>状态层</span>
-                <h3>State Layer</h3>
+                <span class="lang lang-en">State layer</span>
+                <span class="lang lang-zh">状态层</span>
+                <h3>Persistence & Memory</h3>
                 <ul>
-                  <li>PostgreSQL</li>
-                  <li>Agent runs</li>
-                  <li>Messages</li>
-                  <li>Sessions</li>
-                  <li>Workflow metadata</li>
+                  <li><span class="lang lang-en">PostgreSQL</span><span class="lang lang-zh">PostgreSQL</span></li>
+                  <li><span class="lang lang-en">Agent runs</span><span class="lang lang-zh">运行记录</span></li>
+                  <li><span class="lang lang-en">Messages</span><span class="lang lang-zh">消息状态</span></li>
+                  <li><span class="lang lang-en">Sessions</span><span class="lang lang-zh">会话</span></li>
+                  <li><span class="lang lang-en">Workflow metadata</span><span class="lang lang-zh">工作流元数据</span></li>
                 </ul>
               </article>
             </div>
@@ -237,14 +325,17 @@
           <div class="container">
             <div class="section-intro">
               <div class="eyebrow">
-                <span>Execution Flow</span>
-                <span class="dot"></span>
-                <span>用户意图到工具执行的完整路径</span>
+                <span class="lang lang-en">Execution Flow</span>
+                <span class="lang lang-zh">从用户意图到工具执行的完整路径</span>
               </div>
-              <h2>Hephaestus is built around observable execution.</h2>
-              <p>
+              <h2 class="lang lang-en">Hephaestus is built around observable execution.</h2>
+              <h2 class="lang lang-zh">Hephaestus 的核心不是“回答”，而是可观察的执行。</h2>
+              <p class="lang lang-en">
                 What matters is not only that an agent can act, but that the system makes the process understandable:
                 queued runs, tool use, streaming updates, and persisted thread state.
+              </p>
+              <p class="lang lang-zh">
+                关键不只是 Agent 能不能行动，而是系统是否让整个过程清晰可见：任务排队、工具调用、流式更新、线程状态和持久化结果都应该被用户理解。
               </p>
             </div>
 
@@ -252,32 +343,42 @@
               <article class="flow-step">
                 <span class="step-index">01</span>
                 <h3>User Intent</h3>
-                <span>用户发起任务</span>
-                <p>A user creates or continues a thread from the frontend and sends a structured request.</p>
+                <span class="lang lang-en">User starts a task</span>
+                <span class="lang lang-zh">用户发起任务</span>
+                <p class="lang lang-en">A user creates or continues a thread from the frontend and sends a structured request.</p>
+                <p class="lang lang-zh">用户在前端创建或继续一个线程，并提交结构化任务请求。</p>
               </article>
               <article class="flow-step">
                 <span class="step-index">02</span>
                 <h3>API Orchestration</h3>
-                <span>后端接管上下文</span>
-                <p>The backend persists thread context, prepares run records, and coordinates execution setup.</p>
+                <span class="lang lang-en">Backend prepares context</span>
+                <span class="lang lang-zh">后端接管上下文</span>
+                <p class="lang lang-en">The backend persists thread context, prepares run records, and coordinates execution setup.</p>
+                <p class="lang lang-zh">后端持久化线程上下文，创建运行记录，并协调后续执行准备工作。</p>
               </article>
               <article class="flow-step">
                 <span class="step-index">03</span>
                 <h3>Queued Execution</h3>
-                <span>任务入队</span>
-                <p>Redis and Dramatiq hand the task to a worker so long-running jobs do not block the request cycle.</p>
+                <span class="lang lang-en">Task enters the queue</span>
+                <span class="lang lang-zh">任务进入队列</span>
+                <p class="lang lang-en">Redis and Dramatiq hand the task to a worker so long-running jobs do not block the request cycle.</p>
+                <p class="lang lang-zh">Redis 与 Dramatiq 把任务移交给 Worker，避免长任务阻塞请求流程。</p>
               </article>
               <article class="flow-step">
                 <span class="step-index">04</span>
                 <h3>Agent Runtime</h3>
-                <span>Agent 实际执行</span>
-                <p>The runtime uses tools, files, shell, browser, or sandbox-backed actions while preserving intermediate state.</p>
+                <span class="lang lang-en">Agent executes with tools</span>
+                <span class="lang lang-zh">Agent 实际执行</span>
+                <p class="lang lang-en">The runtime uses tools, files, shell, browser, or sandbox-backed actions while preserving intermediate state.</p>
+                <p class="lang lang-zh">运行时开始调用工具、文件、Shell、浏览器或沙箱能力，同时保留中间状态。</p>
               </article>
               <article class="flow-step">
                 <span class="step-index">05</span>
                 <h3>Streaming Return</h3>
-                <span>结果流式返回</span>
-                <p>Structured updates are pushed back to the UI so users can observe reasoning, tools, and outputs in real time.</p>
+                <span class="lang lang-en">Results stream back</span>
+                <span class="lang lang-zh">结果流式返回</span>
+                <p class="lang lang-en">Structured updates are pushed back to the UI so users can observe reasoning, tools, and outputs in real time.</p>
+                <p class="lang lang-zh">结构化更新被持续推回 UI，用户可以实时观察推理、工具和最终输出。</p>
               </article>
             </div>
           </div>
@@ -287,56 +388,65 @@
           <div class="container split">
             <div class="section-intro compact">
               <div class="eyebrow">
-                <span>Capability Matrix</span>
-                <span class="dot"></span>
-                <span>产品能力矩阵</span>
+                <span class="lang lang-en">Capability Matrix</span>
+                <span class="lang lang-zh">产品能力矩阵</span>
               </div>
-              <h2>A landing page should map the product surface, not hide it.</h2>
-              <p>
+              <h2 class="lang lang-en">A landing page should map the product surface, not hide it.</h2>
+              <h2 class="lang lang-zh">官网应该把产品边界讲出来，而不是把系统藏起来。</h2>
+              <p class="lang lang-en">
                 Hephaestus is strongest when it clearly shows what layers are available:
                 retrieval, execution, sandbox operations, and workflow-ready orchestration.
               </p>
+              <p class="lang lang-zh">
+                这个平台最有说服力的时候，是它能清楚展示自己具备哪些层：研究检索、执行自动化、沙箱能力和面向工作流的编排基础。
+              </p>
               <div class="content-card note-card">
-                <h3>Design direction</h3>
-                <p>参考站点的科技叙事感与结构密度，但内容完全重写为 Hephaestus 的产品心智和系统分层。</p>
+                <h3 class="lang lang-en">Design direction</h3>
+                <h3 class="lang lang-zh">设计方向</h3>
+                <p class="lang lang-en">The visual rhythm references a tech-heavy narrative site, but the messaging is fully rewritten around Hephaestus as a product system.</p>
+                <p class="lang lang-zh">视觉节奏参考科技叙事型官网，但内容完全围绕 Hephaestus 作为“产品系统”来重新组织。</p>
               </div>
             </div>
 
             <div class="capability-grid">
               <article class="content-card">
                 <h3>Research and Retrieval</h3>
-                <span>研究与检索</span>
+                <span class="lang lang-en">Research flows</span>
+                <span class="lang lang-zh">研究与检索</span>
                 <ul>
-                  <li>Thread-aware context</li>
-                  <li>Structured agent outputs</li>
-                  <li>Expandable knowledge-oriented flows</li>
+                  <li><span class="lang lang-en">Thread-aware context</span><span class="lang lang-zh">线程级上下文</span></li>
+                  <li><span class="lang lang-en">Structured agent outputs</span><span class="lang lang-zh">结构化 Agent 输出</span></li>
+                  <li><span class="lang lang-en">Expandable knowledge-oriented flows</span><span class="lang lang-zh">可扩展的知识型流程</span></li>
                 </ul>
               </article>
               <article class="content-card">
                 <h3>Execution and Automation</h3>
-                <span>执行与自动化</span>
+                <span class="lang lang-en">Task execution</span>
+                <span class="lang lang-zh">执行与自动化</span>
                 <ul>
-                  <li>Shell and file actions</li>
-                  <li>Background run orchestration</li>
-                  <li>Worker-friendly execution model</li>
+                  <li><span class="lang lang-en">Shell and file actions</span><span class="lang lang-zh">Shell 与文件操作</span></li>
+                  <li><span class="lang lang-en">Background run orchestration</span><span class="lang lang-zh">后台运行编排</span></li>
+                  <li><span class="lang lang-en">Worker-friendly execution model</span><span class="lang lang-zh">适合 Worker 的执行模型</span></li>
                 </ul>
               </article>
               <article class="content-card">
                 <h3>Browser and Sandbox</h3>
-                <span>浏览器与沙箱</span>
+                <span class="lang lang-en">Sandboxed tools</span>
+                <span class="lang lang-zh">浏览器与沙箱</span>
                 <ul>
-                  <li>Sandbox-centric design</li>
-                  <li>Tool rendering for browser tasks</li>
-                  <li>Support for richer task surfaces</li>
+                  <li><span class="lang lang-en">Sandbox-centric design</span><span class="lang lang-zh">以沙箱为中心的设计</span></li>
+                  <li><span class="lang lang-en">Tool rendering for browser tasks</span><span class="lang lang-zh">面向浏览器任务的工具展示</span></li>
+                  <li><span class="lang lang-en">Support for richer task surfaces</span><span class="lang lang-zh">更丰富的任务表面</span></li>
                 </ul>
               </article>
               <article class="content-card">
                 <h3>Workflow-ready Foundation</h3>
-                <span>面向工作流的底座</span>
+                <span class="lang lang-en">Workflow base</span>
+                <span class="lang lang-zh">工作流底座</span>
                 <ul>
-                  <li>Projects + threads + runs</li>
-                  <li>Versionable agent concepts</li>
-                  <li>Composable future integrations</li>
+                  <li><span class="lang lang-en">Projects + threads + runs</span><span class="lang lang-zh">项目 + 线程 + 运行</span></li>
+                  <li><span class="lang lang-en">Versionable agent concepts</span><span class="lang lang-zh">可版本化的 Agent 概念</span></li>
+                  <li><span class="lang lang-en">Composable future integrations</span><span class="lang lang-zh">可组合的未来集成能力</span></li>
                 </ul>
               </article>
             </div>
@@ -347,37 +457,48 @@
           <div class="container">
             <div class="section-intro">
               <div class="eyebrow">
-                <span>Use Cases</span>
-                <span class="dot"></span>
-                <span>从演示能力走向真实工作场景</span>
+                <span class="lang lang-en">Use Cases</span>
+                <span class="lang lang-zh">从演示能力走向真实工作场景</span>
               </div>
-              <h2>Designed for teams that want a system, not just a prompt box.</h2>
-              <p>
+              <h2 class="lang lang-en">Designed for teams that want a system, not just a prompt box.</h2>
+              <h2 class="lang lang-zh">它适合的是需要“系统”的团队，而不是只要一个提示框的团队。</h2>
+              <p class="lang lang-en">
                 The product story becomes much clearer when we tie the platform to concrete usage patterns:
                 research threads, execution-heavy tasks, browser-backed inspection, and long-running internal workflows.
+              </p>
+              <p class="lang lang-zh">
+                当我们把平台和具体场景绑定时，产品叙事会更清晰：研究线程、执行密集型任务、浏览器辅助检查，以及长生命周期的内部工作流。
               </p>
             </div>
 
             <div class="use-case-grid">
               <article class="feature-card">
                 <h3>Research Operations</h3>
-                <span>研究型工作流</span>
-                <p>Capture a question, fan out into browsing and document inspection, and stream structured results back into a persistent thread.</p>
+                <span class="lang lang-en">Research workflow</span>
+                <span class="lang lang-zh">研究型工作流</span>
+                <p class="lang lang-en">Capture a question, fan out into browsing and document inspection, and stream structured results back into a persistent thread.</p>
+                <p class="lang lang-zh">从一个问题出发，分发到浏览、文档检查与整理，最后把结构化结果流式写回一个可追踪线程。</p>
               </article>
               <article class="feature-card">
                 <h3>Product Copilot Surface</h3>
-                <span>产品内部副驾驶</span>
-                <p>Use projects, threads, and tool panels as a product interface for PM, ops, and engineering collaboration around the same task context.</p>
+                <span class="lang lang-en">Internal product copilot</span>
+                <span class="lang lang-zh">产品内部副驾驶</span>
+                <p class="lang lang-en">Use projects, threads, and tool panels as a product interface for PM, ops, and engineering collaboration around the same task context.</p>
+                <p class="lang lang-zh">把项目、线程和工具面板做成 PM、运营和工程团队共享任务上下文的统一界面。</p>
               </article>
               <article class="feature-card">
                 <h3>Sandboxed Execution</h3>
-                <span>受控执行环境</span>
-                <p>Route code, files, shell operations, and browser actions through a sandbox-oriented runtime instead of letting execution disappear into hidden services.</p>
+                <span class="lang lang-en">Controlled runtime</span>
+                <span class="lang lang-zh">受控执行环境</span>
+                <p class="lang lang-en">Route code, files, shell operations, and browser actions through a sandbox-oriented runtime instead of letting execution disappear into hidden services.</p>
+                <p class="lang lang-zh">让代码、文件、Shell 和浏览器动作都进入可控沙箱运行时，而不是消失在不可见服务后面。</p>
               </article>
               <article class="feature-card">
                 <h3>Workflow Foundation</h3>
-                <span>工作流底座</span>
-                <p>Model agent runs as persistent state that can later grow into richer workflow systems, triggers, scheduled execution, and multi-step orchestration.</p>
+                <span class="lang lang-en">Workflow base</span>
+                <span class="lang lang-zh">工作流底座</span>
+                <p class="lang lang-en">Model agent runs as persistent state that can later grow into richer workflow systems, triggers, scheduled execution, and multi-step orchestration.</p>
+                <p class="lang lang-zh">把 Agent 运行过程建模成可持久化状态，为后续的触发器、调度和多步骤编排预留成长空间。</p>
               </article>
             </div>
           </div>
@@ -387,36 +508,41 @@
           <div class="container">
             <div class="section-intro">
               <div class="eyebrow">
-                <span>Product Positioning</span>
-                <span class="dot"></span>
-                <span>和普通聊天式产品的差异</span>
+                <span class="lang lang-en">Product Positioning</span>
+                <span class="lang lang-zh">和普通聊天式产品的差异</span>
               </div>
-              <h2>Hephaestus is closer to an execution platform than a chatbot shell.</h2>
-              <p>
+              <h2 class="lang lang-en">Hephaestus is closer to an execution platform than a chatbot shell.</h2>
+              <h2 class="lang lang-zh">Hephaestus 更接近执行平台，而不是聊天壳。</h2>
+              <p class="lang lang-en">
                 The website should help visitors immediately understand what makes the system different:
                 it is not only about model response quality, but about product structure, execution flow, and tool visibility.
+              </p>
+              <p class="lang lang-zh">
+                官网应该让访客立刻理解它的不同：重点不只是模型回答得如何，而是产品结构、执行流和工具可见性。
               </p>
             </div>
 
             <div class="compare-grid">
               <article class="compare-card compare-card-muted">
                 <div class="compare-label">Chat-first tools</div>
-                <h3>Prompt in, answer out.</h3>
+                <h3 class="lang lang-en">Prompt in, answer out.</h3>
+                <h3 class="lang lang-zh">输入提示，输出答案。</h3>
                 <ul>
-                  <li>Conversation is the whole surface</li>
-                  <li>Execution is hidden or abstracted away</li>
-                  <li>Tool usage often collapses into plain text</li>
-                  <li>State is shallow or short-lived</li>
+                  <li><span class="lang lang-en">Conversation is the whole surface</span><span class="lang lang-zh">对话就是全部界面</span></li>
+                  <li><span class="lang lang-en">Execution is hidden or abstracted away</span><span class="lang lang-zh">执行过程被隐藏或抽象化</span></li>
+                  <li><span class="lang lang-en">Tool usage often collapses into plain text</span><span class="lang lang-zh">工具调用经常被压扁成纯文本</span></li>
+                  <li><span class="lang lang-en">State is shallow or short-lived</span><span class="lang lang-zh">状态很浅或生命周期很短</span></li>
                 </ul>
               </article>
               <article class="compare-card compare-card-accent">
                 <div class="compare-label">Hephaestus</div>
-                <h3>Intent in, systemized execution out.</h3>
+                <h3 class="lang lang-en">Intent in, systemized execution out.</h3>
+                <h3 class="lang lang-zh">输入意图，输出系统化执行。</h3>
                 <ul>
-                  <li>Projects, threads, tools, runs, and state all have product surfaces</li>
-                  <li>Async execution is a first-class design constraint</li>
-                  <li>Tool output is rendered as structured UI, not only text</li>
-                  <li>Persistent backend state makes tasks resumable and inspectable</li>
+                  <li><span class="lang lang-en">Projects, threads, tools, runs, and state all have product surfaces</span><span class="lang lang-zh">项目、线程、工具、运行和状态都有自己的产品表面</span></li>
+                  <li><span class="lang lang-en">Async execution is a first-class design constraint</span><span class="lang lang-zh">异步执行是第一等设计约束</span></li>
+                  <li><span class="lang lang-en">Tool output is rendered as structured UI, not only text</span><span class="lang lang-zh">工具输出是结构化 UI，而不是文本堆叠</span></li>
+                  <li><span class="lang lang-en">Persistent backend state makes tasks resumable and inspectable</span><span class="lang lang-zh">后端持久化状态使任务可恢复、可追踪、可检查</span></li>
                 </ul>
               </article>
             </div>
@@ -424,31 +550,37 @@
             <div class="deployment-grid">
               <article class="deployment-card">
                 <h3>Local-first</h3>
-                <p>For teams that want to run the stack under their own control and keep credentials, workflows, and execution surfaces closer to the edge.</p>
+                <p class="lang lang-en">For teams that want to run the stack under their own control and keep credentials, workflows, and execution surfaces closer to the edge.</p>
+                <p class="lang lang-zh">适合希望在自己控制范围内运行整套系统，并把凭证、工作流和执行界面握在手里的团队。</p>
               </article>
               <article class="deployment-card">
                 <h3>Private deployment</h3>
-                <p>Suitable for internal environments where product teams need stronger ownership over data flow, runtime coordination, and system boundaries.</p>
+                <p class="lang lang-en">Suitable for internal environments where product teams need stronger ownership over data flow, runtime coordination, and system boundaries.</p>
+                <p class="lang lang-zh">适合内部环境，需要更强的数据流、运行协调和系统边界掌控能力的团队。</p>
               </article>
               <article class="deployment-card">
                 <h3>Public product surface</h3>
-                <p>The landing website can stay static and fast, while the product application evolves separately as a richer operational interface.</p>
+                <p class="lang lang-en">The landing website can stay static and fast, while the product application evolves separately as a richer operational interface.</p>
+                <p class="lang lang-zh">官网可以保持轻量静态发布，而产品应用则独立演化为更丰富的操作界面。</p>
               </article>
             </div>
           </div>
         </section>
 
-        <section id="start" class="section">
+        <section id="start" class="section" data-reveal>
           <div class="container">
             <div class="section-intro center">
               <div class="eyebrow">
-                <span>Quick Start</span>
-                <span class="dot"></span>
-                <span>从环境初始化到可运行系统</span>
+                <span class="lang lang-en">Quick Start</span>
+                <span class="lang lang-zh">从环境初始化到可运行系统</span>
               </div>
-              <h2>From repository clone to a running system in three short stages.</h2>
-              <p>
+              <h2 class="lang lang-en">From repository clone to a running system in three short stages.</h2>
+              <h2 class="lang lang-zh">从拉取仓库到跑起系统，只需要三步。</h2>
+              <p class="lang lang-en">
                 The product website should also prove that the platform is buildable, inspectable, and runnable by a technical team.
+              </p>
+              <p class="lang lang-zh">
+                官网不只讲愿景，也要证明这个系统是可构建、可检查、可由技术团队实际跑起来的。
               </p>
             </div>
 
@@ -456,7 +588,8 @@
               <article class="terminal-card">
                 <div class="terminal-head">
                   <span>Prepare backend</span>
-                  <strong>初始化后端环境</strong>
+                  <strong class="lang lang-en">Initialize backend environment</strong>
+                  <strong class="lang lang-zh">初始化后端环境</strong>
                 </div>
                 <pre><code>cd backend
 python -m venv .venv
@@ -466,7 +599,8 @@ pip install -r requirements.txt</code></pre>
               <article class="terminal-card">
                 <div class="terminal-head">
                   <span>Configure services</span>
-                  <strong>配置数据库与 Redis</strong>
+                  <strong class="lang lang-en">Configure database and Redis</strong>
+                  <strong class="lang lang-zh">配置数据库与 Redis</strong>
                 </div>
                 <pre><code>Copy-Item .env.example .env
 python scripts/01_setup_database.py
@@ -476,7 +610,8 @@ python scripts/03_init_hephaestus_table.py</code></pre>
               <article class="terminal-card">
                 <div class="terminal-head">
                   <span>Run the system</span>
-                  <strong>启动前后端与 Worker</strong>
+                  <strong class="lang lang-en">Start app and worker</strong>
+                  <strong class="lang lang-zh">启动前后端与 Worker</strong>
                 </div>
                 <pre><code># terminal 1
 python api.py
@@ -501,29 +636,49 @@ npm run dev</code></pre>
                 <span class="dot"></span>
                 <span>把最常见的问题提前讲清楚</span>
               </div>
-              <h2>Questions a technical team will ask before adopting the platform.</h2>
-              <p>
+              <h2 class="lang lang-en">Questions a technical team will ask before adopting the platform.</h2>
+              <h2 class="lang lang-zh">这些是技术团队在真正采用前最常问的问题。</h2>
+              <p class="lang lang-en">
                 A stronger product website should answer architecture and deployment questions directly,
                 especially when the system sits between product UX and agent infrastructure.
+              </p>
+              <p class="lang lang-zh">
+                一个更成熟的产品官网，应该直接回答架构和部署问题，尤其是当系统同时横跨产品体验和智能体基础设施时。
               </p>
             </div>
 
             <div class="faq-list">
               <details class="faq-item" open>
-                <summary>Why separate the product app from the website?</summary>
-                <p>The product app and the marketing site serve different goals. The app is an authenticated operational surface, while the website is a public narrative and entry point.</p>
+                <summary>
+                  <span class="lang lang-en">Why separate the product app from the website?</span>
+                  <span class="lang lang-zh">为什么要把产品应用和官网拆开？</span>
+                </summary>
+                <p class="lang lang-en">The product app and the website serve different goals. The app is an authenticated operational surface, while the website is a public narrative and entry point.</p>
+                <p class="lang lang-zh">产品应用和官网承担的是不同目标。前者是登录后的真实操作界面，后者是对外叙事和入口页面。</p>
               </details>
               <details class="faq-item">
-                <summary>Is Hephaestus only a chat interface?</summary>
-                <p>No. The system is structured around threads, tool execution, background workers, persistence, and sandbox-backed actions. Chat is only one interaction layer.</p>
+                <summary>
+                  <span class="lang lang-en">Is Hephaestus only a chat interface?</span>
+                  <span class="lang lang-zh">Hephaestus 只是一个聊天界面吗？</span>
+                </summary>
+                <p class="lang lang-en">No. The system is structured around threads, tool execution, background workers, persistence, and sandbox-backed actions. Chat is only one layer.</p>
+                <p class="lang lang-zh">不是。系统围绕线程、工具执行、后台 Worker、持久化和沙箱动作组织起来，对话只是其中一个交互层。</p>
               </details>
               <details class="faq-item">
-                <summary>Why emphasize Redis, workers, and persistence on the website?</summary>
-                <p>Because those layers determine whether the product can handle real tasks. The website should make those execution guarantees legible instead of hiding them behind generic AI messaging.</p>
+                <summary>
+                  <span class="lang lang-en">Why emphasize Redis, workers, and persistence on the website?</span>
+                  <span class="lang lang-zh">为什么官网要强调 Redis、Worker 和持久化？</span>
+                </summary>
+                <p class="lang lang-en">Because those layers determine whether the platform can handle real tasks. The website should make those execution guarantees legible.</p>
+                <p class="lang lang-zh">因为这些层决定了平台是否真的能承载真实任务。官网应该把这些执行保证讲清楚，而不是只说“它很智能”。</p>
               </details>
               <details class="faq-item">
-                <summary>Can this site be deployed independently of the product app?</summary>
-                <p>Yes. The `website/` directory is static and can be deployed to GitHub Pages or any static host, while the product application continues to live in `frontend/`.</p>
+                <summary>
+                  <span class="lang lang-en">Can this site be deployed independently of the product app?</span>
+                  <span class="lang lang-zh">这个官网可以和产品应用独立部署吗？</span>
+                </summary>
+                <p class="lang lang-en">Yes. The `website/` directory is static and deploys well on GitHub Pages or any static host, while the product app remains in `frontend/`.</p>
+                <p class="lang lang-zh">可以。`website/` 是纯静态目录，适合 GitHub Pages 或任意静态托管平台，而真实产品应用继续保留在 `frontend/`。</p>
               </details>
             </div>
           </div>
@@ -534,33 +689,48 @@ npm run dev</code></pre>
         <div class="container footer-grid">
           <div class="footer-copy">
             <div class="eyebrow">
-              <span>Open Project Surface</span>
-              <span class="dot"></span>
-              <span>把系统叙事、工程结构和执行逻辑放在同一页</span>
+              <span class="lang lang-en">Open Project Surface</span>
+              <span class="lang lang-zh">把系统叙事、工程结构和执行逻辑放在同一页</span>
             </div>
-            <h2>Build the website as if the runtime itself matters.</h2>
-            <p>
+            <h2 class="lang lang-en">Build the website as if the runtime itself matters.</h2>
+            <h2 class="lang lang-zh">把官网做成一个真正解释运行时的产品页面。</h2>
+            <p class="lang lang-en">
               Hephaestus deserves a product site that explains what users see, how engineers extend it,
               and how tasks actually move through the stack.
             </p>
+            <p class="lang lang-zh">
+              Hephaestus 值得拥有一个真正解释“用户看到什么、工程师如何扩展、任务如何穿过整条栈”的官网。
+            </p>
             <div class="hero-actions">
-              <a class="button button-primary" href="https://github.com/zcxGGmu/Hephaestus" target="_blank" rel="noreferrer">Explore the repository</a>
-              <a class="button button-secondary" href="https://github.com/zcxGGmu/Hephaestus/tree/main/docs" target="_blank" rel="noreferrer">Read the docs</a>
+              <a class="button button-primary" href="https://github.com/zcxGGmu/Hephaestus" target="_blank" rel="noreferrer">
+                <span class="lang lang-en">Explore the repository</span>
+                <span class="lang lang-zh">查看仓库</span>
+              </a>
+              <a class="button button-secondary" href="https://github.com/zcxGGmu/Hephaestus/tree/main/docs" target="_blank" rel="noreferrer">
+                <span class="lang lang-en">Read the docs</span>
+                <span class="lang lang-zh">阅读文档</span>
+              </a>
             </div>
           </div>
 
           <div class="doc-links">
             <a class="doc-card" href="https://github.com/zcxGGmu/Hephaestus/blob/main/docs/setup.md" target="_blank" rel="noreferrer">
-              <span>Setup Guide</span>
-              <strong>Install and boot the system</strong>
+              <span class="lang lang-en">Setup Guide</span>
+              <span class="lang lang-zh">安装说明</span>
+              <strong class="lang lang-en">Install and boot the system</strong>
+              <strong class="lang lang-zh">从环境准备到系统启动</strong>
             </a>
             <a class="doc-card" href="https://github.com/zcxGGmu/Hephaestus/blob/main/docs/architecture.md" target="_blank" rel="noreferrer">
-              <span>Architecture Notes</span>
-              <strong>See the runtime layers</strong>
+              <span class="lang lang-en">Architecture Notes</span>
+              <span class="lang lang-zh">架构说明</span>
+              <strong class="lang lang-en">See the runtime layers</strong>
+              <strong class="lang lang-zh">查看系统分层与执行结构</strong>
             </a>
             <a class="doc-card" href="https://github.com/zcxGGmu/Hephaestus/tree/main/docs/analysis" target="_blank" rel="noreferrer">
-              <span>Analysis Documents</span>
-              <strong>Read the deeper project breakdown</strong>
+              <span class="lang lang-en">Analysis Documents</span>
+              <span class="lang lang-zh">分析文档</span>
+              <strong class="lang lang-en">Read the deeper project breakdown</strong>
+              <strong class="lang lang-zh">深入阅读项目拆解与运行链路</strong>
             </a>
           </div>
         </div>
