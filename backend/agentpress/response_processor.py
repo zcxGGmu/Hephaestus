@@ -1243,11 +1243,15 @@ class ResponseProcessor:
             # --- Save and Yield assistant_response_end ---
             if assistant_message_object: # Only save if assistant message was saved
                 try:
-                    # Save the full LiteLLM response object directly in content
+                    assistant_end_summary = {
+                        "status_type": "assistant_response_end",
+                        "finish_reason": finish_reason,
+                        "model": llm_model,
+                    }
                     await self.add_message(
                         thread_id=thread_id,
                         type="assistant_response_end",
-                        content=llm_response,
+                        content=assistant_end_summary,
                         is_llm_message=False,
                         metadata={"thread_run_id": thread_run_id}
                     )

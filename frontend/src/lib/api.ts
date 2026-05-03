@@ -304,13 +304,12 @@ export const getSidebarProjects = async (): Promise<Project[]> => {
     const { data: { session } } = await supabase.auth.getSession();
 
     if (!session?.access_token) {
-      throw new NoAccessTokenAvailableError();
+      return [];
     }
 
     if (!API_URL) {
-      throw new Error(
-        'Backend URL is not configured. Set NEXT_PUBLIC_BACKEND_URL in your environment.',
-      );
+      console.warn('Sidebar projects skipped: NEXT_PUBLIC_BACKEND_URL is not configured.');
+      return [];
     }
 
     const response = await fetch(`${API_URL}/sidebar/projects`, {
@@ -336,9 +335,15 @@ export const getSidebarProjects = async (): Promise<Project[]> => {
       return [];
     }
   } catch (err) {
+    // Sidebar data should fail gracefully without surfacing runtime errors.
+    if (
+      err instanceof NoAccessTokenAvailableError ||
+      (err instanceof TypeError && err.message.includes('fetch'))
+    ) {
+      return [];
+    }
+
     console.error('Error fetching sidebar projects:', err);
-    handleApiError(err, { operation: 'load sidebar projects', resource: 'sidebar projects' });
-    // Return empty array for permission errors to avoid crashing the UI
     return [];
   }
 };
@@ -605,13 +610,12 @@ export const getSidebarThreads = async (projectId?: string): Promise<Thread[]> =
     const { data: { session } } = await supabase.auth.getSession();
 
     if (!session?.access_token) {
-      throw new NoAccessTokenAvailableError();
+      return [];
     }
 
     if (!API_URL) {
-      throw new Error(
-        'Backend URL is not configured. Set NEXT_PUBLIC_BACKEND_URL in your environment.',
-      );
+      console.warn('Sidebar threads skipped: NEXT_PUBLIC_BACKEND_URL is not configured.');
+      return [];
     }
 
     const url = new URL(`${API_URL}/sidebar/threads`);
@@ -642,8 +646,15 @@ export const getSidebarThreads = async (projectId?: string): Promise<Thread[]> =
       return [];
     }
   } catch (error) {
+    // Sidebar data should fail gracefully without surfacing runtime errors.
+    if (
+      error instanceof NoAccessTokenAvailableError ||
+      (error instanceof TypeError && error.message.includes('fetch'))
+    ) {
+      return [];
+    }
+
     console.error('Error getting sidebar threads:', error);
-    handleApiError(error, { operation: 'load sidebar threads', resource: projectId ? `sidebar threads for project ${projectId}` : 'sidebar threads' });
     return [];
   }
 };
@@ -1018,26 +1029,35 @@ export const stopAgent = async (agentRunId: string): Promise<void> => {
   } = await supabase.auth.getSession();
 
   if (!session?.access_token) {
-    const authError = new NoAccessTokenAvailableError();
-    handleApiError(authError, { operation: 'stop agent', resource: 'AI assistant' });
-    throw authError;
+    return;
   }
 
-  const response = await fetch(`${API_URL}/agent-run/${agentRunId}/stop`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${session.access_token}`,
-    },
-    cache: 'no-store',
-  });
+  try {
+    const response = await fetch(`${API_URL}/agent-run/${agentRunId}/stop`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      cache: 'no-store',
+    });
 
-  posthog.capture('task_abandoned', { agentRunId });
+    posthog.capture('task_abandoned', { agentRunId });
 
-  if (!response.ok) {
-    const stopError = new Error(`Error stopping agent: ${response.statusText}`);
-    handleApiError(stopError, { operation: 'stop agent', resource: 'AI assistant' });
-    throw stopError;
+    if (!response.ok) {
+      if (response.status === 404 || response.status === 409) {
+        return;
+      }
+
+      const stopError = new Error(`Error stopping agent: ${response.statusText}`);
+      handleApiError(stopError, { operation: 'stop agent', resource: 'AI assistant' });
+      throw stopError;
+    }
+  } catch (error) {
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      return;
+    }
+    throw error;
   }
 };
 
@@ -2127,6 +2147,34 @@ export const getAvailableModels = async (): Promise<AvailableModelsResponse> => 
   console.log('Available models API temporarily disabled - returning default models');
   return {
     models: [
+      {
+        id: 'deepseek-v4-flash',
+        short_name: 'deepseek-v4-flash',
+        display_name: 'DeepSeek V4 Flash',
+        created_by: 'DeepSeek',
+        model_id: 'deepseek-v4-flash',
+        requires_subscription: false,
+        vision_enabled: false,
+        input_cost_per_million_tokens: 0.000000150,
+        output_cost_per_million_tokens: 0.000000600,
+        supports_thinking: true,
+        max_thinking_tokens: 32000,
+        is_available: true
+      },
+      {
+        id: 'deepseek-v4-pro',
+        short_name: 'deepseek-v4-pro',
+        display_name: 'DeepSeek V4 Pro',
+        created_by: 'DeepSeek',
+        model_id: 'deepseek-v4-pro',
+        requires_subscription: false,
+        vision_enabled: false,
+        input_cost_per_million_tokens: 0.000002000,
+        output_cost_per_million_tokens: 0.000008000,
+        supports_thinking: true,
+        max_thinking_tokens: 32000,
+        is_available: true
+      },
       {
         id: 'deepseek-chat',
         short_name: 'deepseek-chat',

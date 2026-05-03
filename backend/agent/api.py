@@ -18,7 +18,7 @@ from services import redis
 from utils.simple_auth_middleware import get_current_user_id_from_jwt, get_user_id_from_stream_auth, verify_thread_access
 from utils.logger import logger, structlog
 # from services.billing import check_billing_status, can_use_model
-from utils.config import config
+from utils.config import config, EnvMode
 from sandbox.sandbox import create_sandbox, delete_sandbox, get_or_start_sandbox
 # from run_agent_background import run_agent_background, _cleanup_redis_response_list, update_agent_run_status
 from run_agent_background import run_agent_background
@@ -3741,8 +3741,11 @@ async def create_thread(
 
         # 2. Create Sandbox
         sandbox_id = None
+        sandbox_pass = str(uuid.uuid4())
+        vnc_url = None
+        website_url = None
+        token = None
         try:
-            sandbox_pass = str(uuid.uuid4())
             sandbox = await create_sandbox(sandbox_pass, project_id)
             sandbox_id = sandbox.id
             logger.info(f"Created new sandbox {sandbox_id} for project {project_id}")
@@ -3759,24 +3762,38 @@ async def create_thread(
                 token = str(vnc_link).split("token='")[1].split("'")[0]
         except Exception as e:
             logger.error(f"Error creating sandbox: {str(e)}")
-            await client.table('projects').delete().eq('project_id', project_id).execute()
-            if sandbox_id:
-                try: 
-                    await delete_sandbox(sandbox_id)
-                except Exception as e: 
-                    logger.error(f"Error deleting sandbox: {str(e)}")
-            raise Exception("Failed to create sandbox")
+            if config.ENV_MODE == EnvMode.LOCAL:
+                logger.warning(
+                    "Sandbox creation failed in local mode; continuing without sandbox"
+                )
+                sandbox_id = None
+                sandbox_pass = None
+                vnc_url = None
+                website_url = None
+                token = None
+            else:
+                await client.table('projects').eq('project_id', project_id).delete()
+                if sandbox_id:
+                    try: 
+                        await delete_sandbox(sandbox_id)
+                    except Exception as e: 
+                        logger.error(f"Error deleting sandbox: {str(e)}")
+                raise Exception("Failed to create sandbox")
 
         # Update project with sandbox info
-        update_result = await client.table('projects').update({
-            'sandbox': {
+        sandbox_payload = {}
+        if sandbox_id:
+            sandbox_payload = {
                 'id': sandbox_id, 
                 'pass': sandbox_pass, 
                 'vnc_preview': vnc_url,
                 'sandbox_url': website_url, 
                 'token': token
             }
-        }).eq('project_id', project_id).execute()
+
+        update_result = await client.table('projects').eq('project_id', project_id).update({
+            'sandbox': json.dumps(sandbox_payload)
+        })
 
         if not update_result.data:
             logger.error(f"Failed to update project {project_id} with new sandbox {sandbox_id}")
@@ -3803,6 +3820,7 @@ async def create_thread(
         
         thread = await client.schema('public').table('threads').insert(thread_data)
         thread_id = thread.data[0]['thread_id']
+        await _create_adk_session_if_not_exists(client, user_id, thread_id)
         logger.info(f"Created new thread: {thread_id}")
 
         logger.info(f"Successfully created thread {thread_id} with project {project_id}")

@@ -23,6 +23,25 @@ from utils.retry import retry
 
 import sentry_sdk # type: ignore
 from typing import Dict, Any
+import sys
+
+
+def _configure_windows_stdio() -> None:
+    """Avoid Unicode logging crashes on Windows consoles using GBK."""
+    if sys.platform != "win32":
+        return
+
+    for stream_name in ("stdout", "stderr"):
+        stream = getattr(sys, stream_name, None)
+        reconfigure = getattr(stream, "reconfigure", None)
+        if callable(reconfigure):
+            try:
+                reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+
+_configure_windows_stdio()
 
 # 使用与 services/redis.py 相同的配置
 redis_host = os.getenv('REDIS_HOST', 'redis')
@@ -311,7 +330,7 @@ async def run_agent_background(
                 break
 
             # Store response in Redis list and publish notification
-            response_json = json.dumps(response)
+            response_json = json.dumps(response, default=str)
             pending_redis_operations.append(asyncio.create_task(redis.rpush(response_list_key, response_json)))
             pending_redis_operations.append(asyncio.create_task(redis.publish(response_channel, "new")))
             total_responses += 1
@@ -338,7 +357,7 @@ async def run_agent_background(
              logger.info(f"Agent run {agent_run_id} completed normally (duration: {duration:.2f}s, responses: {total_responses})")
              completion_message = {"type": "status", "status": "completed", "message": "Agent run completed successfully"}
              # trace.span(name="agent_run_completed").end(status_message="agent_run_completed")
-             await redis.rpush(response_list_key, json.dumps(completion_message))
+             await redis.rpush(response_list_key, json.dumps(completion_message, default=str))
              await redis.publish(response_channel, "new") # Notify about the completion message
 
         # Fetch final responses from Redis for DB update
@@ -374,7 +393,7 @@ async def run_agent_background(
         # Push error message to Redis list
         error_response = {"type": "status", "status": "error", "message": error_message}
         try:
-            await redis.rpush(response_list_key, json.dumps(error_response))
+            await redis.rpush(response_list_key, json.dumps(error_response, default=str))
             await redis.publish(response_channel, "new")
         except Exception as redis_err:
              logger.error(f"Failed to push error response to Redis for {agent_run_id}: {redis_err}")

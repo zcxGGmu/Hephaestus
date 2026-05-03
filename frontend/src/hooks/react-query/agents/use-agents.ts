@@ -6,6 +6,7 @@ import { Agent, AgentUpdateRequest, AgentsParams, createAgent, deleteAgent, getA
 import { useRef, useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { DEFAULT_AGENTPRESS_TOOLS } from '@/components/agents/tools';
+import { useFeatureFlag } from '@/lib/feature-flags';
 
 export const useAgents = (
   params: AgentsParams = {},
@@ -204,11 +205,13 @@ export const useAgentDeletionState = () => {
 };
 
 export const useThreadAgent = (threadId: string) => {
+  const { enabled: customAgentsEnabled } = useFeatureFlag('custom_agents');
+
   return createQueryHook(
     agentKeys.threadAgent(threadId),
     () => getThreadAgent(threadId),
     {
-      enabled: !!threadId,
+      enabled: !!threadId && customAgentsEnabled,
       staleTime: 5 * 60 * 1000,
       gcTime: 10 * 60 * 1000,
     }

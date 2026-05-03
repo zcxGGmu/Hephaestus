@@ -156,13 +156,35 @@ class ThreadManager:
         logger.debug(f"Adding message of type '{type}' to thread {thread_id} (agent: {agent_id}, version: {agent_version_id})")
         client = await self.db.client
 
+        thread_result = await client.table('threads').select('project_id').eq('thread_id', thread_id).execute()
+        project_id = None
+        if thread_result.data and isinstance(thread_result.data[0], dict):
+            project_id = thread_result.data[0].get('project_id')
+
+        serialized_content = (
+            json.dumps(content, ensure_ascii=False)
+            if isinstance(content, (dict, list))
+            else content
+        )
+        serialized_metadata = (
+            json.dumps(metadata or {}, ensure_ascii=False)
+            if isinstance(metadata, (dict, list)) or metadata is None
+            else metadata
+        )
+
         # Prepare data for insertion
         data_to_insert = {
             'thread_id': thread_id,
+            'project_id': project_id,
             'type': type,
-            'content': content,
+            'role': (
+                content.get('role')
+                if isinstance(content, dict) and content.get('role')
+                else type
+            ),
+            'content': serialized_content,
             'is_llm_message': is_llm_message,
-            'metadata': metadata or {},
+            'metadata': serialized_metadata,
         }
         
         # Add agent information if provided
@@ -292,6 +314,7 @@ class ThreadManager:
         llm_max_tokens: Optional[int] = None,
         processor_config: Optional[ProcessorConfig] = None,
         tool_choice: ToolChoice = "auto",
+        available_functions: Optional[Dict[str, Any]] = None,
         native_max_auto_continues: int = 25,
         max_xml_tool_calls: int = 0,
         include_xml_examples: bool = False,
@@ -312,6 +335,7 @@ class ThreadManager:
             llm_max_tokens: Maximum tokens in the LLM response
             processor_config: Configuration for the response processor
             tool_choice: Tool choice preference ("auto", "required", "none")
+            available_functions: Optional precomputed tool map passed by callers.
             native_max_auto_continues: Maximum number of automatic continuations when
                                       finish_reason="tool_calls" (0 disables auto-continue)
             max_xml_tool_calls: Maximum number of XML tool calls to allow (0 = no limit)
@@ -536,6 +560,11 @@ When using the tools:
                             prepared_messages[i] = dict(msg)
                     print(f"🔍 检查 stream 类型:")
                     print(f"  stream: {stream}")
+                    effective_stream = stream
+                    if stream and "deepseek" in llm_model.lower():
+                        logger.info("DeepSeek streaming fallback activated; using non-streaming completion")
+                        effective_stream = False
+
                     llm_response = await make_llm_api_call(
                         prepared_messages, # Pass the potentially modified messages
                         llm_model,
@@ -543,7 +572,7 @@ When using the tools:
                         max_tokens=llm_max_tokens,
                         # tools=openapi_tool_schemas,
                         tool_choice=tool_choice if config.native_tool_calling else "none",
-                        stream=stream,
+                        stream=effective_stream,
                         enable_thinking=enable_thinking,
                         reasoning_effort=reasoning_effort
                     )
@@ -556,7 +585,7 @@ When using the tools:
                     raise
 
                 # 6. Process LLM response using the ResponseProcessor
-                if stream:
+                if effective_stream:
                     print("我进入的是 流式！！！")
                     logger.debug("Processing streaming response")
 
@@ -663,7 +692,16 @@ When using the tools:
                             "updated_at": "2025-08-25T10:30:07Z"
                         }
                     
-                    response_generator = fake_response_generator()
+                    response_generator = self.response_processor.process_streaming_response(
+                        llm_response=cast(AsyncGenerator, llm_response),
+                        thread_id=thread_id,
+                        config=config,
+                        prompt_messages=prepared_messages,
+                        llm_model=llm_model,
+                        can_auto_continue=(native_max_auto_continues > 0),
+                        auto_continue_count=auto_continue_count,
+                        continuous_state=continuous_state
+                    )
                     
                     # # Ensure we have an async generator for streaming
                     # if hasattr(llm_response, '__aiter__'):

@@ -475,15 +475,35 @@ class AgentRunner:
                 logger.info(f"Langfuse trace created successfully")
             else:
                 logger.info(f"Using existing trace")
-     
-            # 浣跨敤 Google ADK 妗嗘灦鎵挎帴鏈嶅姟
-            self.thread_manager = ADKThreadManager(
-                        trace=self.config.trace, 
-                        is_agent_builder=self.config.is_agent_builder or False, 
-                        target_agent_id=self.config.target_agent_id, 
-                        agent_config=self.config.agent_config
-                    )
-            logger.info(f"ADKThreadManager created successfully")
+
+            use_thread_manager = False
+            openai_api_base = getattr(config, 'OPENAI_API_BASE', None)
+            deepseek_api_base = getattr(config, 'DEEPSEEK_API_BASE', None)
+            model_name = (self.config.model_name or "").lower()
+            if (
+                (openai_api_base and ("gpt" in model_name or "openai" in model_name))
+                or (deepseek_api_base and "deepseek" in model_name)
+            ):
+                use_thread_manager = True
+                logger.info("Using ThreadManager for OpenAI-compatible backend configuration")
+
+            if use_thread_manager:
+                self.thread_manager = ThreadManager(
+                    trace=self.config.trace,
+                    is_agent_builder=self.config.is_agent_builder or False,
+                    target_agent_id=self.config.target_agent_id,
+                    agent_config=self.config.agent_config
+                )
+                logger.info("ThreadManager created successfully")
+            else:
+                # 浣跨敤 Google ADK 妗嗘灦鎵挎帴鏈嶅姟
+                self.thread_manager = ADKThreadManager(
+                            trace=self.config.trace, 
+                            is_agent_builder=self.config.is_agent_builder or False, 
+                            target_agent_id=self.config.target_agent_id, 
+                            agent_config=self.config.agent_config
+                        )
+                logger.info(f"ADKThreadManager created successfully")
 
             # 鍒濆鍖栨暟鎹簱瀹㈡埛绔?
             self.client = await self.thread_manager.db.client
@@ -789,6 +809,10 @@ class AgentRunner:
                                         assistant_content_json = content
 
                                     assistant_text = assistant_content_json.get('content', '')
+                                    if isinstance(assistant_text, list):
+                                        assistant_text = ''.join(str(item) for item in assistant_text)
+                                    elif not isinstance(assistant_text, str):
+                                        assistant_text = str(assistant_text)
                                     full_response += assistant_text
                                     
                                     if isinstance(assistant_text, str):

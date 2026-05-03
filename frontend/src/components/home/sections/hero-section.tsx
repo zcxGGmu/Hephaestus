@@ -16,8 +16,6 @@ import {
 import { useInitiateAgentMutation } from '@/hooks/react-query/dashboard/use-initiate-agent';
 import { useThreadQuery } from '@/hooks/react-query/threads/use-threads';
 import { generateThreadName } from '@/lib/actions/threads';
-import { useAgents } from '@/hooks/react-query/agents/use-agents';
-
 import { BillingErrorAlert } from '@/components/billing/usage-limit-alert';
 import { useBillingError } from '@/hooks/useBillingError';
 import { useAccounts } from '@/hooks/use-accounts';
@@ -31,6 +29,7 @@ import { agentKeys } from '@/hooks/react-query/agents/keys';
 import { getAgents } from '@/hooks/react-query/agents/utils';
 import { AgentRunLimitDialog } from '@/components/thread/agent-run-limit-dialog';
 import { Examples } from '@/components/dashboard/examples';
+import { useFeatureFlag } from '@/lib/feature-flags';
 
 
 
@@ -65,6 +64,7 @@ export function HeroSection() {
     runningCount: number;
     runningThreadIds: string[];
   } | null>(null);
+  const { enabled: customAgentsEnabled } = useFeatureFlag('custom_agents');
 
   // Fetch agents for selection
   const { data: agentsResponse } = createQueryHook(
@@ -79,7 +79,7 @@ export function HeroSection() {
       sort_order: 'asc'
     }),
     {
-      enabled: !!user && !isLoading,
+      enabled: !!user && !isLoading && customAgentsEnabled,
       staleTime: 5 * 60 * 1000,
       gcTime: 10 * 60 * 1000,
     }

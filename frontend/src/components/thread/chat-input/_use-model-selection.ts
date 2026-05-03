@@ -31,6 +31,18 @@ export interface CustomModel {
 // SINGLE SOURCE OF TRUTH for all model data - aligned with backend constants
 export const MODELS = {
   // Free tier models (available to all users)
+  'deepseek-v4-flash': {
+    tier: 'free',
+    priority: 101,
+    recommended: true,
+    lowQuality: false
+  },
+  'deepseek-v4-pro': {
+    tier: 'free',
+    priority: 100,
+    recommended: false,
+    lowQuality: false
+  },
   'deepseek-chat': { 
     tier: 'free',
     priority: 100, 

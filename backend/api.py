@@ -13,6 +13,24 @@ import time
 import uuid
 import sys
 
+
+def _configure_windows_stdio() -> None:
+    """Avoid Unicode logging crashes on Windows consoles using GBK."""
+    if sys.platform != "win32":
+        return
+
+    for stream_name in ("stdout", "stderr"):
+        stream = getattr(sys, stream_name, None)
+        reconfigure = getattr(stream, "reconfigure", None)
+        if callable(reconfigure):
+            try:
+                reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+
+_configure_windows_stdio()
+
 from fastapi import FastAPI, Request, HTTPException, Response, Depends, APIRouter # type: ignore
 from utils.logger import logger, structlog
 from datetime import datetime, timezone

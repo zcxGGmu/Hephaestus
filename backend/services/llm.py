@@ -15,7 +15,7 @@ import os
 import json
 import asyncio
 import contextvars
-from openai import OpenAIError
+from openai import AsyncOpenAI, OpenAIError
 import litellm
 from litellm.files.main import ModelResponse
 from utils.logger import logger
@@ -105,6 +105,33 @@ class LLMRetryError(LLMError):
     """Exception raised when retries are exhausted."""
     pass
 
+
+def normalize_model_name(model_name: str) -> str:
+    """Normalize model aliases to a provider-acceptable model name."""
+    resolved_model = MODEL_NAME_ALIASES.get(model_name, model_name)
+
+    if "deepseek" in model_name.lower():
+        legacy_deepseek_names = {
+            "deepseek",
+            "deepseek-chat",
+            "deepseek/deepseek-chat",
+            "deepseek/deepseek-chat-v3.1",
+            "deepseek/deepseek-chat-v3",
+            "deepseek/deepseek-reasoner",
+            "deepseek/deepseek-r1",
+            "deepseek/deepseek-v3",
+            "deepseek/deepseek-v3.1",
+        }
+        if resolved_model.lower() in legacy_deepseek_names:
+            preferred_deepseek_model = getattr(config, "MODEL_TO_USE", None) or "deepseek-v4-flash"
+            return (
+                preferred_deepseek_model
+                if isinstance(preferred_deepseek_model, str) and preferred_deepseek_model.lower().startswith("deepseek-v4")
+                else "deepseek-v4-flash"
+            )
+
+    return resolved_model
+
 def setup_api_keys() -> None:
     """Set up API keys from environment variables."""
     providers = ['OPENAI', 'ANTHROPIC', 'GROQ', 'OPENROUTER', 'XAI', 'MORPH', 'GEMINI']
@@ -133,6 +160,45 @@ def setup_api_keys() -> None:
         os.environ['AWS_REGION_NAME'] = aws_region
     else:
         logger.warning(f"Missing AWS credentials for Bedrock integration - access_key: {bool(aws_access_key)}, secret_key: {bool(aws_secret_key)}, region: {aws_region}")
+
+
+def resolve_provider_credentials(model_name: str) -> tuple[str, Optional[str], Optional[str]]:
+    """Resolve provider name, API key, and API base for the requested model."""
+    resolved_model = normalize_model_name(model_name)
+
+    resolved_api_key: Optional[str] = None
+    resolved_api_base: Optional[str] = None
+    provider = "Unknown"
+
+    if "openrouter" in resolved_model.lower():
+        resolved_api_key = config.OPENROUTER_API_KEY
+        resolved_api_base = config.OPENROUTER_API_BASE
+        provider = "OpenRouter"
+    elif "openai" in resolved_model.lower() or "gpt" in resolved_model.lower():
+        resolved_api_key = config.OPENAI_API_KEY
+        resolved_api_base = config.OPENAI_API_BASE
+        provider = "OpenAI"
+    elif "anthropic" in resolved_model.lower() or "claude" in resolved_model.lower():
+        resolved_api_key = config.ANTHROPIC_API_KEY
+        provider = "Anthropic"
+    elif "deepseek" in resolved_model.lower():
+        resolved_api_key = getattr(config, 'DEEPSEEK_API_KEY', None) or config.OPENAI_API_KEY
+        resolved_api_base = config.DEEPSEEK_API_BASE
+        provider = "DeepSeek" if getattr(config, 'DEEPSEEK_API_KEY', None) else "DeepSeek (using OpenAI key)"
+    elif "gemini" in resolved_model.lower():
+        resolved_api_key = config.GEMINI_API_KEY
+        provider = "Gemini"
+    elif "groq" in resolved_model.lower():
+        resolved_api_key = config.GROQ_API_KEY
+        provider = "Groq"
+    elif "xai" in resolved_model.lower():
+        resolved_api_key = config.XAI_API_KEY
+        provider = "xAI"
+    else:
+        resolved_api_key = config.OPENAI_API_KEY
+        provider = "OpenAI (default)"
+
+    return provider, resolved_api_key, resolved_api_base
 
 def get_openrouter_fallback(model_name: str) -> Optional[str]:
     """Get OpenRouter fallback model for a given model name."""
@@ -389,18 +455,65 @@ async def make_llm_api_call(
     logger.info(f"Making LLM API call to model: {model_name} (Thinking: {enable_thinking}, Effort: {reasoning_effort})")
     logger.info(f"馃摗 API Call: Using model {model_name}")
 
+    provider, resolved_api_key, resolved_api_base = resolve_provider_credentials(model_name)
+    resolved_model_name = normalize_model_name(model_name)
+    effective_api_key = api_key or resolved_api_key
+    effective_api_base = api_base or resolved_api_base
+
+    if not effective_api_key:
+        raise LLMError(
+            f"No API key configured for provider {provider} while using model '{model_name}'. "
+            "Set the corresponding key in backend/.env and restart the backend."
+        )
+
+    # OpenAI-compatible providers can work better through the official SDK than LiteLLM.
+    if any(name in provider.lower() for name in ["openai", "deepseek", "openrouter"]):
+        sdk_model_name = resolved_model_name
+        if sdk_model_name.startswith("openai/"):
+            sdk_model_name = sdk_model_name.split("/", 1)[1]
+        if sdk_model_name.startswith("openrouter/"):
+            sdk_model_name = sdk_model_name.split("/", 1)[1]
+
+        client = AsyncOpenAI(
+            api_key=effective_api_key,
+            base_url=effective_api_base,
+        )
+
+        request_kwargs: Dict[str, Any] = {
+            "model": sdk_model_name,
+            "messages": messages,
+            "stream": stream,
+        }
+
+        if max_tokens is not None:
+            request_kwargs["max_tokens"] = max_tokens
+        if temperature is not None:
+            request_kwargs["temperature"] = temperature
+        if top_p is not None:
+            request_kwargs["top_p"] = top_p
+        if tools:
+            request_kwargs["tools"] = tools
+            request_kwargs["tool_choice"] = tool_choice
+        if response_format is not None:
+            request_kwargs["response_format"] = response_format
+
+        logger.info(f"Using AsyncOpenAI client for model: {sdk_model_name}")
+        try:
+            return await client.chat.completions.create(**request_kwargs)
+        except Exception as e:
+            logger.error(f"AsyncOpenAI API call failed: {str(e)}", exc_info=True)
+            raise LLMError(f"API call failed: {str(e)}")
 
     params = prepare_params(
         messages=messages,
-        # model_name=model_name,
-        model_name="gpt-4o",
+        model_name=model_name,
         temperature=temperature,
         max_tokens=max_tokens,
         response_format=response_format,
         tools=tools,
         tool_choice=tool_choice,
-        api_key=api_key,
-        api_base=api_base,
+        api_key=effective_api_key,
+        api_base=effective_api_base,
         stream=stream,
         top_p=top_p,
         model_id=model_id,
@@ -552,49 +665,21 @@ async def make_adk_api_call(
     else:
         logger.warning(f" No alias mapping found for: {model_name}, available aliases: {list(MODEL_NAME_ALIASES.keys())[:10]}")
     
-    # 鏍规嵁妯″瀷鎻愪緵鍟嗚幏鍙栧搴旂殑API Key
-    resolved_api_key = None
-    provider = "Unknown"
-    
-    # 鏍规嵁妯″瀷鍚嶇О纭畾鎻愪緵鍟嗗苟鑾峰彇API Key
-    if "openai" in resolved_model.lower() or "gpt" in resolved_model.lower():
-        resolved_api_key = config.OPENAI_API_KEY
-        provider = "OpenAI"
-    elif "anthropic" in resolved_model.lower() or "claude" in resolved_model.lower():
-        resolved_api_key = config.ANTHROPIC_API_KEY
-        provider = "Anthropic"
-    elif "deepseek" in resolved_model.lower():
-        # 浼樺厛浣跨敤DEEPSEEK_API_KEY锛屽洖閫€鍒癘PENAI_API_KEY锛堝洜涓篋eepSeek鍏煎OpenAI API锛?
-        resolved_api_key = getattr(config, 'DEEPSEEK_API_KEY', None) or config.OPENAI_API_KEY
-        provider = "DeepSeek" if getattr(config, 'DEEPSEEK_API_KEY', None) else "DeepSeek (using OpenAI key)"
-    elif "gemini" in resolved_model.lower():
-        resolved_api_key = config.GEMINI_API_KEY
-        provider = "Gemini"
-    elif "groq" in resolved_model.lower():
-        resolved_api_key = config.GROQ_API_KEY
-        provider = "Groq"
-    elif "xai" in resolved_model.lower():
-        resolved_api_key = config.XAI_API_KEY
-        provider = "xAI"
-    else:
-        # 榛樿浣跨敤OpenAI
-        resolved_api_key = config.OPENAI_API_KEY
-        provider = "OpenAI (default)"
+    provider, resolved_api_key, resolved_api_base = resolve_provider_credentials(resolved_model)
+    if provider == "OpenAI (default)" and not ("openai" in resolved_model.lower() or "gpt" in resolved_model.lower()):
         logger.warning(f"Unrecognized model {resolved_model}, using default OpenAI configuration")
 
-
     logger.info(f"Using provider: {provider}")
-    logger.info(f"API Key: {resolved_api_key}")
-    
-    # 鏍规嵁鎻愪緵鍟嗙‘瀹?api_base
-    resolved_api_base = None
-    if "deepseek" in resolved_model.lower():
-        resolved_api_base = config.DEEPSEEK_API_BASE
-    elif "openrouter" in resolved_model.lower():
-        resolved_api_base = config.OPENROUTER_API_BASE
+    logger.info(f"API Key configured: {bool(resolved_api_key)}")
     
     if resolved_api_base:
         logger.info(f"Using API Base: {resolved_api_base}")
+
+    if not resolved_api_key:
+        raise LLMError(
+            f"No API key configured for provider {provider} while using model '{resolved_model}'. "
+            "Set the corresponding key in backend/.env and restart the backend."
+        )
     
     logger.info(f"Creating LiteLlm model with model={resolved_model}")
     

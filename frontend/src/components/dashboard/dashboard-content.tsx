@@ -69,6 +69,8 @@ export function DashboardContent() {
     limit: 100,
     sort_by: 'name',
     sort_order: 'asc'
+  }, {
+    enabled: customAgentsEnabled,
   });
 
   const agents = agentsResponse?.agents || [];

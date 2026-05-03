@@ -19,7 +19,7 @@ import { isLocalMode } from '@/lib/config';
 import { ThreadContent } from '@/components/thread/content/ThreadContent';
 import { ThreadSkeleton } from '@/components/thread/content/ThreadSkeleton';
 import { useAddUserMessageMutation } from '@/hooks/react-query/threads/use-messages';
-import { useStartAgentMutation, useStopAgentMutation } from '@/hooks/react-query/threads/use-agent-run';
+import { useStartAgentMutation } from '@/hooks/react-query/threads/use-agent-run';
 import { useSubscription } from '@/hooks/react-query/subscriptions/use-subscriptions';
 import { SubscriptionStatus } from '@/components/thread/chat-input/_use-model-selection';
 
@@ -182,7 +182,6 @@ export default function ThreadPage({
 
   const addUserMessageMutation = useAddUserMessageMutation();
   const startAgentMutation = useStartAgentMutation();
-  const stopAgentMutation = useStopAgentMutation();
   const { data: threadAgentData } = useThreadAgent(threadId);
   const agent = threadAgentData?.agent;
   const workflowId = threadQuery.data?.metadata?.workflow_id;
@@ -439,17 +438,8 @@ export default function ThreadPage({
 
   const handleStopAgent = useCallback(async () => {
     setAgentStatus('idle');
-
     await stopStreaming();
-
-    if (agentRunId) {
-      try {
-        await stopAgentMutation.mutateAsync(agentRunId);
-      } catch (error) {
-        console.error('Error stopping agent:', error);
-      }
-    }
-  }, [stopStreaming, agentRunId, stopAgentMutation, setAgentStatus]);
+  }, [stopStreaming, setAgentStatus]);
 
   const handleOpenFileViewer = useCallback((filePath?: string, filePathList?: string[]) => {
     if (filePath) {

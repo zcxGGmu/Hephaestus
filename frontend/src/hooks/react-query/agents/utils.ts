@@ -157,7 +157,15 @@ export const getAgents = async (params: AgentsParams = {}): Promise<AgentsRespon
   try {
     const agentPlaygroundEnabled = await isFlagEnabled('custom_agents');
     if (!agentPlaygroundEnabled) {
-      throw new Error('Custom agents is not enabled');
+      return {
+        agents: [],
+        pagination: {
+          page: params.page ?? 1,
+          limit: params.limit ?? 0,
+          total: 0,
+          pages: 0,
+        },
+      };
     }
     const supabase = createClient();
     const { data: { session } } = await supabase.auth.getSession();
@@ -204,7 +212,18 @@ export const getAgent = async (agentId: string): Promise<Agent> => {
   try {
     const agentPlaygroundEnabled = await isFlagEnabled('custom_agents');
     if (!agentPlaygroundEnabled) {
-      throw new Error('Custom agents is not enabled');
+      return {
+        agent_id: agentId,
+        account_id: '',
+        name: 'Hephaestus',
+        description: '',
+        system_prompt: '',
+        configured_mcps: [],
+        agentpress_tools: {},
+        is_default: false,
+        created_at: '',
+        updated_at: '',
+      };
     }
     const supabase = createClient();
     const { data: { session } } = await supabase.auth.getSession();
@@ -350,7 +369,11 @@ export const getThreadAgent = async (threadId: string): Promise<ThreadAgentRespo
   try {
     const agentPlaygroundEnabled = await isFlagEnabled('custom_agents');
     if (!agentPlaygroundEnabled) {
-      throw new Error('Custom agents is not enabled');
+      return {
+        agent: null,
+        source: 'none',
+        message: 'Custom agents is not enabled',
+      };
     }
     const supabase = createClient();
     const { data: { session } } = await supabase.auth.getSession();
@@ -384,7 +407,10 @@ export const getAgentBuilderChatHistory = async (agentId: string): Promise<{mess
   try {
     const agentPlaygroundEnabled = await isFlagEnabled('custom_agents');
     if (!agentPlaygroundEnabled) {
-      throw new Error('Custom agents is not enabled');
+      return {
+        messages: [],
+        thread_id: null,
+      };
     }
     const supabase = createClient();
     const { data: { session } } = await supabase.auth.getSession();
@@ -520,7 +546,7 @@ export const getAgentVersions = async (agentId: string): Promise<AgentVersion[]>
   try {
     const agentPlaygroundEnabled = await isFlagEnabled('custom_agents');
     if (!agentPlaygroundEnabled) {
-      throw new Error('Custom agents is not enabled');
+      return [];
     }
     const supabase = createClient();
     const { data: { session } } = await supabase.auth.getSession();
@@ -629,7 +655,19 @@ export const getAgentVersion = async (
   try {
     const agentPlaygroundEnabled = await isFlagEnabled('custom_agents');
     if (!agentPlaygroundEnabled) {
-      throw new Error('Custom agents is not enabled');
+      return {
+        version_id: versionId,
+        agent_id: agentId,
+        version_number: 0,
+        version_name: 'default',
+        system_prompt: '',
+        configured_mcps: [],
+        custom_mcps: [],
+        agentpress_tools: {},
+        is_active: false,
+        created_at: '',
+        updated_at: '',
+      };
     }
     const supabase = createClient();
     const { data: { session } } = await supabase.auth.getSession();

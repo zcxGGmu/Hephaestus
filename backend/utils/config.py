@@ -201,6 +201,7 @@ class Configuration:
     # LLM API keys
     ANTHROPIC_API_KEY: Optional[str] = None
     OPENAI_API_KEY: Optional[str] = None
+    OPENAI_API_BASE: Optional[str] = None
     DEEPSEEK_API_KEY: Optional[str] = None
     DEEPSEEK_API_BASE: Optional[str] = "https://api.deepseek.com"
     GROQ_API_KEY: Optional[str] = None

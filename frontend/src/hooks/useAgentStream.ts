@@ -582,10 +582,9 @@ export function useAgentStream(
     } catch (err) {
       // Don't revert status here, as the user intended to stop. Just log error.
       const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error(
+      console.warn(
         `[useAgentStream] Error sending stop request for ${runIdToStop}: ${errorMessage}`,
       );
-      toast.error(`Failed to stop agent: ${errorMessage}`);
     }
   }, [agentRunId, finalizeStream]); // Add dependencies
 
