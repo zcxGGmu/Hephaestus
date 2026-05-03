@@ -76,7 +76,7 @@ class ToolManager:
     
     def register_all_tools(self):
         # 娴嬭瘯鐜版湁宸ュ叿娉ㄥ唽娴佺▼
-        logger.info("鎴戠幇鍦ㄥ紑濮嬪姞杞藉伐鍏凤紒锛侊紒锛?)
+        logger.info("Registering tools")
         from agent.tools.simple_test_tool import SimpleTestTool
         self.thread_manager.add_tool(SimpleTestTool)
 
@@ -340,21 +340,21 @@ class PromptManager:
 
 class MessageManager:
     """
-    娑堟伅绠＄悊鍣ㄧ被
-    
-    璐熻矗鏋勫缓涓存椂娑堟伅锛屽寘鎷祻瑙堝櫒鐘舵€佸拰鍥惧儚涓婁笅鏂囦俊鎭€?
-    杩欎簺涓存椂娑堟伅浼氬湪AI澶勭悊鐢ㄦ埛璇锋眰鏃朵綔涓轰笂涓嬫枃淇℃伅鎻愪緵缁欐ā鍨嬨€?
+    Message manager.
+
+    Builds temporary context messages such as browser state and image context
+    so the model can use them while processing the user's request.
     """
     
     def __init__(self, client, thread_id: str, model_name: str, trace: Optional[StatefulTraceClient]): # type: ignore
         """
-        鍒濆鍖栨秷鎭鐞嗗櫒
-        
+        Initialize the message manager.
+
         Args:
-            client: 鏁版嵁搴撳鎴风锛岀敤浜庢煡璇㈡秷鎭〃
-            thread_id: 绾跨▼ID锛岀敤浜庢爣璇嗙壒瀹氱殑瀵硅瘽绾跨▼
-            model_name: 妯″瀷鍚嶇О锛岀敤浜庡垽鏂槸鍚︽敮鎸佸浘鍍忓鐞?
-            trace: 杩借釜瀹㈡埛绔紝鐢ㄤ簬鏃ュ織璁板綍
+            client: Database client used to query message records.
+            thread_id: Conversation thread identifier.
+            model_name: Model name used to decide image support behavior.
+            trace: Optional tracing client for diagnostics.
         """
         self.client = client
         self.thread_id = thread_id
@@ -363,47 +363,48 @@ class MessageManager:
     
     async def build_temporary_message(self) -> Optional[dict]:
         """
-        鏋勫缓涓存椂娑堟伅
-        
-        杩欎釜鏂规硶浼氾細
-        1. 鑾峰彇鏈€鏂扮殑娴忚鍣ㄧ姸鎬佷俊鎭紙鍖呮嫭鎴浘锛?
-        2. 鑾峰彇鏈€鏂扮殑鍥惧儚涓婁笅鏂囦俊鎭?
-        3. 灏嗚繖浜涗俊鎭粍鍚堟垚涓€涓复鏃舵秷鎭紝渚汚I妯″瀷浣跨敤
-        
-        Returns:
-            Optional[dict]: 鍖呭惈娴忚鍣ㄧ姸鎬佸拰鍥惧儚淇℃伅鐨勪复鏃舵秷鎭紝濡傛灉娌℃湁鐩稿叧淇℃伅鍒欒繑鍥濶one
-        """
-        temp_message_content_list = []  # 瀛樺偍涓存椂娑堟伅鐨勫唴瀹瑰垪琛?
+        Build a temporary context message.
 
-        # 鑾峰彇鏈€鏂扮殑娴忚鍣ㄧ姸鎬佹秷鎭?
+        This method:
+        1. Fetches the latest browser state information.
+        2. Fetches the latest image-context information.
+        3. Combines both into a temporary message for the model.
+
+        Returns:
+            Optional[dict]: Temporary context payload, or None when no
+            relevant context exists.
+        """
+        temp_message_content_list = []  # Temporary message content fragments.
+
+        # Fetch the latest browser-state message.
         latest_browser_state_msg = await self.client.table('messages').select('*').eq('thread_id', self.thread_id).eq('type', 'browser_state').order('created_at', desc=True).limit(1).execute()
         
         if latest_browser_state_msg.data and len(latest_browser_state_msg.data) > 0:
             try:
-                # 瑙ｆ瀽娴忚鍣ㄧ姸鎬佸唴瀹?
+                # Parse browser-state content.
                 browser_content = latest_browser_state_msg.data[0]["content"]
                 if isinstance(browser_content, str):
                     browser_content = json.loads(browser_content)
                 
-                # 鎻愬彇鎴浘淇℃伅
-                screenshot_base64 = browser_content.get("screenshot_base64")  # Base64缂栫爜鐨勬埅鍥?
-                screenshot_url = browser_content.get("image_url")  # 鎴浘鐨刄RL鍦板潃
+                # Extract screenshot information.
+                screenshot_base64 = browser_content.get("screenshot_base64")  # Base64 screenshot.
+                screenshot_url = browser_content.get("image_url")  # Screenshot URL.
                 
-                # 澶嶅埗娴忚鍣ㄧ姸鎬佹枃鏈紝绉婚櫎鎴浘鐩稿叧瀛楁
+                # Copy browser-state text and remove screenshot-only fields.
                 browser_state_text = browser_content.copy()
                 browser_state_text.pop('screenshot_base64', None)
                 browser_state_text.pop('image_url', None)
 
-                # 濡傛灉鏈夋祻瑙堝櫒鐘舵€佹枃鏈俊鎭紝娣诲姞鍒颁复鏃舵秷鎭腑
+                # Add browser-state text to the temporary message when available.
                 if browser_state_text:
                     temp_message_content_list.append({
                         "type": "text",
                         "text": f"The following is the current state of the browser:\n{json.dumps(browser_state_text, indent=2)}"
                     })
                 
-                # 妫€鏌ユā鍨嬫槸鍚︽敮鎸佸浘鍍忓鐞嗭紙Gemini銆丄nthropic銆丱penAI锛?
+                # Check whether the model supports image inputs.
                 if 'gemini' in self.model_name.lower() or 'anthropic' in self.model_name.lower() or 'openai' in self.model_name.lower():
-                    # 浼樺厛浣跨敤URL锛屽鏋滄病鏈夊垯浣跨敤Base64
+                    # Prefer a URL when available; otherwise use Base64.
                     if screenshot_url:
                         temp_message_content_list.append({
                             "type": "image_url",
@@ -523,7 +524,7 @@ class AgentRunner:
         tool_manager = ToolManager(self.thread_manager, self.config.project_id, self.config.thread_id)
         if self.config.agent_config and self.config.agent_config.get('is_hephaestus_default', False):
             tool_manager.register_all_tools()
-            logger.info("register all tools success锛?)
+            logger.info("Registered all default tools successfully")
 
     
     def get_max_tokens(self) -> Optional[int]:
@@ -1165,37 +1166,37 @@ class AgentRunner:
         #     }
     
     async def _run_with_adk(self) -> AsyncGenerator[Dict[str, Any], None]:
-        """浣跨敤ADK Runner鎵ц"""
+        """Run the agent through the ADK runner."""
         try:
-            print(f"  馃摑 鍑嗗鐢ㄦ埛杈撳叆...")
+            print("  Preparing user input...")
             # 鍑嗗鐢ㄦ埛杈撳叆鍐呭
             user_content = types.Content(
                 role='user',
                 parts=[types.Part.from_text(text=self.config.user_message or "Hello")]
             )
-            print(f"  鉁?鐢ㄦ埛杈撳叆鍑嗗瀹屾垚")
+            print("  User input prepared")
             
-            print(f"  馃攧 寮€濮婣DK Runner鎵ц...")
+            print("  Starting ADK runner...")
             # 浣跨敤ADK Runner鎵ц
             async for event in self.adk_runner.run_async(
                 user_id=self.adk_session.user_id,
                 content=user_content,
                 session_id=self.adk_session.id
             ):
-                print(f"  馃摠 鏀跺埌ADK浜嬩欢: {event.type}")
+                print(f"  Received ADK event: {event.type}")
                 
-                # 灏咥DK浜嬩欢杞崲涓轰綘鐨勬牸寮?
+                # Convert the ADK event into the internal format.
                 converted_event = self._convert_adk_event_to_format(event)
                 if converted_event:
                     yield converted_event
                 
-                # 妫€鏌ユ槸鍚﹀畬鎴?
+                # Stop once the assistant response ends.
                 if event.type == "assistant_response_end":
-                    print(f"  鉁?ADK鎵ц瀹屾垚")
+                    print("  ADK execution completed")
                     break
                     
         except Exception as adk_error:
-            print(f"  鉂?ADK鎵ц澶辫触: {adk_error}")
+            print(f"  ADK execution failed: {adk_error}")
             yield {
                 "type": "error",
                 "content": f"ADK execution failed: {str(adk_error)}",
@@ -1203,9 +1204,9 @@ class AgentRunner:
             }
     
     async def _run_with_thread_manager(self) -> AsyncGenerator[Dict[str, Any], None]:
-        """浣跨敤ThreadManager鎵ц锛堝洖閫€妯″紡锛?""
+        """Run the fallback ThreadManager execution path."""
         try:
-            print(f"  馃摑 鍑嗗ThreadManager鎵ц...")
+            print("  Preparing ThreadManager execution...")
             
             # 鏋勫缓涓存椂娑堟伅
             temporary_message = None
@@ -1265,7 +1266,7 @@ class AgentRunner:
             }
     
     def _convert_adk_event_to_format(self, adk_event) -> Optional[Dict[str, Any]]:
-        """灏咥DK浜嬩欢杞崲涓轰綘鐨勬牸寮?""
+        """Convert an ADK event into the internal response format."""
         try:
             if adk_event.type == "assistant_response_start":
                 return {

@@ -470,7 +470,7 @@ const LoggedInMenu: React.FC<UnifiedConfigMenuProps> = ({
                                 <DropdownMenuPortal>
                                     <DropdownMenuSubContent className="w-72 rounded-xl max-h-80 overflow-y-auto">
                                         {playbooksLoading ? (
-                                            <div className="px-3 py-2 text-xs text-muted-foreground">Loading鈥?/div>
+                                            <div className="px-3 py-2 text-xs text-muted-foreground">Loading...</div>
                                         ) : playbooks && playbooks.length > 0 ? (
                                             playbooks.map((wf: any) => (
                                                 <DropdownMenuItem

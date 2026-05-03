@@ -25,30 +25,30 @@ from run_agent_background import run_agent_background
 
 def determine_sandbox_type(files):
     """
-    鏍规嵁涓婁紶鐨勬枃浠剁被鍨嬫櫤鑳介€夋嫨娌欑妯℃澘
-    
+    Choose a sandbox type based on the uploaded file set.
+
     Args:
-        files: 涓婁紶鐨勬枃浠跺垪琛?
-        
+        files: Uploaded files.
+
     Returns:
-        str: 娌欑绫诲瀷 ('desktop', 'browser', 'code', 'base')
+        str: Sandbox type such as `desktop`, `browser`, or `code`.
     """
     if not files:
-        return 'desktop'  # 榛樿浣跨敤妗岄潰妯℃澘
+        return 'desktop'  # Default to the desktop template.
     
-    # 鍒嗘瀽鏂囦欢绫诲瀷
+    # Analyze file types.
     file_extensions = []
     file_names = []
     
     for file_obj in files:
-        # UploadFile 瀵硅薄鐩存帴浣跨敤 .filename 灞炴€?
+        # UploadFile objects expose their filename directly.
         if hasattr(file_obj, 'filename') and file_obj.filename:
             filename = file_obj.filename.lower()
         elif hasattr(file_obj, 'get'):
-            # 濡傛灉鏄瓧鍏告牸寮忕殑鏂囦欢淇℃伅
+            # Handle dict-based file metadata.
             filename = file_obj.get('filename', '').lower()
         else:
-            # 濡傛灉鏄瓧绗︿覆
+            # Fall back to a plain string representation.
             filename = str(file_obj).lower()
             
         file_names.append(filename)
@@ -58,25 +58,24 @@ def determine_sandbox_type(files):
     
     logger.info(f"Analyzing file types: {file_extensions}")
     
-    # 濡傛灉鏈夌綉椤电浉鍏虫枃浠讹紝浣跨敤娴忚鍣ㄦā鏉?
+    # Use the browser template when web assets are present.
     web_extensions = {'html', 'htm', 'css', 'js', 'ts', 'jsx', 'tsx', 'vue', 'react'}
     if any(ext in web_extensions for ext in file_extensions):
         logger.info("Detected web files, selecting browser template")
         return 'browser'
     
-    # 濡傛灉鍙湁浠ｇ爜鏂囦欢涓斾笉闇€瑕佸浘褰㈢晫闈紝浣跨敤浠ｇ爜瑙ｉ噴鍣?
+    # Use the code template for pure code inputs that do not need a GUI.
     code_extensions = {'py', 'ipynb', 'r', 'sql', 'sh', 'bash', 'json', 'yaml', 'yml', 'txt', 'md'}
     if (any(ext in code_extensions for ext in file_extensions) and 
         not any(ext in {'png', 'jpg', 'jpeg', 'gif', 'svg', 'pdf', 'doc', 'docx'} for ext in file_extensions)):
-        # 濡傛灉鏈?Jupyter notebook锛屼娇鐢ㄦ闈㈢幆澧冧互渚挎煡鐪嬪浘琛?
+        # Jupyter notebooks are easier to inspect in the desktop environment.
         if any(ext == 'ipynb' for ext in file_extensions):
             logger.info("Detected Jupyter notebook, selecting desktop template")
             return 'desktop'
         logger.info("Detected pure code files, selecting code interpreter template")
         return 'code'
     
-    # 榛樿浣跨敤妗岄潰妯℃澘 - 鎻愪緵鏈€瀹屾暣鐨勫姛鑳?
-    # 閫傜敤浜庯細鍥惧儚鏂囦欢銆佹贩鍚堟枃浠剁被鍨嬨€侀渶瑕佸浘褰㈢晫闈㈢殑鍦烘櫙
+    # Fall back to the desktop template for mixed files and GUI-oriented tasks.
     logger.info("Using default desktop template")
     return 'desktop'
 from utils.constants import MODEL_NAME_ALIASES
@@ -116,8 +115,8 @@ class MessageCreateRequest(BaseModel):
 class AgentCreateRequest(BaseModel):
     name: str
     description: Optional[str] = None
-    system_prompt: Optional[str] = None  # 纭繚绯荤粺鎻愮ず璇嶆槸鍙€夌殑锛屽厑璁搁粯璁や娇鐢?Hephaestus 鐨勭郴缁熸彁绀鸿瘝
-    model: Optional[str] = None  # 纭繚妯″瀷鏄彲閫夌殑
+    system_prompt: Optional[str] = None  # Optional; defaults to the Hephaestus system prompt.
+    model: Optional[str] = None  # Optional model override.
     configured_mcps: Optional[List[Dict[str, Any]]] = []
     custom_mcps: Optional[List[Dict[str, Any]]] = []
     agentpress_tools: Optional[Dict[str, Any]] = {}
@@ -648,9 +647,9 @@ async def stop_agent(agent_run_id: str, user_id: str = Depends(get_current_user_
 @router.get("/thread/{thread_id}/agent-runs")
 async def get_agent_runs(thread_id: str, user_id: str = Depends(get_current_user_id_from_jwt)):
     """Get all agent runs for a thread."""
-    print(f"馃攳 ===== 鏌ヨ绾跨▼Agent杩愯璁板綍 =====")
-    print(f"  馃搵 thread_id: {thread_id}")
-    print(f"  馃懁 user_id: {user_id}")
+    print("===== Fetching thread agent runs =====")
+    print(f"  thread_id: {thread_id}")
+    print(f"  user_id: {user_id}")
     
     structlog.contextvars.bind_contextvars(
         thread_id=thread_id,
@@ -659,24 +658,28 @@ async def get_agent_runs(thread_id: str, user_id: str = Depends(get_current_user
     client = await db.client
     await verify_thread_access(client, thread_id, user_id)
     
-    print(f"  馃攳 鏌ヨ鏁版嵁搴撲腑鐨刟gent_runs璁板綍...")
+    print("  Querying agent_runs records...")
     agent_runs = await client.table('agent_runs').select('id, agent_run_id, thread_id, status, started_at, completed_at, error, created_at, updated_at').eq("thread_id", thread_id).order('created_at', desc=True).execute()
     
-    print(f"  馃搳 鏌ヨ缁撴灉: 鎵惧埌 {len(agent_runs.data)} 鏉¤褰?)
+    print(f"  query result: found {len(agent_runs.data)} records")
     for i, run in enumerate(agent_runs.data):
-        print(f"    {i+1}. ID: {run.get('id')}, agent_run_id: {run.get('agent_run_id')}, 鐘舵€? {run.get('status')}, 寮€濮嬫椂闂? {run.get('started_at')}, 瀹屾垚鏃堕棿: {run.get('completed_at')}")
+        print(
+            f"    {i+1}. ID: {run.get('id')}, agent_run_id: {run.get('agent_run_id')}, "
+            f"status: {run.get('status')}, started_at: {run.get('started_at')}, "
+            f"completed_at: {run.get('completed_at')}"
+        )
     
-    # 澶勭悊杩斿洖鏁版嵁锛岀‘淇濅娇鐢ㄦ纭殑ID瀛楁
+        # Normalize the response payload so the frontend always gets the right ID field.
     processed_runs = []
     for run in agent_runs.data:
         processed_run = dict(run)
-        # 浼樺厛浣跨敤agent_run_id锛屽鏋滄病鏈夊垯浣跨敤id
+        # Prefer agent_run_id and fall back to id when needed.
         if processed_run.get('agent_run_id'):
             processed_run['id'] = processed_run['agent_run_id']
         processed_runs.append(processed_run)
     
     logger.debug(f"Found {len(agent_runs.data)} agent runs for thread: {thread_id}")
-    print(f"馃帀 ===== 鏌ヨ瀹屾垚 =====")
+    print("===== Agent run query complete =====")
     return {"agent_runs": processed_runs}
 
 @router.get("/agent-run/{agent_run_id}")
@@ -852,36 +855,36 @@ async def stream_agent_run(
     request: Request = None
 ):
     """Stream the responses of an agent run using Redis Lists and Pub/Sub."""
-    print(f"馃殌 ===== 娴佸紡杈撳嚭鎺ュ彛寮€濮?=====")
-    print(f"  馃搵 agent_run_id: {agent_run_id}")
-    print(f"  馃攽 token: {token[:10] if token else 'None'}...")
-    print(f"  馃寪 request: {request}")
+    print("===== Stream endpoint started =====")
+    print(f"  agent_run_id: {agent_run_id}")
+    print(f"  token: {token[:10] if token else 'None'}...")
+    print(f"  request: {request}")
     
     print(f"Starting stream for agent run: {agent_run_id}")
     client = await db.client
 
-    print(f"  馃攼 寮€濮嬬敤鎴疯韩浠介獙璇?..")
+    print("  Starting user authentication...")
     user_id = await get_user_id_from_stream_auth(request, token) # 鐬椂楠岃瘉
-    print(f"  鉁?鐢ㄦ埛韬唤楠岃瘉瀹屾垚: {user_id}")
+    print(f"  User authentication complete: {user_id}")
     
-    print(f"  馃攳 寮€濮嬫鏌gent_run璁块棶鏉冮檺...")
+    print("  Checking agent_run access...")
     agent_run_data = await get_agent_run_with_access_check(client, agent_run_id, user_id) # 1 db query
-    print(f"  鉁?agent_run鏁版嵁鑾峰彇瀹屾垚: {agent_run_data}")
+    print(f"  agent_run data retrieved: {agent_run_data}")
 
-    # 缁撴瀯鍖栨棩蹇椾笂涓嬫枃锛屽皢 agent_run_id 鍜?user_id 缁戝畾鍒板綋鍓嶈姹傜殑涓婁笅鏂囦腑锛屽悗缁殑鎵€鏈夋棩蹇楄褰曢兘浼氳嚜鍔ㄥ寘鍚繖浜涗俊鎭?
+    # Bind request-scoped context so later logs automatically include these values.
     structlog.contextvars.bind_contextvars(
         agent_run_id=agent_run_id,
         user_id=user_id,
     )
 
-    # 瀹氫箟Redis涓殑閿悕锛岀敤浜庢祦寮忚緭鍑虹殑鏁版嵁瀛樺偍鍜岄€氫俊
-    response_list_key = f"agent_run:{agent_run_id}:responses"  # Redis List 閿悕锛屽瓨鍌?agent_run 鐨勬墍鏈夊搷搴旀暟鎹?
-    response_channel = f"agent_run:{agent_run_id}:new_response" # Redis Pub/Sub 棰戦亾鍚嶏紝鐢ㄤ簬閫氱煡鏂板搷搴斿埌杈?
-    control_channel = f"agent_run:{agent_run_id}:control" # edis Pub/Sub 棰戦亾鍚嶏紝鐢ㄤ簬鎺у埗淇″彿锛屾瘮濡傚彂閫佸仠姝€佹殏鍋溿€侀敊璇€佺鐞嗘祦寮忚緭鍑虹殑鐢熷懡鍛ㄦ湡
+    # Redis keys used for streaming response storage and control signaling.
+    response_list_key = f"agent_run:{agent_run_id}:responses"  # Redis list with all streamed responses.
+    response_channel = f"agent_run:{agent_run_id}:new_response"  # Pub/Sub channel for new response notifications.
+    control_channel = f"agent_run:{agent_run_id}:control"  # Pub/Sub channel for stop/error/control signals.
     
 
     async def stream_generator(agent_run_data):
-        print(f"   ===== 娴佸紡鐢熸垚鍣ㄥ紑濮?=====")
+        print("   ===== Stream generator started =====")
         print(f"Streaming responses for {agent_run_id} using Redis list {response_list_key} and channel {response_channel}")
         last_processed_index = -1
         pubsub_response = None
@@ -891,62 +894,60 @@ async def stream_agent_run(
         initial_yield_complete = False
 
         try:
-            # 1. 鎹曡幏 Redis List 涓殑鍒濆鍝嶅簲锛屽苟鍙戦€佺粰鍓嶇
-            # 鐩殑锛氬墠绔噸杩炴椂锛岃兘鑾峰彇鍒颁箣鍓嶉敊杩囩殑鍝嶅簲
-            print(f"  馃摜 姝ラ1: 鑾峰彇Redis涓殑鍒濆鍝嶅簲...")
+            # 1. Replay the initial Redis list so reconnecting clients can catch up.
+            print("  Step 1: fetching initial Redis responses...")
             initial_responses_json = await redis.lrange(response_list_key, 0, -1)
-            print(f"  馃搳 Redis涓垵濮嬪搷搴旀暟閲? {len(initial_responses_json) if initial_responses_json else 0}")
+            print(f"  Initial Redis response count: {len(initial_responses_json) if initial_responses_json else 0}")
             
             initial_responses = []
             if initial_responses_json:
                 initial_responses = [json.loads(r) for r in initial_responses_json]
-                print(f"  馃摛 鍙戦€?{len(initial_responses)} 涓垵濮嬪搷搴旂粰鍓嶇")
+                print(f"  Sending {len(initial_responses)} initial responses to the client")
                 for i, response in enumerate(initial_responses):
                     response_str = f"data: {json.dumps(response)}\n\n"
-                    print(f"    [{i+1}] 鍙戦€佸搷搴? {response}")
+                    print(f"    [{i+1}] Sending response: {response}")
                     yield response_str
                 last_processed_index = len(initial_responses) - 1
-                print(f"  鉁?鍒濆鍝嶅簲鍙戦€佸畬鎴愶紝鏈€鍚庡鐞嗙储寮? {last_processed_index}")
+                print(f"  Initial response replay complete; last processed index: {last_processed_index}")
             else:
-                print(f"  鈩癸笍 Redis涓病鏈夊垵濮嬪搷搴?)
+                print("  no initial Redis responses found")
             
             initial_yield_complete = True
 
-            # 2. 鐘舵€佹鏌?
-            # 鐩殑锛氶伩鍏嶅宸插畬鎴愮殑agent_run杩涜涓嶅繀瑕佺殑鐩戝惉
-            print(f"  馃攳 姝ラ2: 妫€鏌gent_run鐘舵€?..")
+            # 2. Check current status to avoid listening to a completed run.
+            print("  Step 2: checking current agent_run status...")
             current_status = agent_run_data.get('status') if agent_run_data else None
-            print(f"  馃搳 褰撳墠鐘舵€? {current_status}")
+            print(f"  Current status: {current_status}")
 
             # 濡傛灉agent_run鐘舵€佷笉鏄痳unning锛屽垯鐩存帴杩斿洖瀹屾垚鐘舵€?
             if current_status != 'running':
-                print(f"  鈿狅笍 Agent run {agent_run_id} 涓嶅湪杩愯鐘舵€?(status: {current_status})锛岀粨鏉熸祦寮忚緭鍑?)
+                print(f"  Agent run {agent_run_id} is not running (status: {current_status}); ending stream")
                 logger.info(f"Agent run {agent_run_id} is not running (status: {current_status}). Ending stream.")
                 completion_message = {'type': 'status', 'status': 'completed'}
-                print(f"  馃摛 鍙戦€佸畬鎴愮姸鎬? {completion_message}")
+                print(f"  Sending completion status: {completion_message}")
                 yield f"data: {json.dumps(completion_message)}\n\n"
                 return
           
-            print(f"  鉁?Agent run姝ｅ湪杩愯锛岀户缁祦寮忚緭鍑?)
+            print("  Agent run is active; continuing stream output")
             structlog.contextvars.bind_contextvars(
                 thread_id=agent_run_data.get('thread_id'),
             )
 
             # 3. 璁剧疆 Pub/Sub 鐩戝惉鍣紝鐢ㄤ簬鎺ユ敹鏂板搷搴斿拰鎺у埗淇″彿
             # 鐩殑锛氬缓绔嬪疄鏃剁洃鍚紝鐩戝惉 Redis 涓殑鏂板搷搴斿拰鎺у埗淇″彿锛屽苟灏嗗叾浼犻€掔粰娴佸紡鐢熸垚鍣?
-            print(f"  馃摗 姝ラ3: 璁剧疆Pub/Sub鐩戝惉鍣?..")
+            print("  Step 3: setting up Pub/Sub listeners...")
             pubsub_response_task = asyncio.create_task(redis.create_pubsub())
             pubsub_control_task = asyncio.create_task(redis.create_pubsub())
             
             pubsub_response, pubsub_control = await asyncio.gather(pubsub_response_task, pubsub_control_task)
-            print(f"  鉁?Pub/Sub瀹㈡埛绔垱寤哄畬鎴?)
+            print("  Pub/Sub clients created")
             
             # Subscribe to channels concurrently
             response_subscribe_task = asyncio.create_task(pubsub_response.subscribe(response_channel))
             control_subscribe_task = asyncio.create_task(pubsub_control.subscribe(control_channel))
             
             await asyncio.gather(response_subscribe_task, control_subscribe_task)
-            print(f"  鉁?璁㈤槄棰戦亾瀹屾垚: {response_channel}, {control_channel}")
+            print(f"  Subscribed to channels: {response_channel}, {control_channel}")
             
             logger.debug(f"Subscribed to response channel: {response_channel}")
             logger.debug(f"Subscribed to control channel: {control_channel}")
@@ -961,7 +962,7 @@ async def stream_agent_run(
                 response_reader = pubsub_response.listen()
                 control_reader = pubsub_control.listen()
                 tasks = [asyncio.create_task(response_reader.__anext__()), asyncio.create_task(control_reader.__anext__())]
-                print(f"  馃摗 鐩戝惉鍣ㄤ换鍔″垱寤哄畬鎴?)
+                print("  Listener tasks created")
 
                 while not terminate_stream:
                     print(f"  馃攧 绛夊緟娑堟伅...")
@@ -1006,91 +1007,91 @@ async def stream_agent_run(
                                      tasks.append(asyncio.create_task(control_reader.__anext__()))
 
                 # Cancel pending listener tasks on exit
-                print(f"  馃洃 鍙栨秷寰呭鐞嗙殑鐩戝惉鍣ㄤ换鍔?)
+                print("  Cancelling pending listener tasks")
                 for p_task in pending: p_task.cancel()
                 for task in tasks: task.cancel()
 
 
             listener_task = asyncio.create_task(listen_messages())
-            print(f"  鉁?鐩戝惉鍣ㄤ换鍔″惎鍔ㄥ畬鎴?)
+            print("  Listener task started")
 
             # 4. Main loop to process messages from the queue
-            print(f"  馃攧 ===== 涓诲惊鐜紑濮?=====")
+            print("  ===== Main loop started =====")
             while not terminate_stream:
                 try:
-                    print(f"  馃摠 绛夊緟闃熷垪娑堟伅...")
+                    print("  Waiting for queued messages...")
                     queue_item = await message_queue.get()
                     print(f"  馃摜 鏀跺埌闃熷垪娑堟伅: {queue_item}")
                     if queue_item["type"] == "new_response":
-                        print(f"  馃摛 澶勭悊鏂板搷搴?..")
+                        print("  Processing new responses...")
                         # 鑾峰彇鏂板搷搴斿苟鍙戦€佺粰鍓嶇
                         new_start_index = last_processed_index + 1
-                        print(f"  馃搷 浠庣储寮?{new_start_index} 寮€濮嬭幏鍙栨柊鍝嶅簲")
+                        print(f"  Fetching new responses starting from index {new_start_index}")
                         new_responses_json = await redis.lrange(response_list_key, new_start_index, -1)
-                        print(f"  馃搳 鑾峰彇鍒?{len(new_responses_json) if new_responses_json else 0} 涓柊鍝嶅簲")
+                        print(f"  Retrieved {len(new_responses_json) if new_responses_json else 0} new responses")
 
                         if new_responses_json:
                             new_responses = [json.loads(r) for r in new_responses_json]
                             num_new = len(new_responses)
-                            print(f"  馃摛 鍙戦€?{num_new} 涓柊鍝嶅簲缁欏墠绔?)
+                            print(f"  Sending {num_new} new responses to the client")
                             # logger.debug(f"Received {num_new} new responses for {agent_run_id} (index {new_start_index} onwards)")
                             for i, response in enumerate(new_responses):
                                 response_str = f"data: {json.dumps(response)}\n\n"
-                                print(f"    [{i+1}] 鍙戦€佸搷搴? {response}")
+                                print(f"    [{i+1}] Sending response: {response}")
                                 yield response_str
                                 # Check if this response signals completion
                                 if response.get('type') == 'status' and response.get('status') in ['completed', 'failed', 'stopped']:
-                                    print(f"  馃幆 妫€娴嬪埌杩愯瀹屾垚鐘舵€? {response.get('status')}")
+                                    print(f"  Detected completion status: {response.get('status')}")
                                     logger.info(f"Detected run completion via status message in stream: {response.get('status')}")
                                     terminate_stream = True
                                     break # Stop processing further new responses
                             last_processed_index += num_new
-                            print(f"  鉁?鏂板搷搴斿鐞嗗畬鎴愶紝鏈€鍚庡鐞嗙储寮? {last_processed_index}")
+                            print(f"  Finished processing new responses; last processed index: {last_processed_index}")
                         else:
-                            print(f"  鈩癸笍 娌℃湁鏂板搷搴?)
+                            print("  No new responses")
                         if terminate_stream: 
-                            print(f"  馃洃 娴佸紡杈撳嚭缁堟")
+                            print("  Stream output terminating")
                             break
 
                     elif queue_item["type"] == "control":
                         control_signal = queue_item["data"]
-                        print(f"  馃洃 鏀跺埌鎺у埗淇″彿: {control_signal}")
+                        print(f"  Received control signal: {control_signal}")
                         terminate_stream = True # Stop the stream on any control signal
                         control_message = {'type': 'status', 'status': control_signal}
-                        print(f"  馃摛 鍙戦€佹帶鍒剁姸鎬? {control_message}")
+                        print(f"  Sending control status: {control_message}")
                         yield f"data: {json.dumps(control_message)}\n\n"
                         break
 
                     elif queue_item["type"] == "error":
-                        print(f"  鉂?鐩戝惉鍣ㄩ敊璇? {queue_item['data']}")
+                        print(f"  Listener error: {queue_item['data']}")
                         logger.error(f"Listener error for {agent_run_id}: {queue_item['data']}")
                         terminate_stream = True
                         error_message = {'type': 'status', 'status': 'error'}
-                        print(f"  馃摛 鍙戦€侀敊璇姸鎬? {error_message}")
+                        print(f"  Sending error status: {error_message}")
                         yield f"data: {json.dumps(error_message)}\n\n"
                         break
 
                 except asyncio.CancelledError:
-                     print(f"  馃洃 娴佸紡鐢熸垚鍣ㄤ富寰幆琚彇娑?)
+                     print("  Stream generator main loop cancelled")
                      logger.info(f"Stream generator main loop cancelled for {agent_run_id}")
                      terminate_stream = True
                      break
                 except Exception as loop_err:
-                    print(f"  鉂?娴佸紡鐢熸垚鍣ㄤ富寰幆閿欒: {loop_err}")
+                    print(f"  Stream generator main loop error: {loop_err}")
                     logger.error(f"Error in stream generator main loop for {agent_run_id}: {loop_err}", exc_info=True)
                     terminate_stream = True
                     error_message = {'type': 'status', 'status': 'error', 'message': f'Stream failed: {loop_err}'}
-                    print(f"  馃摛 鍙戦€侀敊璇姸鎬? {error_message}")
+                    print(f"  Sending error status: {error_message}")
                     yield f"data: {json.dumps(error_message)}\n\n"
                     break
 
         except Exception as e:
-            print(f"  鉂?璁剧疆娴佸紡杈撳嚭鏃跺彂鐢熼敊璇? {e}")
+            print(f"  Error while setting up stream output: {e}")
             logger.error(f"Error setting up stream for agent run {agent_run_id}: {e}", exc_info=True)
             # Only yield error if initial yield didn't happen
             if not initial_yield_complete:
                  error_message = {'type': 'status', 'status': 'error', 'message': f'Failed to start stream: {e}'}
-                 print(f"  馃摛 鍙戦€佸惎鍔ㄩ敊璇姸鎬? {error_message}")
+                 print(f"  Sending startup error status: {error_message}")
                  yield f"data: {json.dumps(error_message)}\n\n"
         finally:
             print(f"  馃Ч ===== 娓呯悊璧勬簮 =====")
@@ -1110,19 +1111,19 @@ async def stream_agent_run(
                 await pubsub_control.close()
 
             if listener_task:
-                print(f"  馃洃 鍙栨秷鐩戝惉鍣ㄤ换鍔?)
+                print("  Cancelling listener task")
                 listener_task.cancel()
                 try:
                     await listener_task  # Reap inner tasks & swallow their errors
                 except asyncio.CancelledError:
-                    print(f"  鉁?鐩戝惉鍣ㄤ换鍔″凡鍙栨秷")
+                    print("  Listener task cancelled")
                     pass
                 except Exception as e:
-                    print(f"  鈿狅笍 鐩戝惉鍣ㄤ换鍔＄粨鏉熸椂鏈夐敊璇? {e}")
+                    print(f"  Listener task finished with error: {e}")
                     logger.debug(f"listener_task ended with: {e}")
             # Wait briefly for tasks to cancel
             await asyncio.sleep(0.1)
-            print(f"  鉁?娴佸紡杈撳嚭娓呯悊瀹屾垚")
+            print("  Stream output cleanup complete")
             logger.debug(f"Streaming cleanup complete for agent run: {agent_run_id}")
 
     print(f"  寮€濮嬪垱寤篠treamingResponse...")
@@ -3357,7 +3358,7 @@ async def get_user_threads(
     page: Optional[int] = Query(1, ge=1, description="Page number (1-based)"),
     limit: Optional[int] = Query(1000, ge=1, le=1000, description="Number of items per page (max 1000)")
 ):
-    """鑾峰彇褰撳墠鐢ㄦ埛鐨勬墍鏈夊璇濈嚎绋嬶紝鍖呭惈鍏宠仈鐨勯」鐩暟鎹?""
+    """Get all threads for the current user, including related project data."""
     logger.info(f"Fetching threads with project data for user: {user_id} (page={page}, limit={limit})")
     client = await db.client
     try:
@@ -3464,37 +3465,37 @@ async def get_project(
     user_id: str = Depends(get_current_user_id_from_jwt)
 ):
     """Get a specific project by ID with complete related data."""
-    print(f"馃攧 ===== 寮€濮嬭幏鍙栭」鐩俊鎭?=====")
-    print(f"  馃搵 project_id: {project_id}")
-    print(f"  馃懁 user_id: {user_id}")
+    print("===== Fetching project details =====")
+    print(f"  project_id: {project_id}")
+    print(f"  user_id: {user_id}")
     logger.info(f"Fetching project: {project_id}")
     client = await db.client
     
     try:
-        print(f"  馃搳 鑾峰彇椤圭洰鏁版嵁...")
+        print("  Fetching project record...")
         project_result = await client.table('projects').select('*').eq('project_id', project_id).execute()
         
         if not project_result.data:
-            print(f"  鉂?椤圭洰鏈壘鍒? {project_id}")
+            print(f"  Project not found: {project_id}")
             raise HTTPException(status_code=404, detail="Project not found")
         
         project = project_result.data[0]
-        print(f"  鉁?椤圭洰鏁版嵁鑾峰彇鎴愬姛")
-        print(f"    馃摑 椤圭洰淇℃伅: name={project.get('name')}, account_id={project.get('account_id')}")
+        print("  Project record retrieved successfully")
+        print(f"    Project info: name={project.get('name')}, account_id={project.get('account_id')}")
         
-        # 楠岃瘉椤圭洰璁块棶鏉冮檺
+        # Verify project access permissions.
         if project.get('account_id') != user_id:
-            print(f"  鉂?椤圭洰璁块棶鏉冮檺琚嫆缁? account_id={project.get('account_id')}, user_id={user_id}")
+            print(f"  Project access denied: account_id={project.get('account_id')}, user_id={user_id}")
             raise HTTPException(status_code=403, detail="Access denied")
         
-        print(f"  鉁?椤圭洰璁块棶鏉冮檺楠岃瘉閫氳繃")
+        print("  Project access verified")
         
-        # 鑾峰彇椤圭洰鍏宠仈鐨勭嚎绋?
-        print(f"  馃挰 鑾峰彇椤圭洰鍏宠仈鐨勭嚎绋?..")
+        # Fetch threads associated with the project.
+        print("  Fetching related threads...")
         threads_result = await client.table('threads').select('*').eq('project_id', project_id).order('created_at', desc=True).execute()
         threads_data = []
         if threads_result.data:
-            print(f"    馃搵 鎵惧埌 {len(threads_result.data)} 涓叧鑱旂嚎绋?)
+            print(f"    Found {len(threads_result.data)} related threads")
             threads_data = [{
                 "thread_id": thread['thread_id'],
                 "account_id": thread['account_id'],
@@ -3504,18 +3505,18 @@ async def get_project(
                 "updated_at": thread['updated_at']
             } for thread in threads_result.data]
             
-            # 鎵撳嵃鏈€杩戠殑鍑犱釜绾跨▼
-            for i, thread in enumerate(threads_result.data[:3]):  # 鍙樉绀哄墠3涓?
+            # Print a quick preview of the first few threads.
+            for i, thread in enumerate(threads_result.data[:3]):
                 print(f"      {i+1}. thread_id: {thread['thread_id']}, created_at: {thread['created_at']}")
         else:
-            print(f"    鈴笍 鏃犲叧鑱旂嚎绋?)
+            print("    No related threads")
         
-        # 鑾峰彇椤圭洰鐩稿叧鐨凙gent杩愯璁板綍
-        print(f"  馃 鑾峰彇椤圭洰鐩稿叧鐨凙gent杩愯璁板綍...")
+        # Fetch agent runs related to this project.
+        print("  Fetching related agent runs...")
         agent_runs_result = await client.table('agent_runs').select('*').in_('thread_id', [t['thread_id'] for t in threads_data]).order('created_at', desc=True).execute()
         agent_runs_data = []
         if agent_runs_result.data:
-            print(f"    馃搵 鎵惧埌 {len(agent_runs_result.data)} 鏉gent杩愯璁板綍")
+            print(f"    Found {len(agent_runs_result.data)} agent runs")
             agent_runs_data = [{
                 "id": run['id'],
                 "thread_id": run['thread_id'],
@@ -3528,26 +3529,26 @@ async def get_project(
                 "created_at": run['created_at']
             } for run in agent_runs_result.data]
             
-            # 鎵撳嵃鏈€杩戠殑鍑犳潯杩愯璁板綍
-            for i, run in enumerate(agent_runs_result.data[:3]):  # 鍙樉绀哄墠3鏉?
-                print(f"      {i+1}. ID: {run['id']}, 鐘舵€? {run.get('status', 'N/A')}, 绾跨▼: {run.get('thread_id')}")
+            # Print a preview of the first few runs.
+            for i, run in enumerate(agent_runs_result.data[:3]):
+                print(f"      {i+1}. ID: {run['id']}, status: {run.get('status', 'N/A')}, thread: {run.get('thread_id')}")
         else:
-            print(f"    鈴笍 鏃燗gent杩愯璁板綍")
+            print("    No agent runs found")
         
-        # 缁熻椤圭洰鎬绘秷鎭暟
-        print(f"  馃搳 缁熻椤圭洰鎬绘秷鎭暟...")
+        # Count total messages across project threads.
+        print("  Counting project messages...")
         total_message_count = 0
         if threads_data:
             for thread in threads_data:
                 message_count_result = await client.schema('public').table('events').select('id', count='exact').eq('session_id', thread['thread_id']).execute()
                 thread_message_count = message_count_result.count if message_count_result.count is not None else 0
                 total_message_count += thread_message_count
-                print(f"    馃搱 绾跨▼ {thread['thread_id']}: {thread_message_count} 鏉℃秷鎭?)
+                print(f"    Thread {thread['thread_id']}: {thread_message_count} messages")
         
-        print(f"    馃搱 椤圭洰鎬绘秷鎭暟: {total_message_count}")
+        print(f"    Total project message count: {total_message_count}")
         
-        # 鏋勫缓杩斿洖鏁版嵁
-        print(f"  馃攧 鏋勫缓杩斿洖鏁版嵁...")
+        # Build the response payload.
+        print("  Building response payload...")
         mapped_project = {
             "project_id": project['project_id'],
             "name": project.get('name', ''),
@@ -3563,8 +3564,8 @@ async def get_project(
             "thread_count": len(threads_data)
         }
         
-        print(f"  鉁?鏁版嵁鏋勫缓瀹屾垚")
-        print(f"    馃搳 杩斿洖鏁版嵁姒傝:")
+        print("  Response payload ready")
+        print("    Response summary:")
         print(f"      - project_id: {mapped_project['project_id']}")
         print(f"      - name: {mapped_project['name']}")
         print(f"      - account_id: {mapped_project['account_id']}")
@@ -3574,7 +3575,7 @@ async def get_project(
         print(f"      - has_sandbox: {bool(mapped_project['sandbox'])}")
         
         logger.info(f"[API] Mapped project for frontend: {project_id} with {len(threads_data)} threads and {total_message_count} total messages")
-        print(f"馃帀 ===== 椤圭洰淇℃伅鑾峰彇瀹屾垚 =====")
+        print("===== Project details fetched =====")
         return mapped_project
         
     except HTTPException:
@@ -3641,7 +3642,7 @@ async def get_thread(
             else:
                 print(f"    鈿狅笍 椤圭洰鏈壘鍒? {thread['project_id']}")
         else:
-            print(f"    鈴笍 绾跨▼鏃犲叧鑱旈」鐩?)
+            print("    Thread has no related project")
         
         # Get message count for the thread
         print(f"  馃搳 缁熻娑堟伅鏁伴噺...")
@@ -4230,7 +4231,7 @@ async def upload_agent_profile_image(
         raise HTTPException(status_code=500, detail="Failed to upload profile image")
 
 async def _create_adk_session_if_not_exists(client, user_id: str, session_id: str, app_name: str = "hephaestus"):
-    """濡傛灉ADK session涓嶅瓨鍦ㄥ垯鍒涘缓"""
+    """Create the ADK session if it does not exist."""
     try:
         # 妫€鏌ession鏄惁宸插瓨鍦?
         async with client.pool.acquire() as conn:
@@ -4262,7 +4263,7 @@ async def _create_adk_session_if_not_exists(client, user_id: str, session_id: st
         raise
 
 async def _log_adk_user_message_event(client, user_id: str, message_content: str, session_id: str, message_id: str, app_name: str = "hephaestus"):
-    """璁板綍鐢ㄦ埛娑堟伅浜嬩欢鍒癆DK events琛?""
+    """Record a user message event into the ADK events table."""
     try:
         import uuid
         import pickle
@@ -4312,7 +4313,7 @@ async def _log_adk_user_message_event(client, user_id: str, message_content: str
         raise
 
 async def _log_adk_agent_response_event(client, user_id: str, response_content: str, session_id: str, model_name: str, app_name: str = "hephaestus"):
-    """璁板綍AI浠ｇ悊鍥炲浜嬩欢鍒癆DK events琛?""
+    """Record an assistant reply event into the ADK events table."""
     try:
         import uuid
         event_id = str(uuid.uuid4())
@@ -4346,7 +4347,7 @@ async def _log_adk_agent_response_event(client, user_id: str, response_content: 
         raise
 
 def _format_messages_from_table(messages):
-    """鏍煎紡鍖杕essages琛ㄦ暟鎹负鍓嶇鏈熸湜鏍煎紡锛屾敮鎸乤ssistant娑堟伅鍔ㄦ€佹媶鍒?""
+    """Format stored message rows into the frontend message shape."""
     formatted_messages = []
     
     # 馃攳 璋冭瘯锛氭鏌ュ師濮嬫暟鎹簱娑堟伅
@@ -4362,9 +4363,9 @@ def _format_messages_from_table(messages):
     if raw_assistant_messages:
         for assistant_msg in raw_assistant_messages:
             raw_msg_id = assistant_msg.get('message_id')
-            logger.info(f"馃攳 鍙戠幇鍘熷assistant娑堟伅: ID={raw_msg_id} (绫诲瀷: {type(raw_msg_id)}), metadata棰勮={str(assistant_msg.get('metadata', ''))[:200]}...")
+            logger.info(f"Found raw assistant message: ID={raw_msg_id} (type: {type(raw_msg_id)}), metadata preview={str(assistant_msg.get('metadata', ''))[:200]}...")
     else:
-        logger.warning("鈿狅笍 鏁版嵁搴撴煡璇㈢粨鏋滀腑娌℃湁assistant娑堟伅锛?)
+        logger.warning("No assistant messages were found in the database query result")
     
     for msg in messages:
         try:
@@ -4526,17 +4527,17 @@ def _format_messages_from_table(messages):
                 updated_tool_count += 1
                 logger.info(f"馃敆 鏇存柊tool娑堟伅 {tool_msg.get('message_id')} -> assistant {correct_assistant_id}")
         except Exception as e:
-            logger.warning(f"鈿狅笍 鏇存柊tool娑堟伅鍏宠仈澶辫触 {tool_msg.get('message_id')}: {e}")
+            logger.warning(f"Failed to update tool message association {tool_msg.get('message_id')}: {e}")
     
     # 馃攳 鏈€缁堢粺璁?
-    logger.info(f"馃 鏈€缁圓ssistant娑堟伅鏁伴噺: {len(assistant_messages)}")
-    logger.info(f"馃敡 Tool娑堟伅鏁伴噺: {len(tool_messages)}")
-    logger.info(f"馃敆 鏇存柊浜?{updated_tool_count} 涓猼ool娑堟伅鐨勫叧鑱?)
+    logger.info(f"Final assistant message count: {len(assistant_messages)}")
+    logger.info(f"Tool message count: {len(tool_messages)}")
+    logger.info(f"Updated associations for {updated_tool_count} tool messages")
     
     return formatted_messages
 
 def _convert_user_events_to_messages(events):
-    """灏嗙敤鎴積vents杞崲涓哄墠绔湡鏈涚殑娑堟伅鏍煎紡"""
+    """Convert user events into the frontend message format."""
     user_messages = []
     
     for event in events:
@@ -4582,12 +4583,12 @@ def _convert_user_events_to_messages(events):
             }
             
             user_messages.append(formatted_message)
-            logger.debug(f"杞崲鐢ㄦ埛娑堟伅: {event.get('id')} - {user_text[:50]}{'...' if len(user_text) > 50 else ''}")
+            logger.debug(f"Converted user message: {event.get('id')} - {user_text[:50]}{'...' if len(user_text) > 50 else ''}")
             
         except Exception as e:
-            logger.warning(f"璺宠繃鏍煎紡閿欒鐨勭敤鎴蜂簨浠?{event.get('id', 'unknown')}: {e}")
+            logger.warning(f"Skipping malformed user event {event.get('id', 'unknown')}: {e}")
             continue
     
-    logger.info(f"馃攧 杞崲浜?{len(user_messages)} 鏉＄敤鎴锋秷鎭?)
+    logger.info(f"Converted {len(user_messages)} user messages")
     return user_messages
 

@@ -222,11 +222,11 @@ export function ToolCallSidePanel({
   onFileClick,
   disableInitialAnimation,
 }: ToolCallSidePanelProps) {
-  // 娓叉煋璁℃暟璋冭瘯
+  // Render count debug
   const renderCount = React.useRef(0);
   renderCount.current += 1;
   
-  console.log('馃帹 [ToolCallSidePanel] RENDER:', {
+  console.log('[ToolCallSidePanel] RENDER:', {
     renderCount: renderCount.current,
     isOpen,
     toolCallsLength: toolCalls.length,
@@ -250,9 +250,9 @@ export function ToolCallSidePanel({
     onClose();
   }, [onClose]);
 
-  // 澶у箙绠€鍖栭€昏緫锛屽彧鍦ㄥ繀瑕佹椂鏇存柊
+  // Keep the update logic minimal and only refresh when necessary.
   React.useEffect(() => {
-    // 鍙湪 toolCalls 闀垮害鍙樺寲鏃堕噸鏂扮敓鎴愬揩鐓?
+    // Rebuild snapshots only when the toolCalls length changes.
     const newSnapshots = toolCalls.map((toolCall, index) => ({
       id: `${index}-${toolCall.assistantCall.timestamp || 'no-timestamp'}`,
       toolCall,
@@ -262,14 +262,14 @@ export function ToolCallSidePanel({
 
     setToolCallSnapshots(newSnapshots);
 
-    // 浠呭湪鍒濆鍖栨椂璁剧疆绱㈠紩
+    // Only initialize the index once.
     if (!isInitialized && newSnapshots.length > 0) {
       setInternalIndex(newSnapshots.length - 1);
       setIsInitialized(true);
     }
-  }, [toolCalls.length]); // 鍙緷璧栭暱搴?
+  }, [toolCalls.length]); // Depend only on length.
 
-  // 绠€鍖栫殑绱㈠紩鍚屾锛屽畬鍏ㄩ伩鍏?toolCallSnapshots 渚濊禆
+  // Simplified index sync that avoids depending on toolCallSnapshots.
   React.useEffect(() => {
     setInternalIndex(currentIndex);
   }, [currentIndex]);
@@ -291,7 +291,7 @@ export function ToolCallSidePanel({
 
   const isCurrentToolStreaming = currentToolCall?.toolResult?.content === 'STREAMING';
   
-  console.log('馃攳 [ToolCallSidePanel] Display logic:', {
+  console.log('[ToolCallSidePanel] Display logic:', {
     isCurrentToolStreaming,
     totalCompletedCalls,
     currentToolName: currentToolCall?.assistantCall?.name,
@@ -299,11 +299,11 @@ export function ToolCallSidePanel({
     totalCalls
   });
   
-  // 馃毃 淇锛氬鏋滃綋鍓嶅伐鍏锋鍦╯treaming锛屽簲璇ユ樉绀簊treaming鐘舵€佽€屼笉鏄垏鎹㈠埌宸插畬鎴愰」
+  // If the current tool is streaming, keep showing the streaming state.
   if (isCurrentToolStreaming) {
-    // 淇濇寔鏄剧ず褰撳墠streaming鐨勫伐鍏凤紝杩欐牱TaskView鍙互姝ｇ‘鏄剧ずloading鐘舵€?
+    // Keep the current streaming tool visible so TaskView can show loading correctly.
     console.log('鉁?[ToolCallSidePanel] Keeping streaming tool for display:', currentToolCall?.assistantCall?.name);
-    // displayToolCall 淇濇寔涓?currentToolCall锛堥粯璁ゅ€硷級
+    // displayToolCall remains currentToolCall by default.
   } else if (!isCurrentToolStreaming) {
     const completedIndex = completedToolCalls.findIndex(snapshot => snapshot.id === currentSnapshot?.id);
     if (completedIndex >= 0) {

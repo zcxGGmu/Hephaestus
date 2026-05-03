@@ -459,7 +459,7 @@ class ADKThreadManager:
                                         
                                         # 妫€娴嬪埌宸ュ叿瀹屾垚锛岀珛鍗崇粓姝㈡暣涓祦绋?
                                         if status_type == 'tool_completed':
-                                            logger.info("馃敡 妫€娴嬪埌宸ュ叿鎵ц瀹屾垚锛岀珛鍗崇粓姝㈡祦绋?)
+                                            logger.info("Detected completed tool execution; ending stream early")
                                             yield chunk  # 鍏堣緭鍑哄伐鍏峰畬鎴愮姸鎬?
                                             return  # 馃敡 褰诲簳缁堟锛屼笉鍐嶅鐞嗕换浣曞悗缁唴瀹?
                                             

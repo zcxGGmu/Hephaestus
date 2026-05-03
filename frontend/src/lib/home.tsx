@@ -109,9 +109,9 @@ export const siteConfig = {
     ),
     badge: '100% OPEN SOURCE',
     githubUrl: 'https://github.com/kortix-ai/suna',
-    title: 'Hephaestus 鈥?鏋勫缓銆佺鐞嗗拰璁粌鎮ㄧ殑 AI 宸ヤ綔鍥㈤槦.',
+    title: 'Hephaestus - 构建、管理和训练您的 AI 工作团队.',
     description:
-      'Hephaestus 鈥?浠庝汉宸ュ埌 AI 杩佺Щ鐨勬渶绠€鍗曟柟寮?',
+      'Hephaestus - 从人工工作流迁移到 AI 工作流的更简单方式.',
     inputPlaceholder: 'Ask Suna to...',
   },
   cloudPricingItems: [
@@ -1231,7 +1231,7 @@ export const siteConfig = {
       text: 'Get Started for free',
       href: '/auth',
     },
-    subtext: '鏋勫缓銆佺鐞嗗拰璁粌鎮ㄧ殑 AI 宸ヤ綔鍥㈤槦',
+    subtext: '构建、管理和训练您的 AI 工作团队',
   },
   footerLinks: [
     {

@@ -28,7 +28,7 @@ class SunaSyncService:
         self.repository = HephaestusAgentRepository()
     
     async def sync_all_agents(self, dry_run: bool = False) -> SyncResult:
-        logger.info("馃殌 Starting Suna agent metadata sync")
+        logger.info("Starting Hephaestus agent metadata sync")
         
         try:
             current_config = self.config_manager.get_current_config()
@@ -37,14 +37,16 @@ class SunaSyncService:
             )
             
             if not agents_needing_sync:
-                logger.info("馃搵 All Suna agents already have current metadata")
+                logger.info("All Hephaestus agents already have current metadata")
                 return SyncResult(
                     success=True,
                     synced_count=0,
                     details=[{"message": "All agents already up to date"}]
                 )
             
-            logger.info(f"馃搳 Updating metadata for {len(agents_needing_sync)} agents to version {current_config.version_tag}")
+            logger.info(
+                f"Updating metadata for {len(agents_needing_sync)} agents to version {current_config.version_tag}"
+            )
             
             if dry_run:
                 return SyncResult(
@@ -66,7 +68,7 @@ class SunaSyncService:
                         current_config.version_tag
                     )
                     success_count += 1
-                    logger.info(f"鉁?Updated metadata for agent {agent.agent_id}")
+                    logger.info(f"Updated metadata for agent {agent.agent_id}")
                 except Exception as e:
                     failed_count += 1
                     error_msg = f"Failed to update agent {agent.agent_id}: {str(e)}"
@@ -89,7 +91,7 @@ class SunaSyncService:
             return SyncResult(success=False, errors=[error_msg])
     
     async def install_for_all_missing_users(self) -> SyncResult:
-        logger.info("馃殌 Installing Suna agents for users who don't have them")
+        logger.info("Installing Hephaestus agents for users who do not have them")
         
         try:
             current_config = self.config_manager.get_current_config()
@@ -102,10 +104,10 @@ class SunaSyncService:
             if not missing_accounts:
                 return SyncResult(
                     success=True,
-                    details=[{"message": "All users already have Suna agents"}]
+                        details=[{"message": "All users already have Hephaestus agents"}]
                 )
             
-            logger.info(f"馃摝 Installing Suna for {len(missing_accounts)} users")
+            logger.info(f"Installing Hephaestus for {len(missing_accounts)} users")
             
             success_count = 0
             failed_count = 0
@@ -118,7 +120,7 @@ class SunaSyncService:
                         current_config.version_tag
                     )
                     success_count += 1
-                    logger.info(f"鉁?Installed Suna for user {account_id}")
+                    logger.info(f"Installed Hephaestus for user {account_id}")
                 except Exception as e:
                     failed_count += 1
                     error_msg = f"Failed to install for user {account_id}: {str(e)}"
@@ -154,7 +156,7 @@ class SunaSyncService:
                 "agents_needing_sync": len(agents_needing_sync),
                 "version_distribution": stats.get("version_distribution", {}),
                 "last_sync": stats.get("last_updated", "unknown"),
-                "note": "System prompt & tools always current from SunaConfig"
+                "note": "System prompt and tools are kept current from the central config"
             }
             
         except Exception as e:

@@ -84,14 +84,14 @@ export function DashboardContent() {
   const enabledEnvironment = isStagingMode() || isLocalMode();
 
   useEffect(() => {
-    console.log('馃殌 Dashboard effect:', { 
+    console.log('Dashboard effect:', { 
       agentsLength: agents.length, 
       selectedAgentId, 
       agents: agents.map(a => ({ id: a.agent_id, name: a.name, isDefault: a.metadata?.is_suna_default })) 
     });
     
     if (agents.length > 0) {
-      console.log('馃摓 Calling initializeFromAgents');
+      console.log('Calling initializeFromAgents');
       initializeFromAgents(agents, undefined, setSelectedAgent);
     }
   }, [agents, initializeFromAgents, setSelectedAgent]);
@@ -222,7 +222,7 @@ export function DashboardContent() {
               <div className="w-full max-w-[650px] flex flex-col items-center justify-center space-y-4 md:space-y-6">
                 <div className="flex flex-col items-center text-center w-full">
                   <p className="tracking-tight text-2xl md:text-3xl font-normal text-muted-foreground/80">
-                    浠婂ぉ鎴戣兘甯偍鍋氫粈涔堬紵
+                    今天我能帮您做些什么？
                   </p>
                 </div>
                 <div className="w-full">
@@ -230,7 +230,7 @@ export function DashboardContent() {
                     ref={chatInputRef}
                     onSubmit={handleSubmit}
                     loading={isSubmitting}
-                    placeholder="璇峰湪杩欓噷鎻忚堪鎮ㄩ渶瑕佹垜甯姪鎮ㄥ仛浠€涔?...."
+                    placeholder="请在这里描述您需要我帮助完成的任务..."
                     value={inputValue}
                     onChange={setInputValue}
                     hideAttachments={false}

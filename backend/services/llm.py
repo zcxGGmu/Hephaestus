@@ -616,7 +616,7 @@ async def make_adk_api_call(
     logger.info(f"Model created successfully: model={resolved_model}, provider={provider}")
 
     # 鎻愬彇 system_prompt
-    agent_instruction = "浣犳槸鎴戠殑AI鍔╂墜锛岃鏍规嵁鐢ㄦ埛鐨勯棶棰樼粰鍑哄洖绛斻€?  # 榛樿鍊?
+    agent_instruction = "You are a helpful AI assistant. Please answer the user's question."
     for msg in messages:
         if msg.get('role') == 'system':
             agent_instruction = msg.get('content', agent_instruction)
@@ -680,7 +680,7 @@ async def make_adk_api_call(
 
     logger.info(f"Agent created successfully: {agent}")
 
-    logger.info(f"agent_info锛歿agent}")
+    logger.info(f"agent_info: {agent}")
 
     # 璁剧疆鏁版嵁搴撲細璇濇湇鍔?
     try:

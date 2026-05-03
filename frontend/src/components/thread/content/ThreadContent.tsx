@@ -325,18 +325,18 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
         : "flex-1 overflow-y-auto scrollbar-thin scrollbar-track-secondary/0 scrollbar-thumb-primary/10 scrollbar-thumb-rounded-full hover:scrollbar-thumb-primary/10 py-4 pb-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60";
 
     // In playback mode, we use visibleMessages instead of messages
-    // 杩囨护鎷嗗垎鐨刟ssistant娑堟伅锛屽彧鏄剧ず涓绘秷鎭?
+    // Filter split assistant messages and only render the primary one.
     const filteredMessages = messages.filter(message => {
-        // 瀵逛簬assistant娑堟伅锛屾鏌ユ槸鍚︿负鎷嗗垎娑堟伅
+        // For assistant messages, check whether the message represents split content.
         if (message.type === 'assistant' && message.metadata) {
             try {
                 const metadata = JSON.parse(message.metadata);
-                // 濡傛灉鏄媶鍒嗘秷鎭笖涓嶆槸涓绘秷鎭紙tool_index > 0锛夛紝鍒欒繃婊ゆ帀
+                // Drop split child messages when tool_index > 0.
                 if (metadata.split_for_frontend === true && metadata.tool_index > 0) {
                     return false;
                 }
             } catch (e) {
-                // metadata瑙ｆ瀽澶辫触鏃朵繚鐣欐秷鎭?
+                // Keep the message if metadata parsing fails.
             }
         }
         return true;
@@ -352,7 +352,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                 name: 'Agent Builder',
                 avatar: (
                     <div className="h-5 w-5 flex items-center justify-center rounded text-xs">
-                        <span className="text-lg">馃</span>
+                        <span className="text-lg">🤖</span>
                     </div>
                 )
             };
@@ -371,7 +371,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                 name: 'Agent Builder',
                 avatar: (
                     <div className="h-5 w-5 flex items-center justify-center rounded text-xs">
-                        <span className="text-lg">馃</span>
+                        <span className="text-lg">🤖</span>
                     </div>
                 )
             };
@@ -511,7 +511,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
     const shouldShowEmpty = displayMessages.length === 0 && !streamingTextContent && !streamingToolCall &&
         !streamingText && !currentToolCall && agentStatus === 'idle';
     
-    console.log('馃攳 [ThreadContent] 鏈€缁堢姸鎬?', {
+    console.log('[ThreadContent] Final state:', {
         displayMessagesLength: displayMessages.length,
         shouldShowEmpty,
         agentStatus
@@ -834,13 +834,13 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                                                                         const parsedContent = safeJsonParse<ParsedContent>(message.content, {});
                                                                         const msgKey = message.message_id || `submsg-assistant-${msgIndex}`;
 
-                                                                        // 鍖哄垎娴佸紡娑堟伅鍜屽巻鍙叉秷鎭殑澶勭悊閫昏緫
+                                                                        // Separate streaming-message handling from historical-message handling.
                                                                         let finalContent;
                                                                         if (msgKey.includes('streaming') || msgKey.includes('playback')) {
-                                                                            // 娴佸紡娑堟伅锛氫娇鐢ㄨВ鏋愬悗鐨勫唴瀹?
+                                                                            // Streaming message: use parsed content.
                                                                             finalContent = parsedContent.content;
                                                                         } else {
-                                                                            // 鍘嗗彶娑堟伅锛氫紭鍏堜娇鐢ㄨВ鏋愬悗鐨勫唴瀹癸紝澶辫触鍒欎娇鐢ㄥ師濮嬪唴瀹?
+                                                                            // Historical message: prefer parsed content and fall back to raw content.
                                                                             finalContent = parsedContent.content || message.content;
                                                                         }
                                                                         

@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     template: `%s - ${siteConfig.name}`,
   },
   description:
-    'Hephaestus 鏄竴涓€氱敤鏅鸿兘浣撶郴缁燂紝甯姪浣犺交鏉惧畬鎴愮幇瀹炰笘鐣岀殑浠诲姟銆傞€氳繃鑷劧瀵硅瘽锛孎uFanManus 鎴愪负浣犵殑鏁板瓧浼翠荆锛岃繘琛岀爺绌躲€佹暟鎹垎鏋愬拰鏃ュ父鎸戞垬銆?,
+    'Hephaestus is an open-source generalist AI workspace for research, automation, analysis, and everyday tasks.',
   keywords: [
     'AI',
     'artificial intelligence',

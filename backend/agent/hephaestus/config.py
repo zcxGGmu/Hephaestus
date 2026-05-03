@@ -5,7 +5,7 @@ from agent.prompt import SYSTEM_PROMPT
 class HephaestusConfig:
     NAME = "Hephaestus"
     DESCRIPTION = "Hephaestus is your AI assistant with access to various tools and integrations to help you with tasks across domains."
-    AVATAR = "馃尀"
+    AVATAR = "🤖"
     AVATAR_COLOR = "#F59E0B"
     DEFAULT_MODEL = "DeepSeek/DeepSeek-chat"
     SYSTEM_PROMPT = SYSTEM_PROMPT

@@ -27,8 +27,16 @@ from utils.config import config, EnvMode
 from collections import OrderedDict
 # from pydantic import BaseModel
 from flags import api as feature_flags_api
-from agent import api as agent_api
-from sandbox import api as sandbox_api
+try:
+    from agent import api as agent_api
+except Exception as exc:
+    agent_api = None
+    logger.warning(f"Agent API disabled during startup: {exc}")
+try:
+    from sandbox import api as sandbox_api
+except Exception as exc:
+    sandbox_api = None
+    logger.warning(f"Sandbox API disabled during startup: {exc}")
 # from services import transcription as transcription_api
 # from services import api_keys_api
 from utils.simple_auth_middleware import get_current_user_id_from_jwt
@@ -57,18 +65,20 @@ async def lifespan(app: FastAPI):
             logger.error(f"Failed to initialize Redis connection: {e}")
 
         # 初始化Agent
-        agent_api.initialize(
-            db,
-            instance_id
-        )
+        if agent_api is not None:
+            agent_api.initialize(
+                db,
+                instance_id
+            )
 
         # sandbox_api.initialize(db)
         
         # 初始化triggers API
         # 触发器组件，用于触发工作流执行（基于ADK可以省略大部分的触发器工作流）
         try:
-            triggers_api.initialize(db)
-            logger.info("Triggers API initialized successfully")
+            if triggers_api is not None:
+                triggers_api.initialize(db)
+                logger.info("Triggers API initialized successfully")
         except Exception as e:
             logger.warning(f"Triggers API initialization skipped: {e}")
         
@@ -76,7 +86,8 @@ async def lifespan(app: FastAPI):
         
         # 清理Agent资源
         logger.info("Cleaning up agent resources")
-        await agent_api.cleanup()
+        if agent_api is not None:
+            await agent_api.cleanup()
         
         # 清理Redis连接
         try:
@@ -162,15 +173,27 @@ api_router.include_router(auth_router)
 api_router.include_router(feature_flags_api.router)
 
 # Include all API routers without individual prefixes
-api_router.include_router(agent_api.router)
+if agent_api is not None:
+    api_router.include_router(agent_api.router)
 
 # Include agent versioning router
-from agent.versioning.api import router as versioning_router
-api_router.include_router(versioning_router)  
-api_router.include_router(sandbox_api.router)
+try:
+    from agent.versioning.api import router as versioning_router
+except Exception as exc:
+    versioning_router = None
+    logger.warning(f"Agent versioning API disabled during startup: {exc}")
+if versioning_router is not None:
+    api_router.include_router(versioning_router)
+if sandbox_api is not None:
+    api_router.include_router(sandbox_api.router)
 
-from triggers import api as triggers_api
-api_router.include_router(triggers_api.router)
+try:
+    from triggers import api as triggers_api
+except Exception as exc:
+    triggers_api = None
+    logger.warning(f"Triggers API disabled during startup: {exc}")
+if triggers_api is not None:
+    api_router.include_router(triggers_api.router)
 
 # api_router.include_router(api_keys_api.router)
 
